@@ -3,7 +3,7 @@
   "title": "Loop 2025",
   "description": "We make game, but faster!",
   "itch": {
-    "upload": itch,
+    "upload": true,
     "username": "golen",
     "game": "loop-2025"
   },
