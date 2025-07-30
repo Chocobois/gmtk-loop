@@ -1,11 +1,11 @@
 {
   "team": "Chocobois",
-  "title": "Game Jam Template",
+  "title": "Loop 2025",
   "description": "We make game, but faster!",
   "itch": {
-    "upload": false,
-    "username": "username",
-    "game": "game-name"
+    "upload": itch,
+    "username": "golen",
+    "game": "loop-2025"
   },
   "neutralino": {
     "allow": ["app.exit", "window.center", "storage.*"],
