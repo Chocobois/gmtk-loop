@@ -32,11 +32,13 @@ const images: Image[] = [
 	image("characters/runes/r9", "r9"),
 
 	// Monsters
-	image("character/enemy/placeholder_enemy", "enemy_placeholder"),
+	// Planning on making monsters a 1 file spritesheet
+	
+	image("characters/enemy/placeholder_enemy", "enemy_placeholder"),
 		// Attacks
-		image("character/enemy/placeholder_attack", "projectile_placeholder"),
+		image("characters/enemy/placeholder_attack", "projectile_placeholder"),
 		// Hazards (spritesheets 512px * Y (how many frames))
-		image("character/enemy/placeholder_hazard", "hazard_placeholder"), 
+		image("characters/enemy/placeholder_hazard", "hazard_placeholder"), 
 
 	// Items
 	image("items/coin", "coin"),
