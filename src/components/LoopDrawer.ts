@@ -5,11 +5,16 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	public scene: GameScene;
 
 	private points: Phaser.Math.Vector2[] = [];
+	private pointTimes: number[] = [];
 	private maxLength: number = 1600;
 
 	private inputArea: Phaser.GameObjects.Rectangle;
 	private graphics: Phaser.GameObjects.Graphics;
 	private cursor: Phaser.GameObjects.Image;
+
+	private sfxLoop: Phaser.Sound.WebAudioSound;
+	private sfxTween: Phaser.Tweens.Tween;
+	private sfxPanIntensity: number = 0.3;
 
 	constructor(scene: GameScene) {
 		super(scene);
@@ -29,13 +34,43 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		this.graphics = scene.add.graphics();
 
 		this.cursor = scene.add.image(0, 0, "cursor");
+
+		// Use the `d_sine` key for sound debugging
+		this.sfxLoop = scene.sound.add("d_brush", {loop: true}) as Phaser.Sound.WebAudioSound;
+
+		this.sfxTween = this.scene.tweens.add({
+			targets: this.sfxLoop,
+			volume: {from: 1, to: 0},
+			duration: 200,
+			persist: true,
+			paused: true,
+			onComplete: () => {
+				this.sfxLoop.stop();
+				this.sfxLoop.setVolume(1);
+			},
+			onStop: () => {
+				this.sfxLoop.setVolume(1);
+			}
+		})
 	}
 
-	update(time: number, delta: number) {}
+	update(time: number, delta: number) {
+		if (this.pointTimes.length > 0) {
+			const sinceLastMove = time - (this.pointTimes.at(-1) ?? (time-1));
+
+			// SFX timeout
+			if (sinceLastMove > 60) this.sfxFadeOut(100);
+		}
+	}
 
 	touchStart(pointer: Phaser.Input.Pointer) {
 		this.cursor.setVisible(true).setPosition(pointer.x, pointer.y);
 		this.points = [new Phaser.Math.Vector2(pointer.x, pointer.y)];
+		this.pointTimes = [pointer.time];
+
+		this.scene.sound.play("d_tap", {
+			pan: this.sfxPanIntensity * this.scene.getPan(pointer.x)
+		});
 	}
 
 	touchDrag(pointer: Phaser.Input.Pointer) {
@@ -44,9 +79,10 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		this.cursor.setPosition(pointer.x, pointer.y);
 
 		const lastPoint = this.points[this.points.length - 1];
-		const dx = pointer.x - lastPoint.x;
+		/* const dx = pointer.x - lastPoint.x;
 		const dy = pointer.y - lastPoint.y;
-		const dist = Math.sqrt(dx * dx + dy * dy);
+		const dist = Math.sqrt(dx * dx + dy * dy); */
+		const dist = lastPoint.distance(pointer)
 
 		const currentLine = new Phaser.Geom.Line(
 			pointer.x,
@@ -63,6 +99,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 			if (Phaser.Geom.Intersects.LineToLine(currentLine, segment)) {
 				this.onLoop(this.points.slice(i));
 				this.points = this.points.slice(0, Math.max(i, 1));
+				this.pointTimes = [pointer.time];
 				return;
 			}
 		}
@@ -82,6 +119,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 				startPoint,
 				new Phaser.Math.Vector2(currentLine.x1, currentLine.y1),
 			];
+			this.pointTimes = [pointer.time];
 		} else {
 			let totalDist = Phaser.Geom.Line.Length(currentLine);
 			for (let i = this.points.length - 1; i > 0; i--) {
@@ -98,6 +136,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 		if (dist >= 20) {
 			this.points.push(new Phaser.Math.Vector2(pointer.x, pointer.y));
+			this.pointTimes.push(pointer.time);
 			// this.curve.lineTo(pointer.x, pointer.y);
 		}
 
@@ -113,9 +152,67 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		});
 		this.graphics.lineTo(pointer.x, pointer.y);
 		this.graphics.strokePath();
+
+		// Sound stuff
+
+		this.sfxTween.stop() // Cancel SFX fade-out
+		if (!this.sfxLoop.isPlaying) this.sfxLoop.play();
+
+		this.sfxLoop.setPan(this.sfxPanIntensity * this.scene.getPan(pointer.x, true));
+
+		// Dynamic sound playing rate (pitch)
+		const minRate = 0.2;
+		const maxRate = 10;
+		const recentTargetSpan = 500; // Get average speed from last 500ms worth of points
+
+		if (this.pointTimes.length < 2) {
+			this.sfxLoop.setRate(minRate);
+		} else {
+			// Todo: somehow calculate the rate from drawn cycles per second instead
+
+			// Get points from roughly the last 500ms
+			let recentWindowSize = this.pointTimes.length;
+			for (let i = this.pointTimes.length - 1; i > 0; i--) {
+				const span = this.pointTimes[this.pointTimes.length - 1] - this.pointTimes[i];
+				if (span > recentTargetSpan) {
+					recentWindowSize = this.pointTimes.length - i;
+					break;
+				}
+			}
+
+			const recentPoints = this.points.slice(-recentWindowSize);
+			const recentPointTimes = this.pointTimes.slice(-recentWindowSize);
+
+			let recentDist = 0;
+			for (let i = 1; i < recentPoints.length; i++) {
+				const p0 = recentPoints[i - 1];
+				const p1 = recentPoints[i];
+				recentDist += Phaser.Math.Distance.Between(p0.x, p0.y, p1.x, p1.y);
+			}
+
+			const recentSpan = Math.max(...recentPointTimes) - Math.min(...recentPointTimes);
+			const recentSpeed = 1000 * Phaser.Math.GetSpeed(recentDist, recentSpan);
+
+			/* console.debug({
+				len: this.pointTimes.length,
+				window: recentWindowSize,
+				dist: Math.round(recentDist),
+				span: Math.round(recentTimeSpan),
+				speed: Number(recentSpeed.toFixed(4)),
+				times: recentPointTimes
+			}) */
+
+			// The sound clip has 4 loops per 4.745 seconds -> about 0.843 loops/sec
+			this.sfxLoop.setRate(Phaser.Math.Clamp(0.843*recentSpeed, minRate, maxRate));
+
+		}
 	}
 
 	touchEnd(pointer: Phaser.Input.Pointer) {
+		this.scene.sound.play("d_raise", {
+			pan: this.sfxPanIntensity * this.scene.getPan(pointer.x)
+		});
+
 		this.onLineBreak();
 	}
 
@@ -144,7 +241,9 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		this.emit("break");
 		this.cursor.setVisible(false);
 		this.points = [];
+		this.pointTimes = [];
 		this.graphics.clear();
+		this.sfxStop();
 	}
 
 	addLoopGraphic(points: Phaser.Math.Vector2[]) {
@@ -167,6 +266,21 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 				graphics.destroy();
 			},
 		});
+	}
+
+	/** Fade out the drawing loop sound @param [duration] in milliseconds */
+	sfxFadeOut(duration = this.sfxTween.duration) {
+		this.sfxTween.duration = duration;
+
+		if (this.sfxTween.isPlaying()) return;
+		this.sfxTween.restart();
+		this.sfxTween.play();
+	}
+
+	/** Abruptly stop the drawing loop sound */
+	sfxStop() {
+		this.sfxTween.stop();
+		this.sfxLoop.stop();
 	}
 
 	get lineSegments(): Phaser.Geom.Line[] {
