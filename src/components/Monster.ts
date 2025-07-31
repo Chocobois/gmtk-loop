@@ -13,6 +13,12 @@ console.assert(
 	"Max speed unreachable"
 );
 
+export interface DifficultyStats {
+	speed: number;
+	attackrate: number;
+	
+}
+
 export class Monster extends Phaser.GameObjects.Container {
 	public scene: GameScene;
 

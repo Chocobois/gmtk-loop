@@ -10,8 +10,8 @@ export class CaptureBar extends Phaser.GameObjects.Container{
     private rad: number = 220;
     private sc: number = 0.4;
 
-    private hp: number = 50;
-    private maxHP: number = 50;
+    private hp: number = 250;
+    private maxHP: number = 250;
     public captured: boolean = false;
     private runes: Phaser.GameObjects.Image[];
     public disp: Phaser.GameObjects.Container;

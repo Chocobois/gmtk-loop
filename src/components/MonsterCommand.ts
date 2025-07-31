@@ -226,7 +226,9 @@ export class MonsterCommand
     }
 
     resetVariables() {
+        this.pend = false;
         this.step = 0;
+        this.timer = 0;
         this.variableMap = new Map<string, MonsterAction>();
     }
 }
