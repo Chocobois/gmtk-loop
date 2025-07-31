@@ -3,14 +3,22 @@ import { Monster } from "@/components/Monster";
 import { LoopDrawer } from "@/components/LoopDrawer";
 import { UI } from "@/components/UI";
 import { TextParticle, TextParticleEffects } from "@/components/TextParticle";
+import { Effect } from "@/components/Effect";
+import { EffectTracker } from "@/components/EffectTracker";
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
 	private entities: Monster[];
+	private entityLayer: Phaser.GameObjects.Container;
 	private loopDrawer: LoopDrawer;
+
 	// private ui: UI;
 	private debugGraphics: Phaser.GameObjects.Graphics;
 	private textParticles: TextParticle;
+
+	private hitEffects: EffectTracker;
+	private projectiles: EffectTracker;
+	private indicators: EffectTracker;
 
 	//we should have a player or something to store your current damage and powerups and such
 	private dmg: number = 123;
@@ -28,9 +36,11 @@ export class GameScene extends BaseScene {
 		this.fitToScreen(this.background);
 
 		this.entities = [];
-		this.addMonster(300, 300);
+		this.entityLayer = new Phaser.GameObjects.Container(this,0,0);
+		this.add.existing(this.entityLayer);
+		//this.addMonster(300, 300);
 		this.addMonster(960, 540);
-		this.addMonster(1620, 780);
+		//this.addMonster(1620, 780);
 
 		this.loopDrawer = new LoopDrawer(this);
 		this.loopDrawer.on("loop", this.onLoop, this);
@@ -38,9 +48,34 @@ export class GameScene extends BaseScene {
 
 		this.textParticles = new TextParticle(this);
 
+
 		// this.ui = new UI(this);
 
 		this.debugGraphics = this.add.graphics();
+
+		this.initGraphics();
+
+
+	}
+
+	initGraphics(){
+
+
+		this.background.setDepth(0);
+		this.entityLayer.setDepth(19);
+		this.textParticles.setDepth(20);
+
+		this.indicators = new EffectTracker(this,0,0);
+		this.add.existing(this.indicators);
+		this.indicators.setDepth(12);
+
+		this.projectiles = new EffectTracker(this,0,0);
+		this.add.existing(this.projectiles);
+		this.projectiles.setDepth(15);
+
+		this.hitEffects = new EffectTracker(this,0,0);
+		this.add.existing(this.hitEffects);
+		this.hitEffects.setDepth(16);
 	}
 
 	update(time: number, delta: number) {
@@ -51,6 +86,29 @@ export class GameScene extends BaseScene {
 		this.textParticles.update(time, delta);
 
 		this.drawColliders();
+		this.updateEffects(time, delta);
+	}
+
+	pushHitEffect(e: Effect){
+		this.hitEffects.pushEffect(e);
+	}
+
+	pushProjectile(e: Effect){
+		this.projectiles.pushEffect(e);
+	}
+
+	pushIndicator(e: Effect){
+		this.indicators.pushEffect(e);
+	}
+
+	updateEffects(t: number, d: number) {
+		this.indicators.update(t,d);
+		this.hitEffects.update(t,d);
+		this.projectiles.update(t,d);
+	}
+
+	addToEntityLayer(p: Phaser.GameObjects.Container){
+		this.entityLayer.add(p);
 	}
 
 	addMonster(x: number, y: number) {
@@ -58,6 +116,7 @@ export class GameScene extends BaseScene {
 		monster.on("action", () => {
 			monster.doABarrelRoll();
 		});
+		this.entityLayer.add(monster);
 		this.entities.push(monster);
 	}
 

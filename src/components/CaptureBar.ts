@@ -27,9 +27,9 @@ export class CaptureBar extends Phaser.GameObjects.Container{
 
         this.runes = [];
         for(let i = 0; i < this.maxCycles; i++){
-            this.runes.push(new Phaser.GameObjects.Image(this.scene, this.rad*Math.cos(i*(2*Math.PI/this.maxCycles)), 
-                this.rad*Math.sin(i*(2*Math.PI/this.maxCycles)),"r"+i));
-            this.runes[i].setAngle(90+i*(360/this.maxCycles));
+            this.runes.push(new Phaser.GameObjects.Image(this.scene, this.rad*Math.cos((-Math.PI/2)+i*(2*Math.PI/this.maxCycles)), 
+                this.rad*Math.sin((-Math.PI/2)+i*(2*Math.PI/this.maxCycles)),"r"+i));
+            this.runes[i].setAngle(i*(360/this.maxCycles));
             this.runes[i].setScale(this.sc);
             this.runes[i].setAlpha(0.25);
             this.disp.add(this.runes[i]);
@@ -42,6 +42,7 @@ export class CaptureBar extends Phaser.GameObjects.Container{
         this.ring.add(this.cc);
 
         this.cc.lineStyle(16,0x9EFFD7,1);
+        this.cc.fillStyle(0xFFFFFF,1);
         this.cc.beginPath();
         this.cc.arc(0,0,265,0,360,false,0.01);
         this.cc.closePath();
@@ -68,6 +69,12 @@ export class CaptureBar extends Phaser.GameObjects.Container{
         this.ring.setAlpha(0.35);
 
 
+        /*
+        this.cc.beginPath();
+        this.cc.slice(0,0,400,Phaser.Math.DegToRad(-1*(90/2)),Phaser.Math.DegToRad((90/2)),false,0);
+        this.cc.closePath();
+        this.cc.fillPath();
+        */
 
     }
 

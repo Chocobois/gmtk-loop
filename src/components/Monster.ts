@@ -1,6 +1,8 @@
 import { GameScene } from "@/scenes/GameScene";
 import { score } from "@/state/ScoreState";
 import { CaptureBar } from "./CaptureBar";
+import { WedgeIndicator } from "./Indicators/WedgeIndicator";
+import { MonsterScriptHandler } from "./MonsterScriptHandler";
 
 const ACCELERATION = 150;
 const MAX_SPEED = 400;
@@ -27,6 +29,9 @@ export class Monster extends Phaser.GameObjects.Container {
 	private border: { [key: string]: number };
 
 	private captureDisp: CaptureBar;
+	private behavior: MonsterScriptHandler;
+
+	private t: number = 2000;
 
 	constructor(scene: GameScene, x: number, y: number) {
 		super(scene, x, y);
@@ -35,9 +40,9 @@ export class Monster extends Phaser.GameObjects.Container {
 
 		/* Sprite */
 		this.spriteSize = 200;
-		this.sprite = this.scene.add.sprite(0, 0, "player");
-		this.sprite.setOrigin(0.5, 1.0);
-		this.sprite.y += this.spriteSize / 2;
+		this.sprite = this.scene.add.sprite(0, 0, "enemy_1");
+		this.sprite.setOrigin(0.5, 0.5);
+		//this.sprite.y += this.spriteSize / 2;
 		this.sprite.setScale(this.spriteSize / this.sprite.width);
 		this.add(this.sprite);
 
@@ -51,6 +56,7 @@ export class Monster extends Phaser.GameObjects.Container {
 		};
 
 		this.captureDisp = new CaptureBar(this.scene,this.x,this.y,this);
+		this.behavior = new MonsterScriptHandler(this,"sans");
 	}
 
 	update(time: number, delta: number) {
@@ -76,8 +82,9 @@ export class Monster extends Phaser.GameObjects.Container {
 		this.setScale(1.0, squish);
 
 		this.captureDisp.update(time, delta);
-	}
+		this.behavior.update(time,delta);
 
+	}
 	damage(amount: number) {
 		console.log("Monster damaged by", amount);
 		this.scene.textParticle(this.x + Math.random()*50, this.y+Math.random()*50, "OrangeRed", ""+amount);
@@ -105,6 +112,6 @@ export class Monster extends Phaser.GameObjects.Container {
 	}
 
 	get colliders(): Phaser.Geom.Circle[] {
-		return [this.collider.setTo(this.x, this.y + 20, 75)];
+		return [this.collider.setTo(this.x, this.y, 75)];
 	}
 }
