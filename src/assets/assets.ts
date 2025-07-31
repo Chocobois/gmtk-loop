@@ -64,6 +64,10 @@ const audios: Audio[] = [
 	music("title", "m_main_menu"),
 	music("first", "m_first"),
 	sound("tree/rustle", "t_rustle", 0.5),
+	sound("drawing/sine", "d_sine", 0.3),
+	sound("drawing/brush", "d_brush"),
+	sound("drawing/raise", "d_raise"),
+	sound("drawing/tap", "d_tap"),
 ];
 
 /* Fonts */
