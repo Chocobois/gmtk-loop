@@ -6,9 +6,20 @@ const images: Image[] = [
 	// Backgrounds
 	image("backgrounds/background", "background"),
 	image("backgrounds/bz", "bz"),
+	
+	// Biomes, combat background
+	image("backgrounds/battlefloor/grassyplains", "background_plains_0"),
+	image("backgrounds/battlefloor/grassyplains_alt1", "background_plains_1"),
+	image("backgrounds/battlefloor/grassyplains_alt2", "background_plains_2"),
+	image("backgrounds/battlefloor/grassyplains_alt3", "background_plains_3"),
+	image("backgrounds/battlefloor/grassyplains_alt4", "background_plains_4"),
+
+	image("backgrounds/battlefloor/stone", "background_stone_0"),
 
 	// Characters
 	image("characters/player", "player"),
+
+	//Runes
 	image("characters/runes/r0", "r0"),
 	image("characters/runes/r1", "r1"),
 	image("characters/runes/r2", "r2"),
@@ -19,6 +30,13 @@ const images: Image[] = [
 	image("characters/runes/r7", "r7"),
 	image("characters/runes/r8", "r8"),
 	image("characters/runes/r9", "r9"),
+
+	// Monsters
+	image("character/enemy/placeholder_enemy", "enemy_placeholder"),
+		// Attacks
+		image("character/enemy/placeholder_attack", "projectile_placeholder"),
+		// Hazards (spritesheets 512px * Y (how many frames))
+		image("character/enemy/placeholder_hazard", "hazard_placeholder"), 
 
 	// Items
 	image("items/coin", "coin"),
