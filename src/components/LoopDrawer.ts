@@ -133,7 +133,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	}
 
 	onLoop(points: Phaser.Math.Vector2[]) {
-		const polygonStr = this.points.map((p) => `${p.x} ${p.y}`).join(" ");
+		const polygonStr = points.map((p) => `${p.x} ${p.y}`).join(" ");
 		const polygon = new Phaser.Geom.Polygon(polygonStr);
 		this.emit("loop", polygon);
 
