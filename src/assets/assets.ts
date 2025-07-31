@@ -9,6 +9,7 @@ const images: Image[] = [
 
 	// Characters
 	image("characters/player", "player"),
+	image("characters/enemy_1", "enemy_1"),
 	image("characters/runes/r0", "r0"),
 	image("characters/runes/r1", "r1"),
 	image("characters/runes/r2", "r2"),
@@ -22,6 +23,7 @@ const images: Image[] = [
 
 	// Items
 	image("items/coin", "coin"),
+	image("items/pbullet", "pbullet"),
 	image("items/spellback", "spellback"),
 	image("items/spellhighlight", "spellhighlight"),
 
@@ -44,6 +46,7 @@ const audios: Audio[] = [
 	music("title", "m_main_menu"),
 	music("first", "m_first"),
 	sound("tree/rustle", "t_rustle", 0.5),
+	sound("tree/machinegun", "machinegun", 0.5),
 ];
 
 /* Fonts */
