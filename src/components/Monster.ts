@@ -1,5 +1,6 @@
 import { GameScene } from "@/scenes/GameScene";
 import { score } from "@/state/ScoreState";
+import { CaptureBar } from "./CaptureBar";
 
 const ACCELERATION = 150;
 const MAX_SPEED = 400;
@@ -25,6 +26,8 @@ export class Monster extends Phaser.GameObjects.Container {
 	public velocity: Phaser.Math.Vector2;
 	private border: { [key: string]: number };
 
+	private captureDisp: CaptureBar;
+
 	constructor(scene: GameScene, x: number, y: number) {
 		super(scene, x, y);
 		scene.add.existing(this);
@@ -46,6 +49,8 @@ export class Monster extends Phaser.GameObjects.Container {
 			top: 100,
 			bottom: scene.H - 100,
 		};
+
+		this.captureDisp = new CaptureBar(this.scene,this.x,this.y,this);
 	}
 
 	update(time: number, delta: number) {
@@ -69,10 +74,15 @@ export class Monster extends Phaser.GameObjects.Container {
 		// Animation (Change to this.sprite.setScale if needed)
 		const squish = 1.0 + 0.02 * Math.sin((6 * time) / 1000);
 		this.setScale(1.0, squish);
+
+		this.captureDisp.update(time, delta);
 	}
 
 	damage(amount: number) {
 		console.log("Monster damaged by", amount);
+		this.scene.textParticle(this.x + Math.random()*50, this.y+Math.random()*50, "OrangeRed", ""+amount);
+		console.log("Particle");
+		this.captureDisp.takeDamage(amount);
 		this.doABarrelRoll();
 	}
 

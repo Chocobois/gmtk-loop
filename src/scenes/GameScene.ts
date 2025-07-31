@@ -5,12 +5,15 @@ import { UI } from "@/components/UI";
 import { TextParticle, TextParticleEffects } from "@/components/TextParticle";
 
 export class GameScene extends BaseScene {
-	// private background: Phaser.GameObjects.Image;
+	private background: Phaser.GameObjects.Image;
 	private entities: Monster[];
 	private loopDrawer: LoopDrawer;
 	// private ui: UI;
 	private debugGraphics: Phaser.GameObjects.Graphics;
 	private textParticles: TextParticle;
+
+	//we should have a player or something to store your current damage and powerups and such
+	private dmg: number = 123;
 
 	constructor() {
 		super({ key: "GameScene" });
@@ -20,9 +23,9 @@ export class GameScene extends BaseScene {
 		this.fade(false, 200, 0x000000);
 
 		this.cameras.main.setBackgroundColor(0xffffff);
-		// this.background = this.add.image(0, 0, "background");
-		// this.background.setOrigin(0);
-		// this.fitToScreen(this.background);
+		this.background = this.add.image(0, 0, "bz");
+		this.background.setOrigin(0);
+		this.fitToScreen(this.background);
 
 		this.entities = [];
 		this.addMonster(300, 300);
@@ -61,9 +64,10 @@ export class GameScene extends BaseScene {
 	onLoop(polygon: Phaser.Geom.Polygon) {
 		this.entities.forEach((entity) => {
 			if (Phaser.Geom.Polygon.Contains(polygon, entity.x, entity.y)) {
-				entity.doABarrelRoll();
-				this.textParticle(entity.x, entity.y, "OrangeRed", "123");
-				console.log("Particle");
+				//entity.doABarrelRoll();
+				if(entity instanceof Monster){
+					entity.damage(this.dmg);
+				}
 			}
 		});
 	}
