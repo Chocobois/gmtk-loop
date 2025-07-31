@@ -71,7 +71,7 @@ export class BaseScene extends Phaser.Scene {
 		fontFamily = "Game Font",
 		x = 0,
 		y = 0,
-		size = 12,
+		size = 32,
 		weight = 500,
 		color = "#FFFFFF",
 		alpha = 1.0,
@@ -104,6 +104,12 @@ export class BaseScene extends Phaser.Scene {
 			fontSize: Math.max(size*10, 1) + "px",
 			color: color
 		}).setLineSpacing(0.4*size).setPadding(2).setScale(0.1);
+	}
+
+	// Map X position to sound panning
+	getPan(x: number, clamp=true): number {
+		const lerp = Phaser.Math.Linear(-1, 1, x / this.W);
+		return clamp ? Phaser.Math.Clamp(lerp, -1, 1) : lerp;
 	}
 
 	// Returns width of screen

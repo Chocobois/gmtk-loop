@@ -49,6 +49,9 @@ const images: Image[] = [
 	image("ui/hud", "hud"),
 	image("ui/cursor", "cursor"),
 
+	// World hub
+	image("hub/level", "hub_level"),
+
 	// Titlescreen
 	image("titlescreen/sky", "title_sky"),
 	image("titlescreen/background", "title_background"),
@@ -64,6 +67,10 @@ const audios: Audio[] = [
 	music("title", "m_main_menu"),
 	music("first", "m_first"),
 	sound("tree/rustle", "t_rustle", 0.5),
+	sound("drawing/sine", "d_sine", 0.3),
+	sound("drawing/brush", "d_brush"),
+	sound("drawing/raise", "d_raise"),
+	sound("drawing/tap", "d_tap"),
 	sound("tree/machinegun", "machinegun", 0.5),
 ];
 
