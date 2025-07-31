@@ -49,6 +49,9 @@ const images: Image[] = [
 	image("ui/hud", "hud"),
 	image("ui/cursor", "cursor"),
 
+	// World hub
+	image("hub/level", "hub_level"),
+
 	// Titlescreen
 	image("titlescreen/sky", "title_sky"),
 	image("titlescreen/background", "title_background"),

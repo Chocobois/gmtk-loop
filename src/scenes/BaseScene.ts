@@ -71,7 +71,7 @@ export class BaseScene extends Phaser.Scene {
 		fontFamily = "Game Font",
 		x = 0,
 		y = 0,
-		size = 12,
+		size = 32,
 		weight = 500,
 		color = "#FFFFFF",
 		alpha = 1.0,
