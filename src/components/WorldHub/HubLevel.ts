@@ -32,8 +32,8 @@ export class HubLevel extends Entity {
 	}
 
 	onLoop() {
-		if (!this.scene)
-			return console.error("HubLevel bug");
+		if (!this.scene) return console.error("HubLevel bug");
+		if (!this.enabled) return;
 
 		// Funny bounce animation
 		this.scene.tweens.addCounter({
@@ -45,5 +45,10 @@ export class HubLevel extends Entity {
 		});
 
 		this.emit("selected", this.levelData);
+	}
+
+	setEnabled(value: boolean) {
+		super.setEnabled(value);
+		this.setAlpha(0.25);
 	}
 }

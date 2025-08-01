@@ -37,6 +37,10 @@ export class WorldScene extends BaseScene {
 			this.entities.push(hub);
 			this.hubs.push(hub);
 
+			if (!levelData.enemy) {
+				hub.setEnabled(false);
+			}
+
 			// Load level upon selecting a hub
 			hub.on("selected", this.loadLevel, this);
 		});
