@@ -48,7 +48,10 @@ export class WorldScene extends BaseScene {
 		this.loopDrawer.on("loop", this.onLoop, this);
 	}
 
-	update(time: number, delta: number) {}
+	update(time: number, delta: number) {
+		this.loopDrawer.update(time, delta);
+		// this.loopDrawer.checkCollisions(this.colliders);
+	}
 
 	loadLevel(levelData: LevelDefinition): void {
 		// Disable loop drawing
