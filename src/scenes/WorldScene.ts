@@ -98,5 +98,35 @@ export class WorldScene extends BaseScene {
 		if (selectedEntities.length === 1) {
 			selectedEntities[0].onLoop();
 		}
+
+		else {
+			// Possible easter eggs when selecting multiple levels at once
+
+			selectedEntities.forEach((e, i) => {
+				if (i == 0) return;
+				this.sound.play("u_question", {
+					volume: 0.2,
+					delay: 0.2 + 0.5 * (i-1),
+					rate: 1 + 0.25 * (i-1),
+				});
+			})
+
+			const midpoint = new Phaser.Math.Vector2(
+				Phaser.Math.Average(selectedEntities.map(e => e.x)),
+				Phaser.Math.Average(selectedEntities.map(e => e.y))
+			)
+
+			const questionMark = this.add.sprite(midpoint.x, midpoint.y, "question");
+			questionMark.setScale(0.35);
+			questionMark.setDepth(10005); // Above the loop fill
+
+			this.tweens.add({
+				targets: questionMark,
+				alpha: 0,
+				onUpdate: () => questionMark.setAngle(Math.sin(this.time.now * 0.001 * 8) * 20),
+				onComplete: () => questionMark.destroy(),
+			});
+		}
+
 	}
 }

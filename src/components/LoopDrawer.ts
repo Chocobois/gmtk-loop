@@ -1,8 +1,17 @@
 import { BaseScene } from "@/scenes/BaseScene";
 import { loopState } from "@/state/LoopState";
 
+const SFX_FADE_OUT_DURATION = 100 //ms
+const SFX_SMOOTHING_WINDOW_SIZE = 500 //ms
+const SFX_TIMEOUT = 60 //ms
+const SFX_PAN_INTENSITY = 0.3 // 30%
+
 export class LoopDrawer extends Phaser.GameObjects.Container {
 	public scene: BaseScene;
+
+	public loopColor: number = 0x0000ff;
+	public lineColor: number = 0x0000ff;
+	public lineWidth: number = 8;
 
 	private points: Phaser.Math.Vector2[] = [];
 	private pointTimes: number[] = [];
@@ -10,10 +19,11 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	private inputArea: Phaser.GameObjects.Rectangle;
 	private graphics: Phaser.GameObjects.Graphics;
 	private cursor: Phaser.GameObjects.Image;
+	private lineBroken: boolean = false;
 
+	public muted: boolean = false;
 	private sfxLoop: Phaser.Sound.WebAudioSound;
 	private sfxTween: Phaser.Tweens.Tween;
-	private sfxPanIntensity: number = 0.3;
 
 	constructor(scene: BaseScene) {
 		super(scene);
@@ -44,7 +54,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		this.sfxTween = this.scene.tweens.add({
 			targets: this.sfxLoop,
 			volume: { from: 1, to: 0 },
-			duration: 200,
+			duration: SFX_FADE_OUT_DURATION,
 			persist: true,
 			paused: true,
 			onComplete: () => {
@@ -58,11 +68,14 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	}
 
 	update(time: number, delta: number) {
+		this.sfxLoop.mute = this.muted;
+		this.graphics.lineStyle(this.lineWidth, this.lineColor);
+
 		if (this.pointTimes.length > 0) {
 			const sinceLastMove = time - (this.pointTimes.at(-1) ?? time - 1);
 
 			// SFX timeout
-			if (sinceLastMove > 60) this.sfxFadeOut(100);
+			if (sinceLastMove > SFX_TIMEOUT) this.sfxFadeOut(SFX_FADE_OUT_DURATION);
 		}
 	}
 
@@ -76,8 +89,8 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		this.points = [new Phaser.Math.Vector2(pointer.x, pointer.y)];
 		this.pointTimes = [pointer.time];
 
-		this.scene.sound.play("d_tap", {
-			pan: this.sfxPanIntensity * this.scene.getPan(pointer.x),
+		if (!this.muted) this.scene.sound.play("d_tap", {
+			pan: SFX_PAN_INTENSITY * this.scene.getPan(pointer.x),
 		});
 	}
 
@@ -149,7 +162,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		}
 
 		this.graphics.clear();
-		this.graphics.lineStyle(8, 0x0000ff);
+		this.graphics.lineStyle(this.lineWidth, this.lineColor);
 		// this.curve.draw(this.graphics);
 
 		// Draw the line from the last point to the current pointer position
@@ -167,25 +180,24 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		if (!this.sfxLoop.isPlaying) this.sfxLoop.play();
 
 		this.sfxLoop.setPan(
-			this.sfxPanIntensity * this.scene.getPan(pointer.x, true)
+			SFX_PAN_INTENSITY * this.scene.getPan(pointer.x, true)
 		);
 
 		// Dynamic sound playing rate (pitch)
 		const minRate = 0.2;
 		const maxRate = 10;
-		const recentTargetSpan = 500; // Get average speed from last 500ms worth of points
 
 		if (this.pointTimes.length < 2) {
 			this.sfxLoop.setRate(minRate);
 		} else {
 			// Todo: somehow calculate the rate from drawn cycles per second instead
 
-			// Get points from roughly the last 500ms
+			// Get average speed from last 500ms worth of points
 			let recentWindowSize = this.pointTimes.length;
 			for (let i = this.pointTimes.length - 1; i > 0; i--) {
 				const span =
 					this.pointTimes[this.pointTimes.length - 1] - this.pointTimes[i];
-				if (span > recentTargetSpan) {
+				if (span > SFX_SMOOTHING_WINDOW_SIZE) {
 					recentWindowSize = this.pointTimes.length - i;
 					break;
 				}
@@ -222,10 +234,11 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	}
 
 	touchEnd(pointer: Phaser.Input.Pointer) {
-		this.scene.sound.play("d_raise", {
-			pan: this.sfxPanIntensity * this.scene.getPan(pointer.x),
+		if (!this.muted && !this.lineBroken) this.scene.sound.play("d_raise", {
+			pan: SFX_PAN_INTENSITY * this.scene.getPan(pointer.x),
 		});
 
+		this.lineBroken = false;
 		this.onLineBreak();
 	}
 
@@ -236,6 +249,12 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		for (const collider of colliders) {
 			for (const line of this.lineSegments) {
 				if (Phaser.Geom.Intersects.LineToCircle(line, collider)) {
+					if (!this.muted) this.scene.sound.play("d_break", {
+						volume: 0.4,
+						pan: SFX_PAN_INTENSITY * this.scene.getPan(collider.x),
+					});
+					this.lineBroken = true;
+					this.fractureLineEffect()
 					return this.onLineBreak();
 				}
 			}
@@ -252,6 +271,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 	onLineBreak() {
 		this.emit("break");
+		if (!this.lineBroken) this.fadeLineEffect(); // Must be before clearing `points`
 		this.cursor.setVisible(false);
 		this.points = [];
 		this.pointTimes = [];
@@ -263,7 +283,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		const graphics = this.scene.add.graphics();
 		graphics.setDepth(10000);
 		graphics.clear();
-		graphics.fillStyle(0x0000ff, 0.5);
+		graphics.fillStyle(this.loopColor, 0.5);
 		graphics.beginPath();
 		graphics.moveTo(points[0].x, points[0].y);
 		points.forEach((point) => {
@@ -282,8 +302,77 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		});
 	}
 
+	/** Animates the line segments breaking apart */
+	fractureLineEffect() {
+		const SPREAD = 60;
+		const JITTER_AMOUNT = 10;
+
+		function jitter(number: number, amount: number = JITTER_AMOUNT) {
+			return number + Phaser.Math.FloatBetween(-amount, amount);
+		}
+
+		// Scrunkle up the newest points
+		const jitteredPoints = this.lineSegments.reverse().map((segment, i, a) => {
+			const jit = (1-(i / a.length)) * JITTER_AMOUNT;
+			segment.x1 = (i == 0) ? jitter(segment.x1, jit) : a[i-1].x2;
+			segment.y1 = (i == 0) ? jitter(segment.y1, jit) : a[i-1].y2;
+			segment.x2 = jitter(segment.x2, jit);
+			segment.y2 = jitter(segment.y2, jit);
+			return segment;
+		})
+
+		jitteredPoints.forEach((segment, i) => {
+			const fxGraphics = this.scene.add.graphics();
+			fxGraphics.setDepth(this.graphics.depth);
+
+			fxGraphics.lineStyle(this.lineWidth, this.lineColor);
+			fxGraphics.beginPath();
+			fxGraphics.moveTo(segment.x1, segment.y1);
+			fxGraphics.lineTo(segment.x2, segment.y2);
+			fxGraphics.strokePath();
+
+			this.scene.tweens.add({
+				targets: fxGraphics,
+				// scale: Phaser.Math.FloatBetween(0.95, 1.05),
+				x: jitter(fxGraphics.x, SPREAD),
+				y: jitter(fxGraphics.y, SPREAD),
+				alpha: 0,
+				delay: Math.max(0, 10*i - 50),
+				duration: 600,
+				ease: "Cubic.Out",
+				onComplete: () => fxGraphics.destroy(),
+			});
+		});
+	}
+
+	/** Animates the current points fading out */
+	fadeLineEffect() {
+		if (this.points.length == 0) return;
+
+		const fxGraphics = this.scene.add.graphics();
+		fxGraphics.setDepth(this.graphics.depth);
+
+		// Recreate what should be in this.graphics
+		fxGraphics.lineStyle(this.lineWidth, this.lineColor);
+		fxGraphics.beginPath();
+		fxGraphics.moveTo(this.points[0].x, this.points[0].y);
+		this.points.forEach((point) => fxGraphics.lineTo(point.x, point.y));
+		fxGraphics.strokePath();
+
+		// Fade out
+		this.scene.tweens.add({
+			targets: fxGraphics,
+			alpha: 0,
+			duration: 300,
+			ease: "Cubic.Out",
+			onComplete: () => {
+				fxGraphics.destroy();
+			},
+		});
+	}
+
 	/** Fade out the drawing loop sound @param [duration] in milliseconds */
-	sfxFadeOut(duration = this.sfxTween.duration) {
+	sfxFadeOut(duration = SFX_FADE_OUT_DURATION) {
 		this.sfxTween.duration = duration;
 
 		if (this.sfxTween.isPlaying()) return;
@@ -295,6 +384,18 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	sfxStop() {
 		this.sfxTween.stop();
 		this.sfxLoop.stop();
+	}
+
+	// For Golen :3
+	mute() {
+		this.muted = true;
+		this.sfxStop();
+		return this;
+	}
+
+	unmute() {
+		this.muted = false;
+		return this;
 	}
 
 	get lineSegments(): Phaser.Geom.Line[] {

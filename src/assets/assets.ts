@@ -55,6 +55,7 @@ const images: Image[] = [
 	image("ui/cursor", "cursor"),
 	image("ui/lose", "lose"),
 	image("ui/win", "win"),
+	image("ui/question", "question"),
 
 	// World hub
 	image("hub/level", "hub_level"),
@@ -82,7 +83,12 @@ const audios: Audio[] = [
 	sound("drawing/brush", "d_brush"),
 	sound("drawing/raise", "d_raise"),
 	sound("drawing/tap", "d_tap"),
+	sound("drawing/break", "d_break"),
 	sound("tree/machinegun", "machinegun", 0.5),
+
+	sound("ui/screen_transition", "u_level_enter"),
+	sound("ui/what", "u_question"),
+	sound("ui/disabled", "u_disabled"),
 ];
 
 /* Fonts */

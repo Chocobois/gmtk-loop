@@ -32,7 +32,17 @@ export class HubLevel extends Entity {
 	}
 
 	onLoop() {
-		if (!this.enabled) return;
+		if (!this.enabled) {
+			const prevTint = this.image.tint;
+			this.scene.sound.play("u_disabled");
+			this.scene.tweens.add({
+				targets: this.image,
+				// Please keep this in mind if you tint the image elsewhere
+				tint: {from: 0xff0000, to: 0xffffff},
+				duration: 400,
+			})
+			return;
+		}
 
 		// Funny bounce animation
 		this.scene.tweens.addCounter({
@@ -42,6 +52,8 @@ export class HubLevel extends Entity {
 				this.setScale(1.0 + 0.5 * y);
 			},
 		});
+
+		this.scene.sound.play("u_level_enter", {volume: 0.4});
 
 		this.emit("selected", this.levelData);
 	}
