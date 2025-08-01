@@ -58,7 +58,11 @@ export class MonsterScriptHandler {
         this.resetScripts();
     }
 
-    swapScript(key: string) { //swap out the whole list
+    addScript(bits: ScriptBit[]){
+        
+    }
+
+    swapScriptList(key: string) { //swap out the whole list
         this.resetScripts();
         this.scriptList = this.scriptbase.fetchScript(key);
         this.currentScript = 0;
@@ -66,7 +70,7 @@ export class MonsterScriptHandler {
         this.resetScripts();
     }
 
-    constructScript(bits: ScriptBit[]) { //make custom scripts from tidbits - format is key, index or -1 for the whole thing
+    constructScriptList(bits: ScriptBit[]) { //make custom scripts from tidbits - format is key, index or -1 for the whole thing
         this.resetScripts();
         this.currentScript = 0;
         this.scriptList = [];

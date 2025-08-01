@@ -166,11 +166,45 @@ export class MonsterCommand
                     this.cmd[this.step].value[4],center,this.cmd[this.step].value[5],this.owner,this.cmd[this.step].conditions[0]));
                 this.advance();
                 break;
-            }   case "storeRandom": {
+            }   case "travel": { //go towards either a fixed position (true) or random (false) - accel/x/y or accel/x1/x2/y1/y2 otherwise
                 if(this.pend) {
                     break;
                 }
-                //this just stores random numbers, only parameter is the amount and the key
+                if(this.owner.traveling) {
+                    break;
+                } else {
+                    if(this.cmd[this.step].conditions[0]){
+                        this.owner.travel(this.cmd[this.step].value[0],[this.cmd[this.step].value[1],this.cmd[this.step].value[2]]);
+                    } else {
+                        this.owner.travel(this.cmd[this.step].value[0],[this.cmd[this.step].value[1]+Math.random()*(this.cmd[this.step].value[2]-this.cmd[this.step].value[1]),
+                            this.cmd[this.step].value[3]+Math.random()*(this.cmd[this.step].value[4]-this.cmd[this.step].value[3])]);
+                    }
+                    this.advance();
+                }
+                break;
+            }   case "tsa": { // wait until traveling (true) or not traveling (false)
+                if(this.pend) {
+                    break;
+                }
+                switch(this.cmd[this.step].conditions[0]) {
+                    case true: {
+                        if(this.owner.traveling) {
+                            this.advance();
+                            break;
+                        }
+                    } case false: {
+                        if(!this.owner.traveling) {
+                            this.advance();
+                            break;
+                        }
+                    }
+                }
+                break;
+            }   case "storeRandom": { //this just stores random numbers, only parameter is the amount and the key
+                if(this.pend) {
+                    break;
+                }
+                
                 let tmp = {
                     key: this.cmd[this.step].args[0],
                     value: [Math.random()],
@@ -183,11 +217,11 @@ export class MonsterCommand
                 this.variableMap.set(this.cmd[this.step].args[0],tmp);
                 this.advance();
                 break;
-            }   case "store": {
+            }   case "store": { //stores whatever you want, first arg is the key
                 if(this.pend) {
                     break;
                 }
-                //stores whatever you want, first arg is the key
+                
                 let tmp = {
                     key: this.cmd[this.step].args[0],
                     value: this.cmd[this.step].value,
@@ -197,21 +231,21 @@ export class MonsterCommand
                 this.variableMap.set(this.cmd[this.step].args[0],tmp);
                 this.advance();
                 break;
-            }   case "loop": {
+            }   case "loop": { //mostly for loops but you can skip with this too, only argument is index
                 if(this.pend) {
                     break;
                 }
                 this.step = this.cmd[this.step].value[0];
                 break;
-            }   case "resetVars": {
+            }   case "resetVars": { //deletes ALL variables and resets the script to the beginning, use sparingly
                 if(this.pend) {
                     break;
                 }
-                //deletes ALL variables, use sparingly
+                
                 this.resetVariables();
                 this.advance();
                 break;
-            }   case "nextScript": {
+            }   case "nextScript": { //queues next scrip
                 if(this.pend) {
                     break;
                 }

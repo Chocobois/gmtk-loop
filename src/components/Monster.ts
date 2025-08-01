@@ -5,6 +5,9 @@ import { WedgeIndicator } from "./Indicators/WedgeIndicator";
 import { MonsterScriptHandler } from "./MonsterScriptHandler";
 import { Entity } from "./Entity";
 
+const IDLE = 0;
+const RAGE = 1;
+const WEAK = 2;
 const ACCELERATION = 150;
 const MAX_SPEED = 400;
 const FRICTION = 0.7;
@@ -39,6 +42,19 @@ export class Monster extends Entity {
 
 	private t: number = 2000;
 
+	//behavioral variables
+	private initPos: number[];
+	private towardsPos: number[];
+	private accel: Phaser.Math.Vector2;
+	private maxV: number = 2000;
+	public traveling: boolean = false;
+	private tDist: number = 0;
+
+	private exhaust: number = 0;
+	private stateHP: number[] = [5,10,15];
+	private multipliers: number[] = [1,0.5,3];
+	private curState: number = 0;
+
 	constructor(scene: GameScene, x: number, y: number) {
 		super(scene, x, y);
 		scene.add.existing(this);
@@ -62,13 +78,23 @@ export class Monster extends Entity {
 		};
 
 		this.captureDisp = new CaptureBar(this.scene,this.x,this.y,this);
-		this.behavior = new MonsterScriptHandler(this,"sans");
+		this.behavior = new MonsterScriptHandler(this,"idle");
+		this.initPos = [this.x,this.y];
+		this.towardsPos = [0,0];
+		this.accel = new Phaser.Math.Vector2(0,0);
 	}
 
 	update(time: number, delta: number) {
+		if(this.accel.x != 0 || this.accel.y != 0){
+			this.velocity.x += this.accel.x*delta/1000;
+			this.velocity.y += this.accel.y*delta/1000;
+			//this.velocityCheck;
+		}
 		this.x += (this.velocity.x * delta) / 1000;
 		this.y += (this.velocity.y * delta) / 1000;
-
+		if(this.traveling){
+			this.travelCheck();
+		}
 		// Border collision
 		if (this.x < this.border.left) {
 			this.x = this.border.left;
@@ -92,7 +118,7 @@ export class Monster extends Entity {
 
 	}
 
-	onLoop() {
+	onLoop() { 
 		this.damage(loopState.attackPower);
 	}
 
@@ -101,7 +127,22 @@ export class Monster extends Entity {
 		this.scene.textParticle(this.x + Math.random()*50, this.y+Math.random()*50, "OrangeRed", ""+amount);
 		console.log("Particle");
 		this.captureDisp.takeDamage(amount);
+		this.exhaust++;
+		if(this.exhaust >= this.stateHP[this.curState]) {
+			this.advanceState();
+		}
 		this.doABarrelRoll();
+	}
+
+	advanceState(){
+		this.resetVelocity();
+		this.exhaust = 0;
+		switch(this.curState){
+			case IDLE: { this.curState = RAGE; this.behavior.swapScriptList("sans"); break;} 
+			case RAGE: { this.curState = WEAK; this.behavior.swapScriptList("weak"); break;}
+			case WEAK: { this.curState = IDLE; this.behavior.swapScriptList("idle"); break;}
+			default: { this.curState = IDLE; break;}
+		}
 	}
 
 	doABarrelRoll() {
@@ -119,6 +160,49 @@ export class Monster extends Entity {
 		}
 	}
 
+	velocityCheck(){
+		if(Math.hypot(this.velocity.y, this.velocity.x) > this.maxV){
+			let r = Math.atan2(this.velocity.y,this.velocity.x);
+			this.velocity.x = this.maxV*Math.cos(r);
+			this.velocity.y = this.maxV*Math.sin(r);
+			this.accel.x = 0;
+			this.accel.y = 0;
+		}
+	}
+
+	resetVelocity(){
+		this.accel.x = 0;
+		this.accel.y = 0;
+		this.velocity.x = 0;
+		this.velocity.y = 0;
+		this.initPos = [this.x,this.y];
+		this.towardsPos = [0,0];
+		this.traveling = false;
+		this.tDist = 0;
+}
+
+	travelCheck(){
+		if(Math.hypot(this.y-this.initPos[1],this.x-this.initPos[0]) >= this.tDist){
+			this.x=this.towardsPos[0];
+			this.y=this.towardsPos[1];
+			this.resetVelocity();
+		}
+	}
+
+	travel(a: number, pos: number[]){ //go towards a position
+		this.traveling = true;
+		this.velocity.x = 0;
+		this.velocity.y = 0;
+		//console.log("begin: " + this.x + ", " + this.y + " ; " + "end: " + pos[0] + ", " + pos[1]);
+		let theta = Math.atan2(pos[1]-this.y, pos[0]-this.x);
+		this.accel.x = a*Math.cos(theta);
+		this.accel.y = a*Math.sin(theta);
+		this.towardsPos = pos;
+		this.tDist = Math.hypot(pos[1]-this.y, pos[0]-this.x);
+		this.initPos[0] = this.x;
+		this.initPos[1] = this.y;
+	}
+
 	protected shapes: Phaser.Geom.Circle[] = [
 		new Phaser.Geom.Circle(),
 	];
@@ -127,4 +211,6 @@ export class Monster extends Entity {
 			this.shapes[0].setTo(this.x, this.y, 75),
 		];
 	}
+
+
 }
