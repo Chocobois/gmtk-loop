@@ -49,6 +49,8 @@ const images: Image[] = [
 	// UI
 	image("ui/hud", "hud"),
 	image("ui/cursor", "cursor"),
+	image("ui/lose", "lose"),
+	image("ui/win", "win"),
 
 	// World hub
 	image("hub/level", "hub_level"),

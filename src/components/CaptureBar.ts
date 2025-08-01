@@ -88,7 +88,7 @@ export class CaptureBar extends Phaser.GameObjects.Container{
                 this.hp = this.maxHP;
                 this.cycle++;
                 if(this.cycle >= this.maxCycles) {
-                    this.reset();
+                    this.owner.handleCapture();
                     return;
                 }
             }

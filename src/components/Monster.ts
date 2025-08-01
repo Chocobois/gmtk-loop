@@ -212,5 +212,8 @@ export class Monster extends Entity {
 		];
 	}
 
+	handleCapture() {
+		this.scene.removeMonster(this);
+	}
 
 }

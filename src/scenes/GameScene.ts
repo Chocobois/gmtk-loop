@@ -21,6 +21,12 @@ export class GameScene extends BaseScene {
 	private projectiles: EffectTracker;
 	private indicators: EffectTracker;
 
+	public winJingle: Phaser.Sound.BaseSound;
+	public loseJingle: Phaser.Sound.BaseSound;
+	private gameOverText: Phaser.GameObjects.Image;
+
+	private playerHP: number;
+
 	constructor() {
 		super({ key: "GameScene" });
 	}
@@ -36,6 +42,8 @@ export class GameScene extends BaseScene {
 		this.entities = [];
 		this.entityLayer = new Phaser.GameObjects.Container(this, 0, 0);
 		this.add.existing(this.entityLayer);
+
+		this.playerHP = 100;
 
 		this.loadMonster(levelData.enemy);
 
@@ -138,6 +146,14 @@ export class GameScene extends BaseScene {
 		});
 	}
 
+	removeMonster(monster: Monster) {
+		this.entities = this.entities.filter((elt) => elt !== monster);
+		monster.destroy();
+		if (this.entities.length === 0) {
+		  this.win();
+		}
+	  }
+
 	drawColliders() {
 		this.debugGraphics.clear();
 		this.debugGraphics.fillStyle(0xff0000, 0.5);
@@ -172,5 +188,34 @@ export class GameScene extends BaseScene {
 
 	get colliders(): Phaser.Geom.Circle[] {
 		return this.entities.flatMap((entity) => entity.colliders);
+	}
+
+	damageToPlayer(amount: number) {
+		this.playerHP = Math.max(0, this.playerHP - amount);
+		if (this.playerHP <= 0) {
+			this.lose();
+		}
+	}
+
+	win() {
+		this.time.addEvent({
+		delay: 5000,
+		callback: () => {
+			this.scene.start("WorldScene");
+		},
+		});
+		this.gameOverText = this.add.image(this.CX, 1000, "win");
+		this.winJingle.play();
+	}
+
+	lose() {
+		this.time.addEvent({
+		delay: 5000,
+		callback: () => {
+			this.scene.start("WorldScene");
+		},
+		});
+		this.gameOverText = this.add.image(this.CX, 1000, "lose");
+		this.loseJingle.play();
 	}
 }
