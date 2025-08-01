@@ -79,6 +79,7 @@ const audios: Audio[] = [
 	sound("drawing/brush", "d_brush"),
 	sound("drawing/raise", "d_raise"),
 	sound("drawing/tap", "d_tap"),
+	sound("drawing/break", "d_break"),
 	sound("tree/machinegun", "machinegun", 0.5),
 ];
 
