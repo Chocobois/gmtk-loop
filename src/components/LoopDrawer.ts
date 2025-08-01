@@ -39,21 +39,20 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		// Use the `d_sine` key for sound debugging
 		this.sfxLoop = scene.sound.add("d_brush", {
 			loop: true,
-			volume: 0,
 		}) as Phaser.Sound.WebAudioSound;
 
 		this.sfxTween = this.scene.tweens.add({
 			targets: this.sfxLoop,
-			volume: { from: 0, to: 0 },
+			volume: { from: 1, to: 0 },
 			duration: 200,
 			persist: true,
 			paused: true,
 			onComplete: () => {
 				this.sfxLoop.stop();
-				this.sfxLoop.setVolume(0);
+				this.sfxLoop.setVolume(1);
 			},
 			onStop: () => {
-				this.sfxLoop.setVolume(0);
+				this.sfxLoop.setVolume(1);
 			},
 		});
 	}
@@ -79,7 +78,6 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 		this.scene.sound.play("d_tap", {
 			pan: this.sfxPanIntensity * this.scene.getPan(pointer.x),
-			volume: 0,
 		});
 	}
 
