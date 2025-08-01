@@ -35,7 +35,13 @@ export class ScriptDataBase {
             {key: "machinegunwide", value: [12,0,0,18000,8000,0,90], args: ["fish"], conditions: [true]},
             {key: "wait", value: [250], args: [], conditions: []},
             {key: "loop", value: [1], args: [], conditions: []}]),
-            ],
+            new MonsterCommand(this.owner, this.ctrl, [
+                {key: "wait", value: [1500], args: [], conditions: []},
+                {key: "travel", value: [500,200,1720,200,880], args: [], conditions: [false]},
+                {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "wait", value: [3500], args: [], conditions: []},
+                {key: "loop", value: [0], args: [], conditions: []}]),
+        ],
         ];
 
         this.idle = [[

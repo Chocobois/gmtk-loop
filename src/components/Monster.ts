@@ -62,7 +62,7 @@ export class Monster extends Entity {
 
 		/* Sprite */
 		this.spriteSize = 200;
-		this.sprite = this.scene.add.sprite(0, 0, "enemy_1");
+		this.sprite = this.scene.add.sprite(0, 0, "sansplane");
 		this.sprite.setOrigin(0.5, 0.5);
 		//this.sprite.y += this.spriteSize / 2;
 		this.sprite.setScale(this.spriteSize / this.sprite.width);
@@ -138,9 +138,9 @@ export class Monster extends Entity {
 		this.resetVelocity();
 		this.exhaust = 0;
 		switch(this.curState){
-			case IDLE: { this.curState = RAGE; this.behavior.swapScriptList("sans"); break;} 
-			case RAGE: { this.curState = WEAK; this.behavior.swapScriptList("weak"); break;}
-			case WEAK: { this.curState = IDLE; this.behavior.swapScriptList("idle"); break;}
+			case IDLE: { this.curState = RAGE; this.behavior.swapScriptList("sans"); this.sprite.setFrame(1); break;} 
+			case RAGE: { this.curState = WEAK; this.behavior.swapScriptList("weak"); this.sprite.setFrame(2); break;}
+			case WEAK: { this.curState = IDLE; this.behavior.swapScriptList("idle"); this.sprite.setFrame(0); break;}
 			default: { this.curState = IDLE; break;}
 		}
 	}

@@ -61,7 +61,9 @@ const images: Image[] = [
 ];
 
 /* Spritesheets */
-const spritesheets: SpriteSheet[] = [];
+const spritesheets: SpriteSheet[] = [
+	spritesheet("characters/sansplane", "sansplane", 256, 196),
+];
 
 /* Audios */
 const audios: Audio[] = [
