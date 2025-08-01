@@ -1,5 +1,4 @@
 import { BaseScene } from "@/scenes/BaseScene";
-import { Monster } from "@/components/Monster";
 import { LoopDrawer } from "@/components/LoopDrawer";
 import { UI } from "@/components/UI";
 import { TextParticle, TextParticleEffects } from "@/components/TextParticle";
@@ -7,9 +6,13 @@ import { Effect } from "@/components/Effect";
 import { EffectTracker } from "@/components/EffectTracker";
 import { LevelDefinition } from "@/components/WorldHub/LevelDefinition";
 
+import { Entity } from "@/components/Entity";
+import { Monster } from "@/components/Monster";
+import { SnakeMonster } from "@/components/enemies/SnakeMonster";
+
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
-	private entities: Monster[];
+	private entities: Entity[];
 	private entityLayer: Phaser.GameObjects.Container;
 	private loopDrawer: LoopDrawer;
 
@@ -71,9 +74,19 @@ export class GameScene extends BaseScene {
 	}
 
 	loadMonster(enemyKey: string) {
-		// Spawn various monster types here
-		// if (enemyKey === "apple") {}
-		this.addMonster(960, 540);
+		if (enemyKey === "sans") {
+			const monster = new Monster(this, 960, 540);
+			this.entityLayer.add(monster);
+			this.entities.push(monster);
+		}
+		else if (enemyKey === "snake") {
+			const monster = new SnakeMonster(this, 960, 540);
+			this.entityLayer.add(monster);
+			this.entities.push(monster);
+		}
+		else {
+			console.warn(`Unknown enemy type: ${enemyKey}`);
+		}
 	}
 
 	initGraphics() {
@@ -127,20 +140,10 @@ export class GameScene extends BaseScene {
 		this.entityLayer.add(p);
 	}
 
-	addMonster(x: number, y: number) {
-		const monster = new Monster(this, x, y);
-		monster.on("action", () => {
-			monster.doABarrelRoll();
-		});
-		this.entityLayer.add(monster);
-		this.entities.push(monster);
-	}
-
 	onLoop(polygon: Phaser.Geom.Polygon) {
 		this.entities.forEach((entity) => {
 			if (Phaser.Geom.Polygon.Contains(polygon, entity.x, entity.y)) {
-				//entity.doABarrelRoll();
-				if (entity instanceof Monster) {
+				if (entity instanceof Entity) {
 					entity.onLoop();
 				}
 			}
@@ -151,9 +154,9 @@ export class GameScene extends BaseScene {
 		this.entities = this.entities.filter((elt) => elt !== monster);
 		monster.destroy();
 		if (this.entities.length === 0) {
-		  this.win();
+			this.win();
 		}
-	  }
+	}
 
 	drawColliders() {
 		this.debugGraphics.clear();
@@ -201,10 +204,10 @@ export class GameScene extends BaseScene {
 	win() {
 		this.loopDrawer.setEnabled(false);
 		this.time.addEvent({
-		delay: 5000,
-		callback: () => {
-			this.scene.start("WorldScene");
-		},
+			delay: 5000,
+			callback: () => {
+				this.scene.start("WorldScene");
+			},
 		});
 		this.gameOverText = this.add.image(this.CX, 1000, "win");
 		this.winJingle.play();
@@ -213,10 +216,10 @@ export class GameScene extends BaseScene {
 	lose() {
 		this.loopDrawer.setEnabled(false);
 		this.time.addEvent({
-		delay: 5000,
-		callback: () => {
-			this.scene.start("WorldScene");
-		},
+			delay: 5000,
+			callback: () => {
+				this.scene.start("WorldScene");
+			},
 		});
 		this.gameOverText = this.add.image(this.CX, 1000, "lose");
 		this.loseJingle.play();
