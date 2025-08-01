@@ -91,10 +91,12 @@ export class WorldScene extends BaseScene {
 	}
 
 	onLoop(polygon: Phaser.Geom.Polygon) {
-		this.entities.forEach((entity) => {
-			if (Phaser.Geom.Polygon.Contains(polygon, entity.x, entity.y)) {
-				entity.onLoop();
-			}
-		});
+		const selectedEntities = this.entities.filter((entity) =>
+			Phaser.Geom.Polygon.Contains(polygon, entity.x, entity.y)
+		);
+
+		if (selectedEntities.length === 1) {
+			selectedEntities[0].onLoop();
+		}
 	}
 }
