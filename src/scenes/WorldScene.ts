@@ -9,7 +9,7 @@ export class WorldScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
 	private loopDrawer: LoopDrawer;
 
-	private entities: Entity[] = [];
+	private entities: Entity[];
 	private hubs: HubLevel[];
 
 	constructor() {
@@ -18,6 +18,8 @@ export class WorldScene extends BaseScene {
 
 	create(): void {
 		this.fade(false, 200, 0x000000);
+
+		this.entities = [];
 
 		this.cameras.main.setBackgroundColor(0xffffff);
 		this.background = this.add.image(0, 0, "background_plains_0");

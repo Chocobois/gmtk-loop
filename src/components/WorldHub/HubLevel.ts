@@ -32,7 +32,6 @@ export class HubLevel extends Entity {
 	}
 
 	onLoop() {
-		if (!this.scene) return console.error("HubLevel bug");
 		if (!this.enabled) return;
 
 		// Funny bounce animation
