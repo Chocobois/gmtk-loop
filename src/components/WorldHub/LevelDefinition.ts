@@ -5,4 +5,5 @@ export type LevelDefinition = {
 	key: string;
 	require: string[];
 	enemy: string;
+	background: string;
 };

@@ -8,6 +8,7 @@ export const levels: LevelDefinition[] = [
 		key: "1",
 		require: [],
 		enemy: "sans",
+		background: "background_plains_0",
 	},
 	{
 		x: 800,
@@ -16,6 +17,7 @@ export const levels: LevelDefinition[] = [
 		key: "2a",
 		require: ["1"],
 		enemy: "snake",
+		background: "background_plains_1",
 	},
 	{
 		x: 800,
@@ -24,6 +26,7 @@ export const levels: LevelDefinition[] = [
 		key: "2b",
 		require: ["1"],
 		enemy: "",
+		background: "background_plains_2",
 	},
 	{
 		x: 1200,
@@ -32,6 +35,7 @@ export const levels: LevelDefinition[] = [
 		key: "3a",
 		require: ["2a"],
 		enemy: "",
+		background: "background_plains_3",
 	},
 	{
 		x: 1200,
@@ -40,6 +44,7 @@ export const levels: LevelDefinition[] = [
 		key: "3b",
 		require: ["2b"],
 		enemy: "",
+		background: "background_plains_4",
 	},
 	{
 		x: 1600,
@@ -48,5 +53,6 @@ export const levels: LevelDefinition[] = [
 		key: "4",
 		require: ["3a", "3b"],
 		enemy: "",
+		background: "background_plains_0",
 	},
 ];

@@ -38,7 +38,7 @@ export class GameScene extends BaseScene {
 		this.fade(false, 200, 0x000000);
 
 		this.cameras.main.setBackgroundColor(0xffffff);
-		this.background = this.add.image(0, 0, "background_plains_0");
+		this.background = this.add.image(0, 0, levelData.background);
 		this.background.setOrigin(0);
 		this.fitToScreen(this.background);
 
@@ -78,13 +78,11 @@ export class GameScene extends BaseScene {
 			const monster = new Monster(this, 960, 540);
 			this.entityLayer.add(monster);
 			this.entities.push(monster);
-		}
-		else if (enemyKey === "snake") {
+		} else if (enemyKey === "snake") {
 			const monster = new SnakeMonster(this, 960, 540);
 			this.entityLayer.add(monster);
 			this.entities.push(monster);
-		}
-		else {
+		} else {
 			console.warn(`Unknown enemy type: ${enemyKey}`);
 		}
 	}
@@ -93,6 +91,8 @@ export class GameScene extends BaseScene {
 		this.background.setDepth(0);
 		this.entityLayer.setDepth(19);
 		this.textParticles.setDepth(20);
+		this.debugGraphics.setDepth(100);
+		this.loopDrawer.setDepth(1000);
 
 		this.indicators = new EffectTracker(this, 0, 0);
 		this.add.existing(this.indicators);
