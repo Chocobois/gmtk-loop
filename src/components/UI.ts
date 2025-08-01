@@ -1,5 +1,5 @@
 import { GameScene } from "@/scenes/GameScene";
-import { score } from "@/state/ScoreState";
+import { loopState } from "@/state/LoopState";
 import { autorun } from "mobx";
 
 export class UI extends Phaser.GameObjects.Container {
@@ -52,11 +52,11 @@ export class UI extends Phaser.GameObjects.Container {
 		);
 
 		autorun(() => {
-			this.text.text = `Score: ${score.clicks}`;
+			this.text.text = `Loop length: ${loopState.maxLength}`;
 		});
 
 		autorun(() => {
-			this.text2.text = `Spam: ${score.spammedClicks}`;
+			this.text2.text = `Loop power: ${loopState.attackPower}`;
 		});
 	}
 

@@ -1,12 +1,11 @@
 import { BaseScene } from "@/scenes/BaseScene";
-import { score } from "@/state/ScoreState";
+import { loopState } from "@/state/LoopState";
 
 export class LoopDrawer extends Phaser.GameObjects.Container {
 	public scene: BaseScene;
 
 	private points: Phaser.Math.Vector2[] = [];
 	private pointTimes: number[] = [];
-	private maxLength: number = 1600;
 
 	private inputArea: Phaser.GameObjects.Rectangle;
 	private graphics: Phaser.GameObjects.Graphics;
@@ -117,14 +116,14 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 		// Check if total line distance exceeds maxLength
 		const distance = Phaser.Geom.Line.Length(currentLine);
-		if (distance > this.maxLength) {
+		if (distance > loopState.maxLength) {
 			const direction = new Phaser.Math.Vector2(
 				currentLine.x1 - currentLine.x2,
 				currentLine.y1 - currentLine.y2
 			).normalize();
 			const startPoint = new Phaser.Math.Vector2(
-				currentLine.x1 - direction.x * this.maxLength,
-				currentLine.y1 - direction.y * this.maxLength
+				currentLine.x1 - direction.x * loopState.maxLength,
+				currentLine.y1 - direction.y * loopState.maxLength
 			);
 			this.points = [
 				startPoint,
@@ -138,7 +137,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 				const p0 = this.points[i - 1];
 				const segDist = Phaser.Math.Distance.Between(p0.x, p0.y, p1.x, p1.y);
 				totalDist += segDist;
-				if (totalDist > this.maxLength) {
+				if (totalDist > loopState.maxLength) {
 					this.points.splice(0, i);
 					break;
 				}
