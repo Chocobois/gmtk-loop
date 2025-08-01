@@ -65,6 +65,7 @@ export class GameScene extends BaseScene {
 			color: "white",
 		});
 		this.input.keyboard?.on("keydown-ESC", () => {
+			this.loopDrawer.setEnabled(false);
 			this.scene.start("WorldScene");
 		});
 	}
@@ -198,6 +199,7 @@ export class GameScene extends BaseScene {
 	}
 
 	win() {
+		this.loopDrawer.setEnabled(false);
 		this.time.addEvent({
 		delay: 5000,
 		callback: () => {
@@ -209,6 +211,7 @@ export class GameScene extends BaseScene {
 	}
 
 	lose() {
+		this.loopDrawer.setEnabled(false);
 		this.time.addEvent({
 		delay: 5000,
 		callback: () => {
