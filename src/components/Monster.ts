@@ -1,8 +1,9 @@
 import { GameScene } from "@/scenes/GameScene";
-import { score } from "@/state/ScoreState";
+import { loopState } from "@/state/LoopState";
 import { CaptureBar } from "./CaptureBar";
 import { WedgeIndicator } from "./Indicators/WedgeIndicator";
 import { MonsterScriptHandler } from "./MonsterScriptHandler";
+import { Entity } from "./Entity";
 
 const ACCELERATION = 150;
 const MAX_SPEED = 400;
@@ -15,11 +16,10 @@ console.assert(
 
 export interface DifficultyStats {
 	speed: number;
-	attackrate: number;
-	
+	attackrate: number;	
 }
 
-export class Monster extends Phaser.GameObjects.Container {
+export class Monster extends Entity {
 	public scene: GameScene;
 
 	// Sprites
@@ -91,6 +91,11 @@ export class Monster extends Phaser.GameObjects.Container {
 		this.behavior.update(time,delta);
 
 	}
+
+	onLoop() {
+		this.damage(loopState.attackPower);
+	}
+
 	damage(amount: number) {
 		console.log("Monster damaged by", amount);
 		this.scene.textParticle(this.x + Math.random()*50, this.y+Math.random()*50, "OrangeRed", ""+amount);
@@ -100,7 +105,6 @@ export class Monster extends Phaser.GameObjects.Container {
 	}
 
 	doABarrelRoll() {
-		score.spammedClicks += 1;
 		if (!this.tween || !this.tween.isActive()) {
 			this.tween = this.scene.tweens.add({
 				targets: this.sprite,
@@ -112,12 +116,15 @@ export class Monster extends Phaser.GameObjects.Container {
 				duration: 300,
 				yoyo: true,
 			});
-
-			score.clicks += 1;
 		}
 	}
 
+	protected shapes: Phaser.Geom.Circle[] = [
+		new Phaser.Geom.Circle(),
+	];
 	get colliders(): Phaser.Geom.Circle[] {
-		return [this.collider.setTo(this.x, this.y, 75)];
+		return [
+			this.shapes[0].setTo(this.x, this.y, 75),
+		];
 	}
 }

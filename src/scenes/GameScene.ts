@@ -21,9 +21,6 @@ export class GameScene extends BaseScene {
 	private projectiles: EffectTracker;
 	private indicators: EffectTracker;
 
-	//we should have a player or something to store your current damage and powerups and such
-	private dmg: number = 123;
-
 	constructor() {
 		super({ key: "GameScene" });
 	}
@@ -135,7 +132,7 @@ export class GameScene extends BaseScene {
 			if (Phaser.Geom.Polygon.Contains(polygon, entity.x, entity.y)) {
 				//entity.doABarrelRoll();
 				if (entity instanceof Monster) {
-					entity.damage(this.dmg);
+					entity.onLoop();
 				}
 			}
 		});

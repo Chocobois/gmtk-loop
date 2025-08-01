@@ -14,12 +14,12 @@ export class Entity extends Phaser.GameObjects.Container {
 		// Override this method in subclasses to handle encirclement logic
 	}
 
-	protected _shapes: Phaser.Geom.Circle[] = [
+	protected shapes: Phaser.Geom.Circle[] = [
 		new Phaser.Geom.Circle(),
 	];
 	get colliders(): Phaser.Geom.Circle[] {
 		return [
-			this.colliders[0].setTo(this.x, this.y, 100),
+			this.shapes[0].setTo(this.x, this.y, 100),
 		];
 	}
 }
