@@ -33,7 +33,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		this.graphics = scene.add.graphics();
 		this.add(this.graphics);
 
-		this.cursor = scene.add.image(0, 0, "cursor");
+		this.cursor = scene.add.image(-999, -999, "cursor");
 		this.add(this.cursor);
 
 		// Use the `d_sine` key for sound debugging
