@@ -2,6 +2,11 @@ import { Monster } from "./Monster";
 import { MonsterCommand } from "./MonsterCommand";
 import { ScriptDataBase } from "./ScriptDataBase";
 
+export interface ScriptBit{
+    key: string;
+    index: number;
+}
+
 export class MonsterScriptHandler {
     public owner: Monster;
     public script: MonsterCommand[];
@@ -37,7 +42,7 @@ export class MonsterScriptHandler {
         }
     }
 
-    changeScript(n: number) {
+    changeScript(n: number) { // go to different script in same list
         if(n >= this.scriptList.length) {
             n = this.scriptList.length-1;
         }
@@ -50,5 +55,39 @@ export class MonsterScriptHandler {
         console.log("EXECUTING SCRIPT:  "+ n);
         this.currentScript = n;
         this.script = this.scriptList[n];
+        this.resetScripts();
+    }
+
+    swapScript(key: string) { //swap out the whole list
+        this.resetScripts();
+        this.scriptList = this.scriptbase.fetchScript(key);
+        this.currentScript = 0;
+        this.script = this.scriptList[0];
+        this.resetScripts();
+    }
+
+    constructScript(bits: ScriptBit[]) { //make custom scripts from tidbits - format is key, index or -1 for the whole thing
+        this.resetScripts();
+        this.currentScript = 0;
+        this.scriptList = [];
+        let t = [];
+        for(let i = 0; i < bits.length; i++){
+            t = this.scriptbase.fetchScript(bits[i].key);
+            if(bits[i].index < t.length) {
+                if(bits[i].index >= 0) {
+                    this.scriptList.push(t[bits[i].index]);
+                } else {
+                    this.scriptList.concat(t);
+                }
+            }
+        }
+        this.script = this.scriptList[0];
+        this.resetScripts();
+    }
+
+    resetScripts(){
+        for(let l = 0; l < this.script.length; l++) {
+            this.script[l].resetVariables();
+        }
     }
 }
