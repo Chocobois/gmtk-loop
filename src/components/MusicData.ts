@@ -31,6 +31,13 @@ const Data = {
 		start: 41860 / 48000 + overlap,
 		end: 2854884 / 48000 + overlap,
 	},
+	m_lightfast: {
+		offset: 1348 / 48000,
+		bpm: 160,
+		loop: true,
+		start: 6 + (1348 / 48000),
+		end: 78 + (1348 / 48000),
+	}
 };
 
 export type MusicKey = keyof typeof Data;
