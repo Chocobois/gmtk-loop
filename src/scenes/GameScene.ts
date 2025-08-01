@@ -9,6 +9,7 @@ import { LevelDefinition } from "@/components/WorldHub/LevelDefinition";
 import { Entity } from "@/components/Entity";
 import { Monster } from "@/components/Monster";
 import { SnakeMonster } from "@/components/enemies/SnakeMonster";
+import { MoleMonster } from "@/components/enemies/MoleMonster";
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -74,17 +75,35 @@ export class GameScene extends BaseScene {
 	}
 
 	loadMonster(enemyKey: string) {
-		if (enemyKey === "sans") {
-			const monster = new Monster(this, 960, 540);
-			this.entityLayer.add(monster);
-			this.entities.push(monster);
-		} else if (enemyKey === "snake") {
-			const monster = new SnakeMonster(this, 960, 540);
-			this.entityLayer.add(monster);
-			this.entities.push(monster);
-		} else {
-			console.warn(`Unknown enemy type: ${enemyKey}`);
+		switch (enemyKey) {
+			case "sans":
+				const monster = new Monster(this, 960, 540);
+				this.addEntity(monster);
+				break;
+
+			case "snake":
+				const snake = new SnakeMonster(this, 960, 540);
+				this.addEntity(snake);
+				break;
+
+			case "mole":
+				const mole = new MoleMonster(this, 960, 540);
+				this.addEntity(mole);
+				mole.addFakeMoles(3);
+				break;
+
+			default:
+				console.warn(`Unknown enemy type: ${enemyKey}`);
+				break;
 		}
+	}
+
+	addEntity(entity: Entity) {
+		this.entityLayer.add(entity);
+		this.entities.push(entity);
+
+		// Call `this.emit("addEntity", object)` inside of a Monster class to add it
+		entity.on("addEntity", this.addEntity, this);
 	}
 
 	initGraphics() {
@@ -92,6 +111,7 @@ export class GameScene extends BaseScene {
 		this.entityLayer.setDepth(19);
 		this.textParticles.setDepth(20);
 		this.debugGraphics.setDepth(100);
+		this.debugGraphics.setVisible(false);
 		this.loopDrawer.setDepth(1000);
 
 		this.indicators = new EffectTracker(this, 0, 0);

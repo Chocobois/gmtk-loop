@@ -31,6 +31,9 @@ const images: Image[] = [
 	image("characters/runes/r9", "r9"),
 	image("characters/snailenemy", "escargot"),
 	image("characters/snake/snake", "snake"),
+	image("characters/mole/mole_idle", "mole_idle"),
+	image("characters/mole/mole_bomb", "mole_bomb"),
+	image("characters/mole/mole_dirt", "mole_dirt"),
 
 	// Monsters
 	// Planning on making monsters a 1 file spritesheet

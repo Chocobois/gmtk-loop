@@ -22,10 +22,10 @@ export const levels: LevelDefinition[] = [
 	{
 		x: 800,
 		y: 740,
-		title: "Empty",
+		title: "Mole",
 		key: "2b",
 		require: ["1"],
-		enemy: "",
+		enemy: "mole",
 		background: "background_plains_2",
 	},
 	{
