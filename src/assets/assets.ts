@@ -29,6 +29,7 @@ const images: Image[] = [
 	image("characters/runes/r7", "r7"),
 	image("characters/runes/r8", "r8"),
 	image("characters/runes/r9", "r9"),
+	image("characters/snailenemy", "escargot"),
 
 	// Monsters
 	// Planning on making monsters a 1 file spritesheet
