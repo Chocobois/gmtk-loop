@@ -253,8 +253,11 @@ export class GameScene extends BaseScene {
 			fadeOut: { enable: true },
 		}
 	) {
-		const text = this.createText(x, y, size, color, content);
+		const text = this.addText({ x, y, size, color, text: content });
 		if (outline) text.setStroke("rgba(0,0,0,0.5)", 30);
+
+		// Center text
+		text.setOrigin(0.5);
 
 		// Prevent text from going too far right
 		const right = text.getRightCenter().x ?? 0;
