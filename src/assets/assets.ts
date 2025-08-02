@@ -105,6 +105,9 @@ const audios: Audio[] = [
 	music("first", "m_first"),
 	music("lightfast", "m_lightfast"),
 
+	music("fight", "m_fight"),
+	music("map", "m_map"),
+
 	sound("tree/rustle", "t_rustle", 0.5),
 	sound("drawing/sine", "d_sine", 0.3),
 	sound("drawing/brush", "d_brush"),
@@ -116,6 +119,8 @@ const audios: Audio[] = [
 	sound("ui/screen_transition", "u_level_enter"),
 	sound("ui/what", "u_question"),
 	sound("ui/disabled", "u_disabled"),
+
+	sound("hub/map_select", "h_map_select"),
 ];
 
 /* Fonts */

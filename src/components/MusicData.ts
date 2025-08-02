@@ -35,9 +35,30 @@ const Data = {
 		offset: 1348 / 48000,
 		bpm: 160,
 		loop: true,
-		start: 6 + (1348 / 48000),
-		end: 78 + (1348 / 48000),
-	}
+		start: 6 + 1348 / 48000,
+		end: 78 + 1348 / 48000,
+	},
+	m_map: {
+		offset: 0.039,
+		bpm: 110,
+		loop: true,
+		start: 26.221,
+		end: 61.130,
+	},
+	m_map_select: {
+		offset: 1348 / 44100,
+		bpm: 160,
+		loop: true,
+		start: 6 + 1348 / 44100,
+		end: 78 + 1348 / 44100,
+	},
+	m_fight: {
+		offset: 0.039,
+		bpm: 170,
+		loop: true,
+		start: 5.687,
+		end: 50.863,
+	},
 };
 
 export type MusicKey = keyof typeof Data;
