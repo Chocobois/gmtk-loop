@@ -9,12 +9,16 @@ export class Entity extends Phaser.GameObjects.Container {
 	// How much damage is dealt when colliding the loop with this entity's colliders
 	public entityDamage: number;
 
+	// Deletion flag
+	public deleteFlag: boolean;
+
 	constructor(scene: BaseScene, x: number, y: number) {
 		super(scene, x, y);
 		scene.add.existing(this);
 		this.scene = scene;
 		this.enabled = true;
 		this.entityDamage = 1;
+		this.deleteFlag = false;
 	}
 
 	// When the entity is encircled by the player's loop

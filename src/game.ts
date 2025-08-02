@@ -5,23 +5,19 @@ import { WorldScene } from "@/scenes/WorldScene";
 import { GameScene } from "@/scenes/GameScene";
 import OutlinePipelinePlugin from "phaser3-rex-plugins/plugins/outlinepipeline-plugin.js";
 import { configure } from "mobx";
+import { ShopScene } from "./scenes/ShopScene";
+import { config } from "./game-config";
 
-configure({
-	enforceActions: "never",
-});
 
 export async function Game() {
-	const config: Phaser.Types.Core.GameConfig = {
-		type: Phaser.WEBGL,
-		width: 1920,
-		height: 1080,
-		mipmapFilter: "LINEAR_MIPMAP_LINEAR",
-		roundPixels: false,
-		scale: {
-			mode: Phaser.Scale.FIT,
-		},
-		scene: [PreloadScene, TitleScene, WorldScene, GameScene],
+	configure({
+		enforceActions: "never",
+	});
 
+	const fullConfig: Phaser.Types.Core.GameConfig = {
+		...config,
+
+		scene: [PreloadScene, TitleScene, WorldScene, GameScene, ShopScene],
 		plugins: {
 			global: [
 				{
@@ -32,6 +28,5 @@ export async function Game() {
 			],
 		},
 	};
-
-	const game = new Phaser.Game(config);
+	const game = new Phaser.Game(fullConfig);
 }
