@@ -6,7 +6,7 @@ const images: Image[] = [
 	// Backgrounds
 	image("backgrounds/background", "background"),
 	image("backgrounds/bz", "bz"),
-	
+
 	// Biomes, combat background
 	image("backgrounds/battlefloor/grassyplains", "background_plains_0"),
 	image("backgrounds/battlefloor/grassyplains_alt1", "background_plains_1"),
@@ -30,19 +30,23 @@ const images: Image[] = [
 	image("characters/runes/r8", "r8"),
 	image("characters/runes/r9", "r9"),
 	image("characters/snailenemy", "escargot"),
+
 	image("characters/snake/snake", "snake"),
-	image("characters/mole/mole_idle", "mole_idle"),
-	image("characters/mole/mole_bomb", "mole_bomb"),
-	image("characters/mole/mole_dirt", "mole_dirt"),
+
+	image("characters/mole/boss_1", "mole_boss_1"),
+	image("characters/mole/boss_2", "mole_boss_2"),
+	image("characters/mole/fake_1", "mole_fake_1"),
+	image("characters/mole/fake_2", "mole_fake_2"),
+	image("characters/mole/dirt", "mole_dirt"),
 
 	// Monsters
 	// Planning on making monsters a 1 file spritesheet
-	
+
 	image("characters/enemy/placeholder_enemy", "enemy_placeholder"),
-		// Attacks
+	// Attacks
 	image("characters/hazards/placeholder_attack", "projectile_placeholder"),
-		// Hazards (spritesheets 512px * Y (how many frames))
-	image("characters/hazards/placeholder_hazard", "hazard_placeholder"), 
+	// Hazards (spritesheets 512px * Y (how many frames))
+	image("characters/hazards/placeholder_hazard", "hazard_placeholder"),
 
 	// Items
 	image("items/coin", "coin"),
@@ -65,11 +69,21 @@ const images: Image[] = [
 	image("titlescreen/background", "title_background"),
 	image("titlescreen/foreground", "title_foreground"),
 	image("titlescreen/character", "title_character"),
+
+	// Particles
+	image("particles/light", "light"),
+	image("particles/circle", "circle"),
 ];
 
 /* Spritesheets */
 const spritesheets: SpriteSheet[] = [
 	spritesheet("characters/sansplane", "sansplane", 256, 196),
+
+	// Particles
+	spritesheet("particles/bubbles", "bubbles", 128, 128),
+	spritesheet("particles/smoke3", "smoke", 128, 128),
+	spritesheet("particles/sparkles", "sparkles", 128, 128),
+	spritesheet("particles/flame3", "flame", 32, 32),
 ];
 
 /* Audios */
