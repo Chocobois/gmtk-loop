@@ -18,6 +18,7 @@ const images: Image[] = [
 	image("backgrounds/battlefloor/ice", "background_ice"),
 	image("backgrounds/battlefloor/magma", "background_magma"),
 	image("backgrounds/battlefloor/stone", "background_stone"),
+	image("backgrounds/battlefloor/rock", "background_rock"),
 
 	image("backgrounds/shelves", "background_shelves"),
 
@@ -144,6 +145,6 @@ const audios: Audio[] = [
 ];
 
 /* Fonts */
-await loadFont("Sketch", "Game Font");
+await loadFont("DynaPuff-Medium", "Game Font");
 
 export { images, spritesheets, audios };

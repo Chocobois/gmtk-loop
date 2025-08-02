@@ -1,5 +1,6 @@
 import { BaseScene } from "@/scenes/BaseScene";
 import { loopState } from "@/state/LoopState";
+import { Entity } from "./Entity";
 import { pearlState } from "@/state/PearlState";
 import { autorun } from "mobx";
 
@@ -261,24 +262,34 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		this.onLineBreak();
 	}
 
-	checkCollisions(colliders: Phaser.Geom.Circle[]) {
+	checkCollisions(entities: Entity[]) {
 		if (this.points.length == 0) return;
 
 		// Break line if it intersects with any collider
-		for (const collider of colliders) {
-			for (const line of this.lineSegments) {
-				if (Phaser.Geom.Intersects.LineToCircle(line, collider)) {
-					if (!this.muted)
-						this.scene.sound.play("d_break", {
-							volume: 0.4,
-							pan: SFX_PAN_INTENSITY * this.scene.getPan(collider.x),
-						});
-					this.lineBroken = true;
-					this.fractureLineEffect();
-					return this.onLineBreak();
+		for (const entity of entities) {
+			for (const collider of entity.colliders) {
+				for (const line of this.lineSegments) {
+					if (Phaser.Geom.Intersects.LineToCircle(line, collider)) {
+						if (!this.muted)
+							this.scene.sound.play("d_break", {
+								volume: 0.4,
+								pan: SFX_PAN_INTENSITY * this.scene.getPan(collider.x),
+							});
+
+						this.lineBroken = true;
+						this.fractureLineEffect();
+						this.onLineBreak();
+
+						// Emit a signal about who's responsible for breaking the line
+						this.emit("break", entity);
+
+						return;
+					}
 				}
 			}
 		}
+
+		return;
 	}
 
 	onLoop(points: Phaser.Math.Vector2[]) {
@@ -290,7 +301,6 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	}
 
 	onLineBreak() {
-		this.emit("break");
 		if (!this.lineBroken) this.fadeLineEffect(); // Must be before clearing `points`
 		this.cursor.setVisible(false);
 		this.points = [];
@@ -478,5 +488,9 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 			lines.push(new Phaser.Geom.Line(prev.x, prev.y, curr.x, curr.y));
 		}
 		return lines;
+	}
+
+	get cursorPosition(): Phaser.Types.Math.Vector2Like {
+		return { x: this.cursor.x, y: this.cursor.y };
 	}
 }

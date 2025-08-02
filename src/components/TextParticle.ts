@@ -1,3 +1,4 @@
+import { TextStyle } from "@/scenes/BaseScene";
 import { GameScene } from "../scenes/GameScene";
 
 export interface TextParticleEffects {
@@ -24,10 +25,6 @@ export interface TextParticleData {
     origin: Phaser.Math.Vector2,
     effects: TextParticleEffects,
 }
-
-type CreateTextOptions = [
-    x: number, y: number, size: number, color: string, text: string
-]
 
 const ONE_OVER_TWO_PI = 1 / Phaser.Math.PI2;
 
@@ -146,12 +143,13 @@ export class TextParticle extends Phaser.GameObjects.Container {
      * @param lifespan Lifespan in seconds
      * @param effects Object describing effects (move, fade, wave)
      */
-    push(text: Phaser.GameObjects.Text | CreateTextOptions, lifespan: number=1, effects: TextParticleEffects={
+    push(text: Phaser.GameObjects.Text | TextStyle, lifespan: number=1, effects: TextParticleEffects={
         wave: {enable: false}, fadeOut: {enable: false}
     }) {
         const textObject = (text instanceof Phaser.GameObjects.Text)
             ? text
-            : this.scene.createText(...text);
+            : this.scene.addText(text);
+        this.add(textObject);
         
         /* const origin = (text instanceof Phaser.GameObjects.Text)
             ? { x: text.x,  y: text.y  }
