@@ -16,6 +16,7 @@ const images: Image[] = [
 	image("backgrounds/battlefloor/ice", "background_ice"),
 	image("backgrounds/battlefloor/magma", "background_magma"),
 	image("backgrounds/battlefloor/stone", "background_stone"),
+	image("backgrounds/battlefloor/rock", "background_rock"),
 
 	// Characters
 	image("characters/player", "player"),
