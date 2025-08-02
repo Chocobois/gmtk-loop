@@ -10,6 +10,7 @@ import { Entity } from "@/components/Entity";
 import { Monster } from "@/components/Monster";
 import { SnakeMonster } from "@/components/enemies/SnakeMonster";
 import { MoleBoss } from "@/components/enemies/mole/MoleBoss";
+import { loopState } from "@/state/LoopState";
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -29,7 +30,7 @@ export class GameScene extends BaseScene {
 	public loseJingle: Phaser.Sound.BaseSound;
 	private gameOverText: Phaser.GameObjects.Image;
 
-	private playerHP: number;
+	private playerHealth: number;
 
 	constructor() {
 		super({ key: "GameScene" });
@@ -47,7 +48,7 @@ export class GameScene extends BaseScene {
 		this.entityLayer = new Phaser.GameObjects.Container(this, 0, 0);
 		this.add.existing(this.entityLayer);
 
-		this.playerHP = 100;
+		this.playerHealth = loopState.maxHealth;
 
 		this.loadMonster(levelData.enemy);
 
@@ -137,6 +138,11 @@ export class GameScene extends BaseScene {
 
 		this.drawColliders();
 		this.updateEffects(time, delta);
+
+		// Camera shake
+		if (this.cameraShakeValue > 0)
+			this.cameras.main.x = this.cameraShakeValue * Math.sin(100 * time);
+		else this.cameras.main.x = 0;
 	}
 
 	pushHitEffect(e: Effect) {
@@ -164,7 +170,7 @@ export class GameScene extends BaseScene {
 	onLoop(polygon: Phaser.Geom.Polygon) {
 		this.entities.forEach((entity) => {
 			if (Phaser.Geom.Polygon.Contains(polygon, entity.x, entity.y)) {
-				if (entity instanceof Entity) {
+				if (entity instanceof Entity && entity.enabled) {
 					entity.onLoop();
 				}
 			}
@@ -181,7 +187,7 @@ export class GameScene extends BaseScene {
 
 	drawColliders() {
 		this.debugGraphics.clear();
-		this.debugGraphics.fillStyle(0xff0000, 0.5);
+		this.debugGraphics.fillStyle(0xff0000, 0.25);
 		this.colliders.forEach((collider) => {
 			this.debugGraphics.fillCircle(collider.x, collider.y, collider.radius);
 		});
@@ -216,8 +222,13 @@ export class GameScene extends BaseScene {
 	}
 
 	damageToPlayer(amount: number) {
-		this.playerHP = Math.max(0, this.playerHP - amount);
-		if (this.playerHP <= 0) {
+		this.flash(200, 0xff7777, 0.2);
+		this.shake(500, 10, 0);
+
+		this.loopDrawer.onLineBreak();
+
+		this.playerHealth = Math.max(0, this.playerHealth - amount);
+		if (this.playerHealth <= 0) {
 			this.lose();
 		}
 	}

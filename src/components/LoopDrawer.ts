@@ -9,8 +9,8 @@ const SFX_PAN_INTENSITY = 0.3 // 30%
 export class LoopDrawer extends Phaser.GameObjects.Container {
 	public scene: BaseScene;
 
-	public loopColor: number = 0x0000ff;
-	public lineColor: number = 0x0000ff;
+	public loopColor: number = 0xFFFFFF;
+	public lineColor: number = 0xFFFFFF;
 	public lineWidth: number = 8;
 
 	private points: Phaser.Math.Vector2[] = [];

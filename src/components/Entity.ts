@@ -19,12 +19,9 @@ export class Entity extends Phaser.GameObjects.Container {
 		this.enabled = value;
 	}
 
-	protected shapes: Phaser.Geom.Circle[] = [
-		new Phaser.Geom.Circle(),
-	];
+	protected shapes: Phaser.Geom.Circle[] = [new Phaser.Geom.Circle()];
 	get colliders(): Phaser.Geom.Circle[] {
-		return [
-			this.shapes[0].setTo(this.x, this.y, 100),
-		];
+		if (!this.enabled) return [];
+		return [this.shapes[0].setTo(this.x, this.y, 100)];
 	}
 }
