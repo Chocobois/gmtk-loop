@@ -40,10 +40,10 @@ export const levels: LevelDefinition[] = [
 	{
 		x: 1200,
 		y: 740,
-		title: "Empty",
+		title: "Abra",
 		key: "3b",
 		require: ["2b"],
-		enemy: "",
+		enemy: "abra",
 		background: "background_plains_3",
 	},
 	{

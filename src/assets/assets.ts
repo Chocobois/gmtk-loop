@@ -48,6 +48,10 @@ const images: Image[] = [
 	image("characters/jester/card_club", "jester_card_club"),
 	image("characters/jester/card_spade", "jester_card_spade"),
 
+	image("characters/abra/idle", "abra_idle"),
+	image("characters/abra/active", "abra_active"),
+	image("characters/abra/hurt", "abra_hurt"),
+
 	// Monsters
 	// Planning on making monsters a 1 file spritesheet
 

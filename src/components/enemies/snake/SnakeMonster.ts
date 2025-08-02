@@ -1,5 +1,5 @@
 import { BaseScene } from "@/scenes/BaseScene";
-import { Entity } from "../../Entity";
+import { BaseMonster } from "../../BaseMonster";
 
 enum SnakeState {
 	SLITHERING,
@@ -11,7 +11,7 @@ const SNAKE_LENGTH = 1000;
 const SNAKE_SEGMENTS = 20;
 const SEGMENT_LENGTH = SNAKE_LENGTH / SNAKE_SEGMENTS;
 
-export class SnakeMonster extends Entity {
+export class SnakeMonster extends BaseMonster {
 	public scene: BaseScene;
 
 	private snakeState: SnakeState;

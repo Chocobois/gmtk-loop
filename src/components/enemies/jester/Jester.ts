@@ -1,6 +1,5 @@
 import { GameScene } from "@/scenes/GameScene";
-import { Entity } from "@/components/Entity";
-import { SparkEffect } from "@/components/particles/SparkEffect";
+import { BaseMonster } from "@/components/BaseMonster";
 import { loopState } from "@/state/LoopState";
 
 enum JesterState {
@@ -10,7 +9,7 @@ enum JesterState {
 	DEAD,
 }
 
-export class Jester extends Entity {
+export class Jester extends BaseMonster {
 	public scene: GameScene;
 
 	private health: number;
@@ -26,8 +25,6 @@ export class Jester extends Entity {
 	private target: Phaser.Math.Vector2;
 	private velocity: Phaser.Math.Vector2;
 
-	private sparkEffect: SparkEffect;
-
 	constructor(scene: GameScene, x: number, y: number) {
 		super(scene, x, y);
 		scene.add.existing(this);
@@ -42,8 +39,6 @@ export class Jester extends Entity {
 
 		this.target = new Phaser.Math.Vector2(x, y);
 		this.velocity = new Phaser.Math.Vector2(1, 1);
-
-		this.sparkEffect = new SparkEffect(scene);
 
 		this.setJesterState(JesterState.IDLE);
 	}
@@ -89,7 +84,7 @@ export class Jester extends Entity {
 				}
 
 				this.sprite.setTexture("jester_attack");
-				this.animateShake(1500);
+				this.animateShake(this.sprite, 1500);
 
 				this.stateTimer = this.scene.addEvent(1500, () =>
 					this.setJesterState(JesterState.IDLE)
@@ -134,20 +129,9 @@ export class Jester extends Entity {
 		this.y += (this.target.y - this.y) * 0.05;
 	}
 
-	animateShake(duration: number = 500) {
-		this.scene.tweens.addCounter({
-			duration,
-			ease: Phaser.Math.Easing.Sine.Out,
-			onUpdate: (tween) => {
-				let t = 1 - (tween.getValue() || 0);
-				this.sprite.setOrigin(0.5 + t * 0.1 * Math.sin(20 * t), 0.5);
-			},
-		});
-	}
-
 	// When the entity is encircled by the player's loop
 	onLoop() {
-		this.animateShake();
+		this.animateShake(this.sprite);
 		this.sparkEffect.play(this.x, this.y);
 
 		// If attacked when no magic is applied, attack immediately

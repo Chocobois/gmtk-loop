@@ -1,17 +1,12 @@
 import { GameScene } from "@/scenes/GameScene";
 import { MoleBase, MoleState } from "./MoleBase";
-import { ExplosionEffect } from "@/components/particles/ExplosionEffect";
 
 // Fake mole that explodes upon being looped
 export class MoleFake extends MoleBase {
-	protected explosionEffect: ExplosionEffect;
-
 	constructor(scene: GameScene, x: number, y: number) {
 		super(scene, x, y);
 
 		this.sprite.setTexture("mole_fake_1");
-
-		this.explosionEffect = new ExplosionEffect(scene, 2.0);
 
 		this.setMoleState(MoleState.IDLE);
 	}

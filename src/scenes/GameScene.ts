@@ -11,6 +11,7 @@ import { Monster } from "@/components/Monster";
 import { SnakeMonster } from "@/components/enemies/snake/SnakeMonster";
 import { MoleBoss } from "@/components/enemies/mole/MoleBoss";
 import { Jester } from "@/components/enemies/jester/Jester";
+import { AbraBoss } from "@/components/enemies/abra/AbraBoss";
 import { loopState } from "@/state/LoopState";
 
 import BendWaves from "@/pipelines/BendWavesPostFX";
@@ -102,6 +103,11 @@ export class GameScene extends BaseScene {
 				this.addEntity(jester);
 				break;
 
+			case "abra":
+				const abra = new AbraBoss(this, 960, 540);
+				this.addEntity(abra);
+				break;
+
 			default:
 				console.warn(`Unknown enemy type: ${enemyKey}`);
 				break;
@@ -114,7 +120,20 @@ export class GameScene extends BaseScene {
 
 		// Call `this.emit("addEntity", object)` inside of a Monster class to add it
 		entity.on("addEntity", this.addEntity, this);
+		entity.on("removeEntity", this.removeEntity, this);
 		entity.on("victory", this.win, this);
+	}
+
+	removeEntity(entity: Entity) {
+		this.entities = this.entities.filter((elt) => elt !== entity);
+		entity.destroy();
+	}
+
+	removeMonster(monster: Monster) {
+		this.removeEntity(monster);
+		if (this.entities.length === 0) {
+			this.win();
+		}
 	}
 
 	initGraphics() {
@@ -183,14 +202,6 @@ export class GameScene extends BaseScene {
 				}
 			}
 		});
-	}
-
-	removeMonster(monster: Monster) {
-		this.entities = this.entities.filter((elt) => elt !== monster);
-		monster.destroy();
-		if (this.entities.length === 0) {
-			this.win();
-		}
 	}
 
 	drawColliders() {
