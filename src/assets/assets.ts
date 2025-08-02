@@ -13,8 +13,16 @@ const images: Image[] = [
 	image("backgrounds/battlefloor/grassyplains_alt2", "background_plains_2"),
 	image("backgrounds/battlefloor/grassyplains_alt3", "background_plains_3"),
 	image("backgrounds/battlefloor/grassyplains_alt4", "background_plains_4"),
+	image("backgrounds/shelves", "background_shelves"),
 
 	image("backgrounds/battlefloor/stone", "background_stone_0"),
+
+	// Pearls
+	image("pearls/fire", "pearl_fire"),
+	image("pearls/grass", "pearl_grass"),
+	image("pearls/water", "pearl_water"),
+	image("pearls/electric", "pearl_electric"),
+
 
 	// Characters
 	image("characters/player", "player"),

@@ -1,6 +1,6 @@
 import { LevelDefinition } from "./LevelDefinition";
 
-export const levels: LevelDefinition[] = [
+export const levels = [
 	{
 		x: 400,
 		y: 540,
@@ -55,4 +55,7 @@ export const levels: LevelDefinition[] = [
 		enemy: "",
 		background: "background_plains_0",
 	},
-];
+] as const satisfies LevelDefinition[];
+
+export type LevelKeys = typeof levels[number]["key"];
+export type LevelKeysList<T> = { [K in LevelKeys]: T};

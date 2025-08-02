@@ -49,6 +49,19 @@ export class WorldScene extends BaseScene {
 
 		this.addHubLines();
 
+		const shop = new HubLevel(this, {
+			x: 200,
+			y: this.H - 200,
+			title: "Shop",
+			key: "shop",
+			background: "asd",
+			enemy: "shop",
+			require: [],
+		});
+		shop.setDepth(100);
+		this.entities.push(shop);
+		shop.on("selected", this.loadShop, this);
+
 		this.loopDrawer = new LoopDrawer(this);
 		this.loopDrawer.setDepth(1000);
 		this.loopDrawer.on("loop", this.onLoop, this);
@@ -57,6 +70,17 @@ export class WorldScene extends BaseScene {
 	update(time: number, delta: number) {
 		this.loopDrawer.update(time, delta);
 		// this.loopDrawer.checkCollisions(this.colliders);
+	}
+
+	loadShop() {
+		this.loopDrawer.setEnabled(false);
+		this.flash(1000, 0xffffff, 0.3);
+		this.addEvent(1000, () => {
+			this.fade(true, 100, 0x000000);
+			this.addEvent(100, () => {
+				this.scene.start("ShopScene");
+			});
+		});
 	}
 
 	loadLevel(levelData: LevelDefinition): void {
