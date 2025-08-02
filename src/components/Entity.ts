@@ -2,12 +2,19 @@ import { BaseScene } from "@/scenes/BaseScene";
 
 export class Entity extends Phaser.GameObjects.Container {
 	public scene: BaseScene;
-	public enabled: boolean = true;
+
+	// If enabled, the entity's colliders can collide with the loop
+	public enabled: boolean;
+
+	// How much damage is dealt when colliding the loop with this entity's colliders
+	public entityDamage: number;
 
 	constructor(scene: BaseScene, x: number, y: number) {
 		super(scene, x, y);
 		scene.add.existing(this);
 		this.scene = scene;
+		this.enabled = true;
+		this.entityDamage = 1;
 	}
 
 	// When the entity is encircled by the player's loop

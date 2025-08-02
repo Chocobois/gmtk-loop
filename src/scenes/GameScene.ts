@@ -37,14 +37,15 @@ export class GameScene extends BaseScene {
 
 	private music: Music;
 
-	private playerHealth: number;
-
 	constructor() {
 		super({ key: "GameScene" });
 	}
 
 	create(levelData: LevelDefinition): void {
 		this.fade(false, 200, 0x000000);
+
+		// Restore health
+		loopState.health = loopState.maxHealth;
 
 		this.cameras.main.setBackgroundColor(0xffffff);
 		this.background = this.add.image(0, 0, levelData.background);
@@ -55,12 +56,11 @@ export class GameScene extends BaseScene {
 		this.entityLayer = new Phaser.GameObjects.Container(this, 0, 0);
 		this.add.existing(this.entityLayer);
 
-		this.playerHealth = loopState.maxHealth;
-
 		this.loadMonster(levelData.enemy);
 
 		this.loopDrawer = new LoopDrawer(this);
 		this.loopDrawer.on("loop", this.onLoop, this);
+		this.loopDrawer.on("break", this.onLoopBreak, this);
 
 		this.textParticles = new TextParticle(this);
 
@@ -132,6 +132,7 @@ export class GameScene extends BaseScene {
 		// Call `this.emit("addEntity", object)` inside of a Monster class to add it
 		entity.on("addEntity", this.addEntity, this);
 		entity.on("removeEntity", this.removeEntity, this);
+		entity.on("damage", this.damagePlayer, this);
 		entity.on("victory", this.win, this);
 	}
 
@@ -171,7 +172,7 @@ export class GameScene extends BaseScene {
 		this.entities.forEach((entity) => entity.update(time, delta));
 
 		this.loopDrawer.update(time, delta);
-		this.loopDrawer.checkCollisions(this.colliders);
+		this.loopDrawer.checkCollisions(this.entities);
 		this.textParticles.update(time, delta);
 
 		this.drawColliders();
@@ -201,10 +202,6 @@ export class GameScene extends BaseScene {
 		this.projectiles.update(t, d);
 	}
 
-	addToEntityLayer(p: Phaser.GameObjects.Container) {
-		this.entityLayer.add(p);
-	}
-
 	onLoop(polygon: Phaser.Geom.Polygon) {
 		this.entities.forEach((entity) => {
 			if (Phaser.Geom.Polygon.Contains(polygon, entity.x, entity.y)) {
@@ -213,6 +210,26 @@ export class GameScene extends BaseScene {
 				}
 			}
 		});
+	}
+
+	onLoopBreak(entity: Entity) {
+		this.damagePlayer(entity.entityDamage);
+	}
+
+	damagePlayer(damage: number) {
+		this.flash(200, 0xff7777, 0.2);
+		this.shake(500, 10, 0);
+
+		this.loopDrawer.onLineBreak();
+
+		const { x, y } = this.ui.healthPosition;
+		this.textParticle(x, y, "red", `${-damage}`, false, 96, 3);
+
+		// Reduce player health
+		loopState.health = Math.max(0, loopState.health - damage);
+		if (loopState.health <= 0) {
+			this.lose();
+		}
 	}
 
 	drawColliders() {
@@ -249,18 +266,6 @@ export class GameScene extends BaseScene {
 
 	get colliders(): Phaser.Geom.Circle[] {
 		return this.entities.flatMap((entity) => entity.colliders);
-	}
-
-	damageToPlayer(amount: number) {
-		this.flash(200, 0xff7777, 0.2);
-		this.shake(500, 10, 0);
-
-		this.loopDrawer.onLineBreak();
-
-		this.playerHealth = Math.max(0, this.playerHealth - amount);
-		if (this.playerHealth <= 0) {
-			this.lose();
-		}
 	}
 
 	win() {
