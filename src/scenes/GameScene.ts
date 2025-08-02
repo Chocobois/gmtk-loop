@@ -14,6 +14,7 @@ import { Jester } from "@/components/enemies/jester/Jester";
 import { loopState } from "@/state/LoopState";
 
 import BendWaves from "@/pipelines/BendWavesPostFX";
+import { Wolf } from "@/components/enemies/wolf/Wolf";
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -81,7 +82,7 @@ export class GameScene extends BaseScene {
 	loadMonster(enemyKey: string) {
 		switch (enemyKey) {
 			case "sans":
-				const monster = new Monster(this, 960, 540);
+				const monster = new Wolf(this, 960, 540);
 				this.addEntity(monster);
 				break;
 
@@ -138,7 +139,7 @@ export class GameScene extends BaseScene {
 	}
 
 	update(time: number, delta: number) {
-		this.entities.forEach((entity) => entity.update(time, delta));
+		this.updateEntities(time,delta);
 
 		this.loopDrawer.update(time, delta);
 		this.loopDrawer.checkCollisions(this.colliders);
@@ -169,6 +170,16 @@ export class GameScene extends BaseScene {
 		this.indicators.update(t, d);
 		this.hitEffects.update(t, d);
 		this.projectiles.update(t, d);
+	}
+
+	updateEntities(t: number, d: number){
+		for(let h = (this.entities.length-1); h >= 0; h--){
+			this.entities[h].update(t, d);
+			if(this.entities[h].deleteFlag) {
+				this.entities[h].destroy();
+				this.entities.splice(h,1);
+			}
+		}
 	}
 
 	addToEntityLayer(p: Phaser.GameObjects.Container) {

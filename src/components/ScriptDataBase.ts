@@ -5,7 +5,8 @@ import { MonsterScriptHandler } from "./MonsterScriptHandler";
 export class ScriptDataBase {
     public owner: Monster;
     public ctrl: MonsterScriptHandler;
-    public scr1: MonsterCommand[][]; public idle: MonsterCommand[][]; public weak: MonsterCommand[][]; public dashblitz: MonsterCommand[][];
+    public scr1: MonsterCommand[][]; public idle: MonsterCommand[][]; public weak: MonsterCommand[][]; public dashblitz: MonsterCommand[][]; public wolfidle: MonsterCommand[][];
+    public sit: MonsterCommand[][];   public shatter: MonsterCommand[][];
     constructor(m: Monster, ct: MonsterScriptHandler){
         //this is an array of an array of monstercommands
         //all monstercommands in the same array will run simultaneously
@@ -66,7 +67,8 @@ export class ScriptDataBase {
 
         this.dashblitz = [[
             new MonsterCommand(this.owner, this.ctrl, [
-                {key: "wait", value: [1000], args: [], conditions: []},
+                {key: "wait", value: [2000], args: [], conditions: []},
+                {key: "stunimmune", value: [], args: [], conditions: [true]},
                 {key: "flash", value: [100,2000], args: [], conditions: []},
                 {key: "wait", value: [2000], args: [], conditions: []},
                 {key: "dashAtCorner", value: [5], args: [], conditions: []},
@@ -82,12 +84,26 @@ export class ScriptDataBase {
                 {key: "tsa", value: [], args: [], conditions: [false]},
                 {key: "wait", value: [1000], args: [], conditions: []},
                 {key: "travel", value: [5,910,1010,490,590], args: [], conditions: [false,true]},
+                {key: "circleEffect", value: [], args: [], conditions: []},
+                {key: "lineEffect", value: [], args: [], conditions: []},
                 {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "stunimmune", value: [], args: [], conditions: [false]},
                 {key: "wait", value: [3000], args: [], conditions: []},
-               
+                {key: "call", value: [1], args: ["clearice"], conditions: []},
+                {key: "stunimmune", value: [], args: [], conditions: [true]},
+                {key: "circleEffect", value: [], args: [], conditions: []},
+                {key: "wait", value: [250], args: [], conditions: []},
+                {key: "circleEffect", value: [], args: [], conditions: []},
+                {key: "wait", value: [250], args: [], conditions: []},
+                {key: "circleEffect", value: [], args: [], conditions: []},
+                {key: "wait", value: [250], args: [], conditions: []},
+                {key: "call", value: [4], args: ["spawnice"], conditions: []},
+                {key: "stunimmune", value: [], args: [], conditions: [false]},
+                
+                {key: "wait", value: [2000], args: [], conditions: []},
+                {key: "stunimmune", value: [], args: [], conditions: [true]},
                 {key: "flash", value: [100,2000], args: [], conditions: []},
                 {key: "wait", value: [2000], args: [], conditions: []},
-
                 {key: "dashAtEdge", value: [5,200], args: [], conditions: []},
                 {key: "tsa", value: [], args: [], conditions: [false]},
                 {key: "wait", value: [1000], args: [], conditions: []},
@@ -101,9 +117,54 @@ export class ScriptDataBase {
                 {key: "tsa", value: [], args: [], conditions: [false]},
                 {key: "wait", value: [1000], args: [], conditions: []},
                 {key: "travel", value: [5,910,1010,490,590], args: [], conditions: [false,true]},
+                {key: "circleEffect", value: [], args: [], conditions: []},
+                {key: "lineEffect", value: [], args: [], conditions: []},
                 {key: "tsa", value: [], args: [], conditions: [false]},
-                {key: "wait", value: [5000], args: [], conditions: []},
-                {key: "loop", value: [1], args: [], conditions: []}]),
+                {key: "stunimmune", value: [], args: [], conditions: [false]},
+                {key: "wait", value: [3000], args: [], conditions: []},
+                {key: "stunimmune", value: [], args: [], conditions: [true]},
+                {key: "call", value: [1], args: ["clearice"], conditions: []},
+                {key: "circleEffect", value: [], args: [], conditions: []},
+                {key: "wait", value: [250], args: [], conditions: []},
+                {key: "circleEffect", value: [], args: [], conditions: []},
+                {key: "wait", value: [250], args: [], conditions: []},
+                {key: "circleEffect", value: [], args: [], conditions: []},
+                {key: "wait", value: [250], args: [], conditions: []},
+                {key: "call", value: [4], args: ["spawnice"], conditions: []},
+                {key: "stunimmune", value: [], args: [], conditions: [false]},
+                {key: "loop", value: [0], args: [], conditions: []}]),
+            ],
+        ]
+
+        this.wolfidle = [[
+            new MonsterCommand(this.owner, this.ctrl, [
+                {key: "wait", value: [1500], args: [], conditions: []},
+                {key: "travel", value: [0.1,200,1720,200,880], args: [], conditions: [false, false]},
+                {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "travel", value: [0.1,200,1720,200,880], args: [], conditions: [false, false]},
+                {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "wait", value: [1500], args: [], conditions: []},
+                {key: "loop", value: [0], args: [], conditions: []}]),
+            ],
+        ]
+
+        this.sit = [[
+            new MonsterCommand(this.owner, this.ctrl, [
+                {key: "wait", value: [1500], args: [], conditions: []},
+                {key: "travel", value: [0.1,200,1720,200,880], args: [], conditions: [false, false]},
+                {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "travel", value: [0.1,200,1720,200,880], args: [], conditions: [false, false]},
+                {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "wait", value: [1500], args: [], conditions: []},
+                {key: "loop", value: [0], args: [], conditions: []}]),
+            ],
+        ]
+
+        this.shatter = [[
+            new MonsterCommand(this.owner, this.ctrl, [
+                {key: "flash", value: [100,1000], args: [], conditions: []},
+                {key: "wait", value: [1050], args: [], conditions: []},
+                {key: "die", value: [], args: [], conditions: []}]),
             ],
         ]
     };
@@ -116,6 +177,9 @@ export class ScriptDataBase {
             case "idle": {return this.idle;}
             case "weak": {return this.weak;}
             case "dashblitz": {return this.dashblitz;}
+            case "wolfidle": {return this.wolfidle;}
+            case "sit": {return this.sit;}
+            case "shatter": {return this.shatter;}
             default: {return this.idle;}
         }
     }

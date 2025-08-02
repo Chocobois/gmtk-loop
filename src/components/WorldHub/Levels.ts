@@ -4,7 +4,7 @@ export const levels: LevelDefinition[] = [
 	{
 		x: 400,
 		y: 540,
-		title: "Sans",
+		title: "Wolf",
 		key: "1",
 		require: [],
 		enemy: "sans",

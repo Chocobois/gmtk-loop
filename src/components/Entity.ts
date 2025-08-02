@@ -3,6 +3,7 @@ import { BaseScene } from "@/scenes/BaseScene";
 export class Entity extends Phaser.GameObjects.Container {
 	public scene: BaseScene;
 	public enabled: boolean = true;
+	public deleteFlag: boolean = false;
 
 	constructor(scene: BaseScene, x: number, y: number) {
 		super(scene, x, y);
