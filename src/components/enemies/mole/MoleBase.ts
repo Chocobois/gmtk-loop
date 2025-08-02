@@ -1,5 +1,5 @@
 import { GameScene } from "@/scenes/GameScene";
-import { Entity } from "../../Entity";
+import { BaseMonster } from "@/components/BaseMonster";
 
 export enum MoleState {
 	IDLE,
@@ -8,7 +8,7 @@ export enum MoleState {
 }
 
 // Shared Mole functionality between MoleBoss and MoleFake
-export class MoleBase extends Entity {
+export class MoleBase extends BaseMonster {
 	public scene: GameScene;
 
 	protected moleState: MoleState;
@@ -65,42 +65,6 @@ export class MoleBase extends Entity {
 		this.moleState = state;
 	}
 
-	// Returns a list of spaced apart positions
-	getRandomPositions(count: number): Phaser.Math.Vector2[] {
-		let separation = 400;
-		const positions: Phaser.Math.Vector2[] = [];
-
-		while (positions.length < count && separation-- > 0) {
-			const x = Phaser.Math.Between(300, this.scene.W - 300);
-			const y = Phaser.Math.Between(300, this.scene.H - 300);
-			const p = new Phaser.Math.Vector2(x, y);
-
-			if (
-				positions.every(
-					(o) => Phaser.Math.Distance.Between(o.x, o.y, p.x, p.y) >= separation
-				)
-			) {
-				positions.push(p);
-			}
-		}
-		return positions;
-	}
-
-	move(x: number, y: number, instantly: boolean) {
-		if (instantly) {
-			this.x = x;
-			this.y = y;
-		} else {
-			this.scene.tweens.add({
-				targets: this,
-				x,
-				y,
-				duration: 2000,
-				ease: Phaser.Math.Easing.Quadratic.InOut,
-			});
-		}
-	}
-
 	animateAppear(duration: number = 500) {
 		this.setEnabled(true);
 
@@ -123,17 +87,6 @@ export class MoleBase extends Entity {
 		});
 	}
 
-	animateShake() {
-		this.scene.tweens.addCounter({
-			duration: 500,
-			ease: Phaser.Math.Easing.Sine.Out,
-			onUpdate: (tween) => {
-				let t = 1 - (tween.getValue() || 0);
-				this.sprite.setOrigin(0.5 + t * 0.1 * Math.sin(20 * t), 0.5);
-			},
-		});
-	}
-
 	update(time: number, delta: number) {
 		const wobble = this.moleState == MoleState.DEAD ? 0 : 0.04;
 		const squish = 1.0 + wobble * Math.sin((8 * time) / 1000);
@@ -150,7 +103,7 @@ export class MoleBase extends Entity {
 	}
 
 	onLoop() {
-		this.animateShake();
+		this.animateShake(this.sprite);
 	}
 
 	protected shapes: Phaser.Geom.Circle[] = [];

@@ -5,13 +5,15 @@ import { TextParticle, TextParticleEffects } from "@/components/TextParticle";
 import { Effect } from "@/components/Effect";
 import { EffectTracker } from "@/components/EffectTracker";
 import { LevelDefinition } from "@/components/WorldHub/LevelDefinition";
+import { loopState } from "@/state/LoopState";
+import { Music } from "@/components/Music";
 
 import { Entity } from "@/components/Entity";
 import { Monster } from "@/components/Monster";
 import { SnakeMonster } from "@/components/enemies/snake/SnakeMonster";
 import { MoleBoss } from "@/components/enemies/mole/MoleBoss";
 import { Jester } from "@/components/enemies/jester/Jester";
-import { loopState } from "@/state/LoopState";
+import { AbraBoss } from "@/components/enemies/abra/AbraBoss";
 
 import BendWaves from "@/pipelines/BendWavesPostFX";
 import { Wolf } from "@/components/enemies/wolf/Wolf";
@@ -33,6 +35,8 @@ export class GameScene extends BaseScene {
 	public winJingle: Phaser.Sound.BaseSound;
 	public loseJingle: Phaser.Sound.BaseSound;
 	private gameOverText: Phaser.GameObjects.Image;
+
+	private music: Music;
 
 	private playerHealth: number;
 
@@ -66,6 +70,14 @@ export class GameScene extends BaseScene {
 		this.debugGraphics = this.add.graphics();
 
 		this.initGraphics();
+
+		// Music
+		if (!this.music) {
+			// TODO: Add music track in LevelDefinition
+			this.music = new Music(this, "m_fight", { volume: 0.2 });
+			// this.music = new Music(this, "m_lightfast", { volume: 0.2 });
+		}
+		this.music.play();
 
 		// Temporary
 		this.addText({
@@ -103,6 +115,11 @@ export class GameScene extends BaseScene {
 				this.addEntity(jester);
 				break;
 
+			case "abra":
+				const abra = new AbraBoss(this, 960, 540);
+				this.addEntity(abra);
+				break;
+
 			default:
 				console.warn(`Unknown enemy type: ${enemyKey}`);
 				break;
@@ -115,7 +132,20 @@ export class GameScene extends BaseScene {
 
 		// Call `this.emit("addEntity", object)` inside of a Monster class to add it
 		entity.on("addEntity", this.addEntity, this);
+		entity.on("removeEntity", this.removeEntity, this);
 		entity.on("victory", this.win, this);
+	}
+
+	removeEntity(entity: Entity) {
+		this.entities = this.entities.filter((elt) => elt !== entity);
+		entity.destroy();
+	}
+
+	removeMonster(monster: Monster) {
+		this.removeEntity(monster);
+		if (this.entities.length === 0) {
+			this.win();
+		}
 	}
 
 	initGraphics() {
@@ -196,14 +226,6 @@ export class GameScene extends BaseScene {
 		});
 	}
 
-	removeMonster(monster: Monster) {
-		this.entities = this.entities.filter((elt) => elt !== monster);
-		monster.destroy();
-		if (this.entities.length === 0) {
-			this.win();
-		}
-	}
-
 	drawColliders() {
 		this.debugGraphics.clear();
 		this.debugGraphics.fillStyle(0xff0000, 0.25);
@@ -254,26 +276,32 @@ export class GameScene extends BaseScene {
 
 	win() {
 		this.loopDrawer.setEnabled(false);
-		this.time.addEvent({
-			delay: 5000,
-			callback: () => {
-				this.scene.start("WorldScene");
-			},
-		});
+		this.music.stop();
+		this.sound.play("u_level_enter", { volume: 0.4 });
+
 		this.gameOverText = this.add.image(this.CX, 1000, "win");
-		// this.winJingle.play();
+
+		this.addEvent(3000, () => {
+			this.fade(true, 100, 0x000000);
+			this.addEvent(100, () => {
+				this.scene.start("WorldScene");
+			});
+		});
 	}
 
 	lose() {
 		this.loopDrawer.setEnabled(false);
-		this.time.addEvent({
-			delay: 4000,
-			callback: () => {
-				this.scene.start("WorldScene");
-			},
-		});
+		this.music.stop();
+		this.sound.play("u_level_enter", { volume: 0.4 });
+
 		this.gameOverText = this.add.image(this.CX, 1000, "lose");
-		// this.loseJingle.play();
+
+		this.addEvent(3000, () => {
+			this.fade(true, 100, 0x000000);
+			this.addEvent(100, () => {
+				this.scene.start("WorldScene");
+			});
+		});
 	}
 
 	// Used by Jester to affect the player input

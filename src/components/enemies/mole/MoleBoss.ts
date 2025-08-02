@@ -1,7 +1,6 @@
 import { GameScene } from "@/scenes/GameScene";
 import { MoleBase, MoleState } from "./MoleBase";
 import { MoleFake } from "./MoleFake";
-import { SparkEffect } from "@/components/particles/SparkEffect";
 import { loopState } from "@/state/LoopState";
 
 // Leader mole that commands the fake moles
@@ -11,8 +10,6 @@ export class MoleBoss extends MoleBase {
 	private digCount: number;
 	private health: number;
 
-	protected sparkEffect: SparkEffect;
-
 	constructor(scene: GameScene, x: number, y: number) {
 		super(scene, x, y);
 
@@ -21,8 +18,6 @@ export class MoleBoss extends MoleBase {
 		this.health = 1000;
 
 		this.sprite.setTexture("mole_boss_1");
-
-		this.sparkEffect = new SparkEffect(scene);
 
 		this.setMoleState(MoleState.IDLE);
 	}
@@ -85,11 +80,12 @@ export class MoleBoss extends MoleBase {
 	}
 
 	moveAllMoles(instantly: boolean) {
+		const duration = instantly ? 0 : 2000;
 		const points = this.getRandomPositions(1 + this.fakeMoles.length);
 
-		this.move(points[0].x, points[0].y, instantly);
+		this.move(points[0].x, points[0].y, duration);
 		this.fakeMoles.forEach((fakeMole, i) => {
-			fakeMole.move(points[i + 1].x, points[i + 1].y, instantly);
+			fakeMole.move(points[i + 1].x, points[i + 1].y, duration);
 		});
 	}
 

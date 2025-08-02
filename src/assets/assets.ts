@@ -15,6 +15,18 @@ const images: Image[] = [
 	image("backgrounds/battlefloor/grassyplains_alt4", "background_plains_4"),
 
 	image("backgrounds/battlefloor/stone", "background_stone_0"),
+	image("backgrounds/battlefloor/ice", "background_ice"),
+	image("backgrounds/battlefloor/magma", "background_magma"),
+	image("backgrounds/battlefloor/stone", "background_stone"),
+
+	image("backgrounds/shelves", "background_shelves"),
+
+	// Pearls
+	image("pearls/fire", "pearl_fire"),
+	image("pearls/grass", "pearl_grass"),
+	image("pearls/water", "pearl_water"),
+	image("pearls/electric", "pearl_electric"),
+
 
 	// Characters
 	image("characters/player", "player"),
@@ -52,6 +64,10 @@ const images: Image[] = [
 	image("characters/jester/card_diamond", "jester_card_diamond"),
 	image("characters/jester/card_club", "jester_card_club"),
 	image("characters/jester/card_spade", "jester_card_spade"),
+
+	image("characters/abra/idle", "abra_idle"),
+	image("characters/abra/active", "abra_active"),
+	image("characters/abra/hurt", "abra_hurt"),
 
 	// Monsters
 	// Planning on making monsters a 1 file spritesheet
@@ -109,6 +125,9 @@ const audios: Audio[] = [
 	music("first", "m_first"),
 	music("lightfast", "m_lightfast"),
 
+	music("fight", "m_fight"),
+	music("map", "m_map"),
+
 	sound("tree/rustle", "t_rustle", 0.5),
 	sound("drawing/sine", "d_sine", 0.3),
 	sound("drawing/brush", "d_brush"),
@@ -120,6 +139,8 @@ const audios: Audio[] = [
 	sound("ui/screen_transition", "u_level_enter"),
 	sound("ui/what", "u_question"),
 	sound("ui/disabled", "u_disabled"),
+
+	sound("hub/map_select", "h_map_select"),
 ];
 
 /* Fonts */
