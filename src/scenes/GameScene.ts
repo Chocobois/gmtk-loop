@@ -9,7 +9,7 @@ import { LevelDefinition } from "@/components/WorldHub/LevelDefinition";
 import { Entity } from "@/components/Entity";
 import { Monster } from "@/components/Monster";
 import { SnakeMonster } from "@/components/enemies/SnakeMonster";
-import { MoleMonster } from "@/components/enemies/MoleMonster";
+import { MoleBoss } from "@/components/enemies/mole/MoleBoss";
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -87,9 +87,10 @@ export class GameScene extends BaseScene {
 				break;
 
 			case "mole":
-				const mole = new MoleMonster(this, 960, 540);
+				const mole = new MoleBoss(this, 960, 540);
 				this.addEntity(mole);
 				mole.addFakeMoles(3);
+				mole.moveAllMoles(true);
 				break;
 
 			default:
@@ -104,14 +105,14 @@ export class GameScene extends BaseScene {
 
 		// Call `this.emit("addEntity", object)` inside of a Monster class to add it
 		entity.on("addEntity", this.addEntity, this);
+		entity.on("victory", this.win, this);
 	}
 
 	initGraphics() {
 		this.background.setDepth(0);
 		this.entityLayer.setDepth(19);
-		this.textParticles.setDepth(20);
+		this.textParticles.setDepth(30);
 		this.debugGraphics.setDepth(100);
-		this.debugGraphics.setVisible(false);
 		this.loopDrawer.setDepth(1000);
 
 		this.indicators = new EffectTracker(this, 0, 0);
@@ -230,18 +231,18 @@ export class GameScene extends BaseScene {
 			},
 		});
 		this.gameOverText = this.add.image(this.CX, 1000, "win");
-		this.winJingle.play();
+		// this.winJingle.play();
 	}
 
 	lose() {
 		this.loopDrawer.setEnabled(false);
 		this.time.addEvent({
-			delay: 5000,
+			delay: 4000,
 			callback: () => {
 				this.scene.start("WorldScene");
 			},
 		});
 		this.gameOverText = this.add.image(this.CX, 1000, "lose");
-		this.loseJingle.play();
+		// this.loseJingle.play();
 	}
 }
