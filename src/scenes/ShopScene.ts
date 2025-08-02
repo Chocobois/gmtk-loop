@@ -1,7 +1,8 @@
 import { BaseScene } from "@/scenes/BaseScene";
 import { LoopDrawer } from "@/components/LoopDrawer";
-import { Pearl, PearlTypes } from "@/components/pearls/Pearl";
+import { Pearl, PearlType, PearlTypes } from "@/components/pearls/Pearl";
 import { Entity } from "@/components/Entity";
+import { pearlState } from "@/state/PearlState";
 
 export class ShopScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -40,7 +41,9 @@ export class ShopScene extends BaseScene {
         for(const [_, pearlDescriptor] of Object.entries(PearlTypes)) {
             const pearl = new Pearl(this, pearlDescriptor);
             this.entities.push(pearl);
-            pearl.on("selected", () => console.log("Pearled"))
+            pearl.on("selected", (pearl: PearlType) => {
+				pearlState.pearlLineColor = pearl.lineColor
+			});
         }
 	}
 

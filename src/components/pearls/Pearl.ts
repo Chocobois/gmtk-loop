@@ -3,31 +3,36 @@ import { Entity } from "../Entity";
 
 import { config } from "@/game-config";
 
-type PearlType = {
+export type PearlType = {
     image: string, 
     x: number,
-    y: number
+    y: number,
+    lineColor: number,
 }
 export const PearlTypes = {
     fire: {
         image: "pearl_fire",
         x: 700,
         y: 500,
+        lineColor: 0xff4444,
     },
     water: {
         image: "pearl_water",
         x: Number(config.width) - 700,
         y: 500,
+        lineColor: 0x4444ff,
     },
     grass: {
         image: "pearl_grass",
         x: 700,
         y: Number(config.height) - 250,
+        lineColor: 0x44ff44,
     },
     electric: {
         image: "pearl_electric",
         x: Number(config.width) - 700,
         y: Number(config.height) - 250,
+        lineColor: 0xffff44,
     },
 } as const satisfies Record<string, PearlType>;
 
@@ -43,6 +48,7 @@ export class Pearl extends Entity {
         this.image.setScale(0.75);
 		this.add(this.image);
 		this.scene = scene;
+        this.pearl = pearl;
     }
 
     onLoop() {

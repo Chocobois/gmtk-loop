@@ -1,5 +1,7 @@
 import { BaseScene } from "@/scenes/BaseScene";
 import { loopState } from "@/state/LoopState";
+import { pearlState } from "@/state/PearlState";
+import { autorun } from "mobx";
 
 const SFX_FADE_OUT_DURATION = 100; //ms
 const SFX_SMOOTHING_WINDOW_SIZE = 500; //ms
@@ -74,6 +76,12 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 			onStop: () => {
 				this.sfxLoop.setVolume(1);
 			},
+		});
+		
+		autorun(() => {
+			console.log("New color")
+			this.loopColor = pearlState.pearlLoopColor;
+			this.lineColor = pearlState.pearlLineColor;
 		});
 	}
 
