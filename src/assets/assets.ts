@@ -42,6 +42,11 @@ const images: Image[] = [
 	image("characters/runes/r8", "r8"),
 	image("characters/runes/r9", "r9"),
 	image("characters/snailenemy", "escargot"),
+	image("characters/iceberg", "iceberg"),
+	image("characters/c1", "c1"),
+	image("characters/c2", "c2"),
+	image("characters/c3", "c3"),
+	image("characters/c4", "c4"),
 
 	image("characters/snake/snake", "snake"),
 
@@ -103,6 +108,9 @@ const images: Image[] = [
 /* Spritesheets */
 const spritesheets: SpriteSheet[] = [
 	spritesheet("characters/sansplane", "sansplane", 256, 196),
+	spritesheet("characters/snail", "snail", 256, 256),
+	spritesheet("characters/wolf", "wolf", 256, 256),
+	spritesheet("effects/boom", "boom", 512, 512),
 
 	// Particles
 	spritesheet("particles/bubbles", "bubbles", 128, 128),

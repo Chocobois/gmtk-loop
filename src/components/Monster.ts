@@ -5,9 +5,7 @@ import { WedgeIndicator } from "./Indicators/WedgeIndicator";
 import { MonsterScriptHandler } from "./MonsterScriptHandler";
 import { Entity } from "./Entity";
 
-const IDLE = 0;
-const RAGE = 1;
-const WEAK = 2;
+
 const ACCELERATION = 150;
 const MAX_SPEED = 400;
 const FRICTION = 0.7;
@@ -23,50 +21,56 @@ export interface DifficultyStats {
 }
 
 export class Monster extends Entity {
+
+	protected IDLE = 0;
+	protected RAGE = 1;
+	protected WEAK = 2;
 	public scene: GameScene;
 
 	// Sprites
-	private spriteSize: number;
-	private sprite: Phaser.GameObjects.Sprite;
-	private tween: Phaser.Tweens.Tween;
+	protected spriteSize: number;
+	protected sprite: Phaser.GameObjects.Sprite;
+	protected tween: Phaser.Tweens.Tween;
+	protected activetw: Phaser.Tweens.Tween;
 
 	// Collider
 	private collider: Phaser.Geom.Circle = new Phaser.Geom.Circle();
 
 	// Controls
 	public velocity: Phaser.Math.Vector2;
-	private border: { [key: string]: number };
+	protected border: { [key: string]: number };
 
-	private captureDisp: CaptureBar;
-	private behavior: MonsterScriptHandler;
+	protected captureDisp: CaptureBar;
+	protected behavior: MonsterScriptHandler;
 
-	private t: number = 2000;
+	protected t: number = 2000;
 
 	//behavioral variables
-	private waitMultiplier: number[] = [1,0.75,2];
-	private initPos: number[];
-	private towardsPos: number[];
-	private accel: Phaser.Math.Vector2;
-	private maxV: number = 2000;
+	protected waitMultiplier: number[] = [1,0.75,2];
+	protected initPos: number[];
+	protected towardsPos: number[];
+	protected accel: Phaser.Math.Vector2;
+	protected maxV: number = 2000;
 	public traveling: boolean = false;
 	public tDist: number = 0;
 	public cDist: number = 0;
-	private elapsedDist: number = 0;
+	protected elapsedDist: number = 0;
+	protected exhaust: number = 0;
+	protected stateHP: number[] = [5,10,15];
+	protected multipliers: number[] = [1,0.5,3];
+	protected curState: number = 0;
+	protected fTimer: number[] = [0,0,0];
+	protected stunTime: number = 0;
+	public stunImmune: boolean = false;
 
-	private exhaust: number = 0;
-	private stateHP: number[] = [5,10,15];
-	private multipliers: number[] = [1,0.5,3];
-	private curState: number = 0;
-	private fTimer: number[] = [0,0,0];
-
-	constructor(scene: GameScene, x: number, y: number) {
+	constructor(scene: GameScene, x: number, y: number, spr: string = "sansplane") {
 		super(scene, x, y);
 		scene.add.existing(this);
 		this.scene = scene;
 
 		/* Sprite */
 		this.spriteSize = 200;
-		this.sprite = this.scene.add.sprite(0, 0, "sansplane");
+		this.sprite = this.scene.add.sprite(0, 0, spr);
 		this.sprite.setOrigin(0.5, 0.5);
 		//this.sprite.y += this.spriteSize / 2;
 		this.sprite.setScale(this.spriteSize / this.sprite.width);
@@ -88,7 +92,20 @@ export class Monster extends Entity {
 		this.accel = new Phaser.Math.Vector2(0,0);
 	}
 
+
+
 	update(time: number, delta: number) {
+		this.boundCheck();
+		this.updateGFX(time,delta);
+		const squish = 1.0 + 0.02 * Math.sin((6 * time) / 1000);
+		this.setScale(1.0, squish);
+		if(this.stunTime > 0){
+			this.stunTime -= delta;
+			if(this.stunTime <= 0){
+				this.stunTime = 0;
+			}
+			return;
+		}
 		if(this.accel.x != 0 || this.accel.y != 0){
 			this.velocity.x += this.accel.x*delta/1000;
 			this.velocity.y += this.accel.y*delta/1000;
@@ -99,6 +116,11 @@ export class Monster extends Entity {
 		if(this.traveling){
 			this.travelCheck();
 		}
+		// Animation (Change to this.sprite.setScale if needed)
+		this.behavior.update(time,delta);
+	}
+
+	boundCheck(){
 		// Border collision
 		if (this.x < this.border.left) {
 			this.x = this.border.left;
@@ -112,19 +134,10 @@ export class Monster extends Entity {
 		if (this.y > this.border.bottom) {
 			this.y = this.border.bottom;
 		}
-
-		// Animation (Change to this.sprite.setScale if needed)
-		const squish = 1.0 + 0.02 * Math.sin((6 * time) / 1000);
-		this.setScale(1.0, squish);
-
-
-		this.captureDisp.update(time, delta);
-		this.behavior.update(time,delta);
-		this.updateGFX(time,delta);
-
 	}
 
 	updateGFX(t: number, d: number){
+		this.captureDisp.update(t, d);
 		if(this.fTimer[2] > 0){
 			if(this.fTimer[0] > (-1*this.fTimer[1])) {
 				this.fTimer[0] -= d;
@@ -143,6 +156,24 @@ export class Monster extends Entity {
 		}
 	}
 
+	stun(n: number){
+		if(!this.stunImmune){
+			this.stunTime = n;
+		}
+		this.animateShake(n);
+	}
+
+	animateShake(t: number) {
+		this.scene.tweens.addCounter({
+			duration: t,
+			ease: Phaser.Math.Easing.Sine.Out,
+			onUpdate: (tween) => {
+				let t = 1 - (tween.getValue() || 0);
+				this.sprite.setOrigin(0.5 + t * 0.1 * Math.sin(20 * t), 0.5);
+			},
+		});
+	}
+
 	onLoop() { 
 		this.damage(loopState.attackPower);
 	}
@@ -150,7 +181,7 @@ export class Monster extends Entity {
 	damage(amount: number) {
 		console.log("Monster damaged by", amount);
 		this.scene.textParticle(this.x + Math.random()*50, this.y+Math.random()*50, "OrangeRed", ""+amount);
-		console.log("Particle");
+		//console.log("Particle");
 		this.captureDisp.takeDamage(amount);
 		this.exhaust++;
 		if(this.exhaust >= this.stateHP[this.curState]) {
@@ -163,10 +194,10 @@ export class Monster extends Entity {
 		this.resetVelocity();
 		this.exhaust = 0;
 		switch(this.curState){
-			case IDLE: { this.curState = RAGE; this.behavior.swapScriptList("sans"); this.sprite.setFrame(1); break;} 
-			case RAGE: { this.curState = WEAK; this.behavior.swapScriptList("weak"); this.sprite.setFrame(2); break;}
-			case WEAK: { this.curState = IDLE; this.behavior.swapScriptList("idle"); this.sprite.setFrame(0); break;}
-			default: { this.curState = IDLE; break;}
+			case this.IDLE: { this.curState = this.RAGE; this.behavior.swapScriptList("sans"); this.sprite.setFrame(1); break;} 
+			case this.RAGE: { this.curState = this.WEAK; this.behavior.swapScriptList("weak"); this.sprite.setFrame(2); break;}
+			case this.WEAK: { this.curState = this.IDLE; this.behavior.swapScriptList("idle"); this.sprite.setFrame(0); break;}
+			default: { this.curState = this.IDLE; break;}
 		}
 	}
 
@@ -214,6 +245,10 @@ export class Monster extends Entity {
 		}
 	}
 
+	die(){
+
+	}
+
 	move(x: number, y: number, instantly: boolean) {
 
 			this.scene.tweens.add({
@@ -256,7 +291,7 @@ export class Monster extends Entity {
 
 	unflash(){
 		this.fTimer = [0,0,0];
-		this.sprite.clearTint;
+		this.sprite.clearTint();
 	}
 
 	protected shapes: Phaser.Geom.Circle[] = [
@@ -272,12 +307,16 @@ export class Monster extends Entity {
 		this.scene.removeMonster(this);
 	}
 
+	callSpecial(key: string){
+
+	}
+
 
 	getWaitMultiplier(): number{
 		switch(this.curState){
-			case IDLE: {return this.waitMultiplier[0]}
-			case RAGE: {return this.waitMultiplier[1]}
-			case WEAK: {return this.waitMultiplier[2]}
+			case this.IDLE: {return this.waitMultiplier[0]}
+			case this.RAGE: {return this.waitMultiplier[1]}
+			case this.WEAK: {return this.waitMultiplier[2]}
 			default: {return 1;}
 		}
 	}
