@@ -17,7 +17,7 @@ export const levels = [
 		key: "2a",
 		require: ["1"],
 		enemy: "snake",
-		background: "background_plains_1",
+		background: "background_ice",
 	},
 	{
 		x: 800,
@@ -44,7 +44,7 @@ export const levels = [
 		key: "3b",
 		require: ["2b"],
 		enemy: "abra",
-		background: "background_plains_3",
+		background: "background_magma",
 	},
 	{
 		x: 1600,
@@ -53,7 +53,7 @@ export const levels = [
 		key: "4",
 		require: ["3a", "3b"],
 		enemy: "",
-		background: "background_plains_0",
+		background: "background_stone",
 	},
 ] as const satisfies LevelDefinition[];
 

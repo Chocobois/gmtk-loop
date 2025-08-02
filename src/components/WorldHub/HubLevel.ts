@@ -38,9 +38,9 @@ export class HubLevel extends Entity {
 			this.scene.tweens.add({
 				targets: this.image,
 				// Please keep this in mind if you tint the image elsewhere
-				tint: {from: 0xff0000, to: 0xffffff},
+				tint: { from: 0xff0000, to: 0xffffff },
 				duration: 400,
-			})
+			});
 			return;
 		}
 
@@ -53,7 +53,7 @@ export class HubLevel extends Entity {
 			},
 		});
 
-		this.scene.sound.play("u_level_enter", {volume: 0.4});
+		this.scene.sound.play("h_map_select", { volume: 0.2 });
 
 		this.emit("selected", this.levelData);
 	}

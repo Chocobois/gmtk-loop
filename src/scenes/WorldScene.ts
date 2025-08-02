@@ -4,6 +4,7 @@ import { HubLevel } from "@/components/WorldHub/HubLevel";
 import { levels } from "@/components/WorldHub/Levels";
 import { Entity } from "@/components/Entity";
 import { LevelDefinition } from "@/components/WorldHub/LevelDefinition";
+import { Music } from "@/components/Music";
 
 export class WorldScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -11,6 +12,8 @@ export class WorldScene extends BaseScene {
 
 	private entities: Entity[];
 	private hubs: HubLevel[];
+
+	private music: Music;
 
 	constructor() {
 		super({ key: "WorldScene" });
@@ -65,6 +68,12 @@ export class WorldScene extends BaseScene {
 		this.loopDrawer = new LoopDrawer(this);
 		this.loopDrawer.setDepth(1000);
 		this.loopDrawer.on("loop", this.onLoop, this);
+
+		// Music
+		if (!this.music) {
+			this.music = new Music(this, "m_map", { volume: 0.2 });
+		}
+		this.music.play();
 	}
 
 	update(time: number, delta: number) {
@@ -86,6 +95,7 @@ export class WorldScene extends BaseScene {
 	loadLevel(levelData: LevelDefinition): void {
 		// Disable loop drawing
 		this.loopDrawer.setEnabled(false);
+		this.music.stop();
 
 		// Flash the screen and start the level
 		this.flash(1000, 0xffffff, 0.3);
