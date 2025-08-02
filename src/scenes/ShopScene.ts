@@ -35,6 +35,7 @@ export class ShopScene extends BaseScene {
 		this.background.setOrigin(0);
 		this.loopDrawer = new LoopDrawer(this);
 		this.loopDrawer.setDepth(1000);
+		this.loopDrawer.on("loop", this.onLoop, this);
 
         for(const [_, pearlDescriptor] of Object.entries(PearlTypes)) {
             const pearl = new Pearl(this, pearlDescriptor);
@@ -59,5 +60,11 @@ export class ShopScene extends BaseScene {
 	}
 
 	onLoop(polygon: Phaser.Geom.Polygon) {
+        const selectedEntities = this.entities.filter((entity) =>
+			Phaser.Geom.Polygon.Contains(polygon, entity.x, entity.y)
+		);
+		if (selectedEntities.length === 1) {
+			selectedEntities[0].onLoop();
+		}
 	}
 }
