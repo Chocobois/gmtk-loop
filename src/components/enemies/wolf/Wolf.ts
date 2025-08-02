@@ -2,15 +2,16 @@ import { Monster } from "@/components/Monster";
 import { GameScene } from "@/scenes/GameScene";
 import { IceChunk } from "./IceChunk";
 import { MonsterScriptHandler } from "@/components/MonsterScriptHandler";
+import { BasicEffect } from "@/components/BasicEffect";
 
 export class Wolf extends Monster{
     protected ices: IceChunk[] = [];
-    protected hp: number = 37000;
+    protected hp: number = 3700;
     protected fade: number = 1;
     protected fading: boolean = false;
     constructor(scene: GameScene, x: number, y: number, spr: string = "wolf") {
 		super(scene, x, y, spr);
-        stateHP: [5,10,5];
+        this.stateHP = [5,10,10];
         this.behavior = new MonsterScriptHandler(this,"wolfidle");
 	}
 
@@ -32,6 +33,7 @@ export class Wolf extends Monster{
     updateGFX(t: number, d: number): void {
         super.updateGFX(t,d);
         this.sprite.setAlpha(this.fade);
+        this.captureDisp.setAlpha(this.fade);
         if(this.fade <= 0){
             this.setVisible(false);
             this.emit("victory");
@@ -62,17 +64,24 @@ export class Wolf extends Monster{
             return;
         }
         super.onLoop();
-        this.stun(250);
     }
 
     damage(amount: number) {
+        if(this.fading){
+            return;
+        }
+        this.stun(500);
 		this.scene.textParticle(this.x + Math.random()*50, this.y+Math.random()*50, "OrangeRed", ""+amount);
 		//console.log("Particle");
 		//this.captureDisp.takeDamage(amount);
+        this.hp -= amount;
 		if(this.hp <= 0) {
             this.stunImmune = false;
             this.stun(99999);
+            this.resetVelocity();
             this.fading = true;
+            this.clearIce();
+            this.scene.pushHitEffect(new BasicEffect(this.scene,"boom",this.x,this.y,6,75,false,0,0,[1.5,1.5]));
             this.scene.tweens.add({
                 targets: this,
                 duration: 1000,

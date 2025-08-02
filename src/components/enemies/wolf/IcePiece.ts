@@ -24,7 +24,7 @@ export class IcePiece extends Monster {
         this.accel.x = 0;
         this.accel.y = 1600;
         stateHP: [9999,9999,9999];
-        this.behavior = new MonsterScriptHandler(this,"sit");
+        this.behavior = new MonsterScriptHandler(this,"inanimate");
         this.captureDisp.disable();
 	}
 

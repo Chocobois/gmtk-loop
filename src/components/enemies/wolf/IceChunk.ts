@@ -23,7 +23,7 @@ export class IceChunk extends Monster {
         this.spark = new SparkEffect(scene);
         this.shapes[0].setTo(this.x, this.y, 150);
         stateHP: [9999,9999,9999];
-        this.behavior = new MonsterScriptHandler(this,"sit");
+        this.behavior = new MonsterScriptHandler(this,"inanimate");
         this.captureDisp.disable();
 	}
 
@@ -61,7 +61,7 @@ export class IceChunk extends Monster {
     die(){
         this.captureDisp.destroy();
         this.spawnChunks();
-        this.scene.pushHitEffect(new BasicEffect(this.scene,"boom",this.x,this.y,6,75));
+        this.scene.pushHitEffect(new BasicEffect(this.scene,"boom",this.x,this.y,6,75,false,0,0));
         this.deleteFlag = true;
     }
 

@@ -104,6 +104,7 @@ export class Monster extends Entity {
 			if(this.stunTime <= 0){
 				this.stunTime = 0;
 			}
+			console.log("stunned for " + this.stunTime);
 			return;
 		}
 		if(this.accel.x != 0 || this.accel.y != 0){
@@ -227,6 +228,9 @@ export class Monster extends Entity {
 	}
 
 	resetVelocity(){
+		if(this.activetw){
+			this.activetw.destroy();
+		}
 		this.velocity.x = 0;
 		this.velocity.y = 0;
 		this.initPos = [this.x,this.y];
@@ -272,8 +276,12 @@ export class Monster extends Entity {
 		let t = 1000*this.tDist/(this.maxV*v);
 		let xx = pos[0];
 		let yy = pos[1];
+
 		if(!dash){
-			this.scene.tweens.add({
+			if(this.activetw){
+				this.activetw.destroy();
+			}
+			this.activetw = this.scene.tweens.add({
 				targets: this, x: xx, y: yy,
 				duration: t,
 				ease: Phaser.Math.Easing.Quadratic.InOut,

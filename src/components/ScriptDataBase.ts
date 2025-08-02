@@ -6,7 +6,7 @@ export class ScriptDataBase {
     public owner: Monster;
     public ctrl: MonsterScriptHandler;
     public scr1: MonsterCommand[][]; public idle: MonsterCommand[][]; public weak: MonsterCommand[][]; public dashblitz: MonsterCommand[][]; public wolfidle: MonsterCommand[][];
-    public sit: MonsterCommand[][];   public shatter: MonsterCommand[][];
+    public sit: MonsterCommand[][]; public shatter: MonsterCommand[][]; public inanimate: MonsterCommand[][];
     constructor(m: Monster, ct: MonsterScriptHandler){
         //this is an array of an array of monstercommands
         //all monstercommands in the same array will run simultaneously
@@ -67,6 +67,17 @@ export class ScriptDataBase {
 
         this.dashblitz = [[
             new MonsterCommand(this.owner, this.ctrl, [
+                {key: "wait", value: [500], args: [], conditions: []},
+                {key: "stunimmune", value: [], args: [], conditions: [true]},
+                {key: "circleEffect", value: [], args: [], conditions: []},
+                {key: "wait", value: [250], args: [], conditions: []},
+                {key: "circleEffect", value: [], args: [], conditions: []},
+                {key: "wait", value: [250], args: [], conditions: []},
+                {key: "circleEffect", value: [], args: [], conditions: []},
+                {key: "wait", value: [250], args: [], conditions: []},
+                {key: "call", value: [4], args: ["spawnice"], conditions: []},
+                {key: "stunimmune", value: [], args: [], conditions: [false]},
+
                 {key: "wait", value: [2000], args: [], conditions: []},
                 {key: "stunimmune", value: [], args: [], conditions: [true]},
                 {key: "flash", value: [100,2000], args: [], conditions: []},
@@ -132,7 +143,7 @@ export class ScriptDataBase {
                 {key: "wait", value: [250], args: [], conditions: []},
                 {key: "call", value: [4], args: ["spawnice"], conditions: []},
                 {key: "stunimmune", value: [], args: [], conditions: [false]},
-                {key: "loop", value: [0], args: [], conditions: []}]),
+                {key: "loop", value: [10], args: [], conditions: []}]),
             ],
         ]
 
@@ -144,17 +155,32 @@ export class ScriptDataBase {
                 {key: "travel", value: [0.1,200,1720,200,880], args: [], conditions: [false, false]},
                 {key: "tsa", value: [], args: [], conditions: [false]},
                 {key: "wait", value: [1500], args: [], conditions: []},
+                {key: "travel", value: [0.1,200,1720,200,880], args: [], conditions: [false, false]},
+                {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "travel", value: [0.1,200,1720,200,880], args: [], conditions: [false, false]},
+                {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "travel", value: [0.1,200,1720,200,880], args: [], conditions: [false, false]},
+                {key: "tsa", value: [], args: [], conditions: [false]},
                 {key: "loop", value: [0], args: [], conditions: []}]),
             ],
         ]
 
         this.sit = [[
             new MonsterCommand(this.owner, this.ctrl, [
+                {key: "call", value: [1], args: ["clearice"], conditions: []},]),
+            new MonsterCommand(this.owner, this.ctrl, [
                 {key: "wait", value: [1500], args: [], conditions: []},
-                {key: "travel", value: [0.1,200,1720,200,880], args: [], conditions: [false, false]},
+                {key: "travel", value: [0.025,200,1720,200,880], args: [], conditions: [false, false]},
                 {key: "tsa", value: [], args: [], conditions: [false]},
-                {key: "travel", value: [0.1,200,1720,200,880], args: [], conditions: [false, false]},
+                {key: "travel", value: [0.025,200,1720,200,880], args: [], conditions: [false, false]},
                 {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "wait", value: [1500], args: [], conditions: []},
+                {key: "loop", value: [0], args: [], conditions: []}]),
+            ],
+        ]
+
+        this.inanimate = [[
+            new MonsterCommand(this.owner, this.ctrl, [
                 {key: "wait", value: [1500], args: [], conditions: []},
                 {key: "loop", value: [0], args: [], conditions: []}]),
             ],
@@ -180,6 +206,7 @@ export class ScriptDataBase {
             case "wolfidle": {return this.wolfidle;}
             case "sit": {return this.sit;}
             case "shatter": {return this.shatter;}
+            case "inanimate": {return this.inanimate;}
             default: {return this.idle;}
         }
     }
