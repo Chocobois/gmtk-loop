@@ -3,6 +3,11 @@ import { Entity } from "../Entity";
 
 import { config } from "@/game-config";
 
+type PearlType = {
+    image: string, 
+    x: number,
+    y: number
+}
 export const PearlTypes = {
     fire: {
         image: "pearl_fire",
@@ -24,18 +29,20 @@ export const PearlTypes = {
         x: Number(config.width) - 700,
         y: Number(config.height) - 250,
     },
-} as const;
-
-type PearlType = typeof PearlTypes;
+} as const satisfies Record<string, PearlType>;
 
 export class Pearl extends Entity {
+	public scene: BaseScene;
     private image: Phaser.GameObjects.Image;
+    private pearl: PearlType
 
-    constructor(scene: BaseScene, pearl: PearlType[keyof PearlType]) {
+    constructor(scene: BaseScene, pearl: PearlType) {
         super(scene, pearl.x, pearl.y);
+		scene.add.existing(this);
 		this.image = scene.add.image(0, 0, pearl.image);
         this.image.setScale(0.75);
 		this.add(this.image);
+		this.scene = scene;
     }
 
     onLoop() {
@@ -47,6 +54,8 @@ export class Pearl extends Entity {
                 this.setScale(1.0 + 0.5 * y);
             },
         });
+
+		this.emit("selected", this.pearl);
     }
 
     setEnabled(value: boolean) {
