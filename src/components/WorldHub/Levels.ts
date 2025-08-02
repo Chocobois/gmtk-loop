@@ -31,11 +31,11 @@ export const levels: LevelDefinition[] = [
 	{
 		x: 1200,
 		y: 340,
-		title: "Empty",
+		title: "Jester",
 		key: "3a",
 		require: ["2a"],
-		enemy: "",
-		background: "background_plains_3",
+		enemy: "jester",
+		background: "background_plains_4",
 	},
 	{
 		x: 1200,
@@ -44,7 +44,7 @@ export const levels: LevelDefinition[] = [
 		key: "3b",
 		require: ["2b"],
 		enemy: "",
-		background: "background_plains_4",
+		background: "background_plains_3",
 	},
 	{
 		x: 1600,

@@ -99,7 +99,7 @@ export class MoleBoss extends MoleBase {
 		this.sprite.play("mole_boss_damage");
 		this.sparkEffect.play(this.x, this.y);
 
-		// TODO: Move to extended class
+		// TODO: Move to parent class
 		this.health -= loopState.attackPower;
 		if (this.health <= 0) {
 			this.setMoleState(MoleState.DEAD);

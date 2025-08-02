@@ -39,6 +39,15 @@ const images: Image[] = [
 	image("characters/mole/fake_2", "mole_fake_2"),
 	image("characters/mole/dirt", "mole_dirt"),
 
+	image("characters/jester/idle", "jester_idle"),
+	image("characters/jester/charge", "jester_charge"),
+	image("characters/jester/attack", "jester_attack"),
+	image("characters/jester/dead", "jester_dead"),
+	image("characters/jester/card_heart", "jester_card_heart"),
+	image("characters/jester/card_diamond", "jester_card_diamond"),
+	image("characters/jester/card_club", "jester_card_club"),
+	image("characters/jester/card_spade", "jester_card_spade"),
+
 	// Monsters
 	// Planning on making monsters a 1 file spritesheet
 

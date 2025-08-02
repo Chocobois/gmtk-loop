@@ -1,16 +1,23 @@
 import { BaseScene } from "@/scenes/BaseScene";
 import { loopState } from "@/state/LoopState";
 
-const SFX_FADE_OUT_DURATION = 100 //ms
-const SFX_SMOOTHING_WINDOW_SIZE = 500 //ms
-const SFX_TIMEOUT = 60 //ms
-const SFX_PAN_INTENSITY = 0.3 // 30%
+const SFX_FADE_OUT_DURATION = 100; //ms
+const SFX_SMOOTHING_WINDOW_SIZE = 500; //ms
+const SFX_TIMEOUT = 60; //ms
+const SFX_PAN_INTENSITY = 0.3; // 30%
+
+enum InputFlipMode {
+	NORMAL,
+	FLIP_X,
+	FLIP_Y,
+	SWAP_X_Y,
+}
 
 export class LoopDrawer extends Phaser.GameObjects.Container {
 	public scene: BaseScene;
 
-	public loopColor: number = 0xFFFFFF;
-	public lineColor: number = 0xFFFFFF;
+	public loopColor: number = 0xffffff;
+	public lineColor: number = 0xffffff;
 	public lineWidth: number = 8;
 
 	private points: Phaser.Math.Vector2[] = [];
@@ -20,6 +27,9 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	private graphics: Phaser.GameObjects.Graphics;
 	private cursor: Phaser.GameObjects.Image;
 	private lineBroken: boolean = false;
+
+	// Manipulate how pointer x/y input is read. Used in the Jester fight.
+	private inputFlipMode: InputFlipMode;
 
 	public muted: boolean = false;
 	private sfxLoop: Phaser.Sound.WebAudioSound;
@@ -85,29 +95,31 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	}
 
 	touchStart(pointer: Phaser.Input.Pointer) {
-		this.cursor.setVisible(true).setPosition(pointer.x, pointer.y);
-		this.points = [new Phaser.Math.Vector2(pointer.x, pointer.y)];
+		const { pointerX, pointerY } = this.getPointer(pointer);
+		this.cursor.setVisible(true).setPosition(pointerX, pointerY);
+		this.points = [new Phaser.Math.Vector2(pointerX, pointerY)];
 		this.pointTimes = [pointer.time];
 
-		if (!this.muted) this.scene.sound.play("d_tap", {
-			pan: SFX_PAN_INTENSITY * this.scene.getPan(pointer.x),
-		});
+		if (!this.muted)
+			this.scene.sound.play("d_tap", {
+				pan: SFX_PAN_INTENSITY * this.scene.getPan(pointerX),
+			});
 	}
 
 	touchDrag(pointer: Phaser.Input.Pointer) {
 		if (this.points.length == 0) return;
 
-		this.cursor.setPosition(pointer.x, pointer.y);
+		const { pointerX, pointerY } = this.getPointer(pointer);
+		this.cursor.setPosition(pointerX, pointerY);
 
 		const lastPoint = this.points[this.points.length - 1];
-		/* const dx = pointer.x - lastPoint.x;
-		const dy = pointer.y - lastPoint.y;
-		const dist = Math.sqrt(dx * dx + dy * dy); */
-		const dist = lastPoint.distance(pointer);
+		const dist = lastPoint.distance(
+			new Phaser.Math.Vector2(pointerX, pointerY)
+		);
 
 		const currentLine = new Phaser.Geom.Line(
-			pointer.x,
-			pointer.y,
+			pointerX,
+			pointerY,
 			lastPoint.x,
 			lastPoint.y
 		);
@@ -156,14 +168,12 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		}
 
 		if (dist >= 20) {
-			this.points.push(new Phaser.Math.Vector2(pointer.x, pointer.y));
+			this.points.push(new Phaser.Math.Vector2(pointerX, pointerY));
 			this.pointTimes.push(pointer.time);
-			// this.curve.lineTo(pointer.x, pointer.y);
 		}
 
 		this.graphics.clear();
 		this.graphics.lineStyle(this.lineWidth, this.lineColor);
-		// this.curve.draw(this.graphics);
 
 		// Draw the line from the last point to the current pointer position
 		this.graphics.beginPath();
@@ -171,7 +181,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		this.points.forEach((point) => {
 			this.graphics.lineTo(point.x, point.y);
 		});
-		this.graphics.lineTo(pointer.x, pointer.y);
+		this.graphics.lineTo(pointerX, pointerY);
 		this.graphics.strokePath();
 
 		// Sound stuff
@@ -179,9 +189,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		this.sfxTween.stop(); // Cancel SFX fade-out
 		if (!this.sfxLoop.isPlaying) this.sfxLoop.play();
 
-		this.sfxLoop.setPan(
-			SFX_PAN_INTENSITY * this.scene.getPan(pointer.x, true)
-		);
+		this.sfxLoop.setPan(SFX_PAN_INTENSITY * this.scene.getPan(pointerX, true));
 
 		// Dynamic sound playing rate (pitch)
 		const minRate = 0.2;
@@ -234,9 +242,12 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	}
 
 	touchEnd(pointer: Phaser.Input.Pointer) {
-		if (!this.muted && !this.lineBroken) this.scene.sound.play("d_raise", {
-			pan: SFX_PAN_INTENSITY * this.scene.getPan(pointer.x),
-		});
+		if (!this.muted && !this.lineBroken) {
+			const { pointerX } = this.getPointer(pointer);
+			this.scene.sound.play("d_raise", {
+				pan: SFX_PAN_INTENSITY * this.scene.getPan(pointerX),
+			});
+		}
 
 		this.lineBroken = false;
 		this.onLineBreak();
@@ -249,12 +260,13 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		for (const collider of colliders) {
 			for (const line of this.lineSegments) {
 				if (Phaser.Geom.Intersects.LineToCircle(line, collider)) {
-					if (!this.muted) this.scene.sound.play("d_break", {
-						volume: 0.4,
-						pan: SFX_PAN_INTENSITY * this.scene.getPan(collider.x),
-					});
+					if (!this.muted)
+						this.scene.sound.play("d_break", {
+							volume: 0.4,
+							pan: SFX_PAN_INTENSITY * this.scene.getPan(collider.x),
+						});
 					this.lineBroken = true;
-					this.fractureLineEffect()
+					this.fractureLineEffect();
 					return this.onLineBreak();
 				}
 			}
@@ -313,13 +325,13 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 		// Scrunkle up the newest points
 		const jitteredPoints = this.lineSegments.reverse().map((segment, i, a) => {
-			const jit = (1-(i / a.length)) * JITTER_AMOUNT;
-			segment.x1 = (i == 0) ? jitter(segment.x1, jit) : a[i-1].x2;
-			segment.y1 = (i == 0) ? jitter(segment.y1, jit) : a[i-1].y2;
+			const jit = (1 - i / a.length) * JITTER_AMOUNT;
+			segment.x1 = i == 0 ? jitter(segment.x1, jit) : a[i - 1].x2;
+			segment.y1 = i == 0 ? jitter(segment.y1, jit) : a[i - 1].y2;
 			segment.x2 = jitter(segment.x2, jit);
 			segment.y2 = jitter(segment.y2, jit);
 			return segment;
-		})
+		});
 
 		jitteredPoints.forEach((segment, i) => {
 			const fxGraphics = this.scene.add.graphics();
@@ -337,7 +349,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 				x: jitter(fxGraphics.x, SPREAD),
 				y: jitter(fxGraphics.y, SPREAD),
 				alpha: 0,
-				delay: Math.max(0, 10*i - 50),
+				delay: Math.max(0, 10 * i - 50),
 				duration: 600,
 				ease: "Cubic.Out",
 				onComplete: () => fxGraphics.destroy(),
@@ -396,6 +408,57 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	unmute() {
 		this.muted = false;
 		return this;
+	}
+
+	getPointer(pointer: Phaser.Input.Pointer): {
+		pointerX: number;
+		pointerY: number;
+	} {
+		let x = pointer.x;
+		let y = pointer.y;
+
+		switch (this.inputFlipMode) {
+			case InputFlipMode.NORMAL:
+				// This should be the case the majority of the time
+				break;
+
+			case InputFlipMode.FLIP_X:
+				x = this.scene.W - x;
+				break;
+
+			case InputFlipMode.FLIP_Y:
+				y = this.scene.H - y;
+				break;
+
+			case InputFlipMode.SWAP_X_Y:
+				let _ = x;
+				x = (y / this.scene.H) * this.scene.W;
+				y = (_ / this.scene.W) * this.scene.H;
+				break;
+		}
+		return {
+			pointerX: x,
+			pointerY: y,
+		};
+	}
+
+	setRandomInputFlipMode() {
+		// Pick a random flip mode that isn't in use
+		const modes = [
+			InputFlipMode.FLIP_X,
+			InputFlipMode.FLIP_Y,
+			InputFlipMode.SWAP_X_Y,
+		];
+		const availableModes = modes.filter((mode) => mode !== this.inputFlipMode);
+		const mode = Phaser.Math.RND.pick(availableModes);
+
+		this.inputFlipMode = mode;
+		this.onLineBreak();
+	}
+
+	resetInputFlipMode() {
+		this.inputFlipMode = InputFlipMode.NORMAL;
+		this.onLineBreak();
 	}
 
 	get lineSegments(): Phaser.Geom.Line[] {

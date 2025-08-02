@@ -8,9 +8,12 @@ import { LevelDefinition } from "@/components/WorldHub/LevelDefinition";
 
 import { Entity } from "@/components/Entity";
 import { Monster } from "@/components/Monster";
-import { SnakeMonster } from "@/components/enemies/SnakeMonster";
+import { SnakeMonster } from "@/components/enemies/snake/SnakeMonster";
 import { MoleBoss } from "@/components/enemies/mole/MoleBoss";
+import { Jester } from "@/components/enemies/jester/Jester";
 import { loopState } from "@/state/LoopState";
+
+import BendWaves from "@/pipelines/BendWavesPostFX";
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -92,6 +95,11 @@ export class GameScene extends BaseScene {
 				this.addEntity(mole);
 				mole.addFakeMoles(3);
 				mole.moveAllMoles(true);
+				break;
+
+			case "jester":
+				const jester = new Jester(this, 960, 540);
+				this.addEntity(jester);
 				break;
 
 			default:
@@ -255,5 +263,44 @@ export class GameScene extends BaseScene {
 		});
 		this.gameOverText = this.add.image(this.CX, 1000, "lose");
 		// this.loseJingle.play();
+	}
+
+	// Used by Jester to affect the player input
+	onInputFlipModeAttack() {
+		this.loopDrawer.setRandomInputFlipMode();
+		this.animateWaveFilter();
+	}
+
+	// Used by Jester to disable player input manipulation
+	resetInputFlipMode() {
+		this.loopDrawer.resetInputFlipMode();
+		this.animateWaveFilter();
+	}
+
+	// Play a short BendWaves PostFX filter animation
+	animateWaveFilter() {
+		// Abort if filter is already in use
+		if (this.cameras.main.hasPostPipeline) return;
+		this.cameras.main.setPostPipeline(BendWaves);
+
+		// Animate wave amplitude, then disable the filter
+		this.tweens.chain({
+			targets: this.cameras.main.getPostPipeline(BendWaves) as BendWaves,
+			tweens: [
+				{
+					amplitude: { from: 0, to: 0.02 },
+					ease: "Sine.InOut",
+					duration: 400,
+				},
+				{
+					amplitude: { from: 0.02, to: 0 },
+					ease: "Sine.Out",
+					duration: 1400,
+				},
+			],
+			onComplete: () => {
+				this.cameras.main.resetPostPipeline();
+			},
+		});
 	}
 }

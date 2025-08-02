@@ -1,5 +1,5 @@
 import { BaseScene } from "@/scenes/BaseScene";
-import { Entity } from "../Entity";
+import { Entity } from "../../Entity";
 
 enum SnakeState {
 	SLITHERING,
