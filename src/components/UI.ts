@@ -5,60 +5,73 @@ import { autorun } from "mobx";
 export class UI extends Phaser.GameObjects.Container {
 	public scene: GameScene;
 
-	private panel: Phaser.GameObjects.Container;
-	private background: Phaser.GameObjects.Image;
-	private text: Phaser.GameObjects.Text;
-	private text2: Phaser.GameObjects.Text;
+	private healthContainer: Phaser.GameObjects.Container;
+	private healthGraphics: Phaser.GameObjects.Graphics;
+	private healthLabel: Phaser.GameObjects.Text;
 
 	constructor(scene: GameScene) {
 		super(scene, 0, 0);
 		scene.add.existing(this);
 		this.scene = scene;
 
-		const panelHeight = 200;
+		const radius = 100;
+		const healthX = 1.2 * radius;
+		const healthY = 1080 - 1.2 * radius;
 
-		this.panel = this.scene.add.container(0, 0);
-		this.add(this.panel);
+		this.healthContainer = scene.add.container(healthX, healthY);
+		this.healthContainer.setData("radius", radius);
+		this.add(this.healthContainer);
 
-		this.background = this.scene.add.image(0, 0, "hud");
-		this.background.setScale(panelHeight / this.background.height);
-		this.panel.add(this.background);
+		this.healthGraphics = scene.add.graphics();
+		this.healthContainer.add(this.healthGraphics);
 
-		this.text = this.scene.addText({
-			x: -50,
-			y: 0,
-			size: 60,
-			color: "#FFFFFF",
-			text: "Score: 0",
+		this.healthLabel = this.scene.addText({
+			size: 64,
+			color: "#007700",
+			text: "100",
 		});
-		this.text.setStroke("black", 4);
-		this.text.setOrigin(0, 0.5);
-		this.panel.add(this.text);
+		this.healthLabel.setStroke("white", 16);
+		this.healthLabel.setOrigin(0.5);
+		this.healthContainer.add(this.healthLabel);
 
-		this.text2 = this.scene.addText({
-			x: -50,
-			y: -80,
-			size: 60,
-			color: "#FFFFFF",
-			text: "Spam: 0",
-		});
-		this.text2.setStroke("black", 4);
-		this.text2.setOrigin(0, 0.5);
-		this.panel.add(this.text2);
-
-		this.panel.setPosition(
-			this.scene.W - this.background.displayWidth / 2 - 30,
-			this.scene.H - this.background.displayHeight / 2 - 30
-		);
+		this.redrawHealth();
 
 		autorun(() => {
-			this.text.text = `Loop length: ${loopState.maxLength}`;
-		});
-
-		autorun(() => {
-			this.text2.text = `Loop power: ${loopState.attackPower}`;
+			if (!this.scene) {
+				console.warn("An old UI remains with an `autorun` listener");
+				return;
+			}
+			this.healthLabel.setText(loopState.health.toString());
+			this.redrawHealth();
 		});
 	}
 
 	update(time: number, delta: number) {}
+
+	redrawHealth() {
+		const ratio = loopState.health / loopState.maxHealth;
+		const radius = this.healthContainer.getData("radius");
+
+		// Draw big white circle
+		this.healthGraphics.fillStyle(0xffffff, 0.9);
+		this.healthGraphics.fillCircle(0, 0, radius);
+
+		// Draw green arc using ratio %
+		this.healthGraphics.lineStyle(0.4 * radius, 0x00dd00, 1);
+		this.healthGraphics.beginPath();
+		this.healthGraphics.arc(
+			0,
+			0,
+			0.625 * radius,
+			Phaser.Math.DegToRad(-90),
+			Phaser.Math.DegToRad(ratio * 360 - 90),
+			false
+		);
+		this.healthGraphics.strokePath();
+		this.healthGraphics.closePath();
+	}
+
+	get healthPosition(): Phaser.Types.Math.Vector2Like {
+		return { x: this.healthContainer.x, y: this.healthContainer.y };
+	}
 }

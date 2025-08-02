@@ -23,7 +23,7 @@ export class GameScene extends BaseScene {
 	private entityLayer: Phaser.GameObjects.Container;
 	public loopDrawer: LoopDrawer;
 
-	// private ui: UI;
+	private ui: UI;
 	private debugGraphics: Phaser.GameObjects.Graphics;
 	private textParticles: TextParticle;
 
@@ -64,7 +64,7 @@ export class GameScene extends BaseScene {
 
 		this.textParticles = new TextParticle(this);
 
-		// this.ui = new UI(this);
+		this.ui = new UI(this);
 
 		this.debugGraphics = this.add.graphics();
 
