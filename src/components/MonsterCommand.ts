@@ -33,6 +33,8 @@ import { Bullet } from "./Bullet";
 import { Monster } from "./Monster";
 import { MonsterScriptHandler } from "./MonsterScriptHandler";
 import { WedgeIndicator } from "./Indicators/WedgeIndicator";
+import { GameScene } from "@/scenes/GameScene";
+import { Bounds } from "@/scenes/BaseScene";
 
 export interface MonsterAction{
     key: string;
@@ -93,18 +95,14 @@ export class MonsterCommand
                 }
                 break;
             }   case "sound": {
-                if(this.pend) {
-                    break;
-                }
+                if(this.pend) { break;}
                 this.owner.scene.sound.play(this.cmd[this.step].args[0], {volume: this.cmd[this.step].value[0]});
                 this.advance();
                 break;
             }   case "machinegunwide": {
                 //values: amount, x, y, velocity, variance (+/- amount), center angle, width
                 //args: key conditions: follow y/n
-                if(this.pend) {
-                    break;
-                }
+                if(this.pend) { break;}
                 let stored = false;
                 let ns = [Math.random()];
                 if(this.variableMap.has(this.cmd[this.step].args[0])){
@@ -140,9 +138,7 @@ export class MonsterCommand
                 break;
             }   case "warnCardinalSlice": {
                 //parameters: args: key, conditions: follow
-                if(this.pend) {
-                    break;
-                }
+                if(this.pend) { break;}
                 let ns = [Math.random()];
                 if(this.variableMap.has(this.cmd[this.step].args[0])){
                     ns = this.variableMap.get(this.cmd[this.step].args[0])!.value;
@@ -166,6 +162,77 @@ export class MonsterCommand
                     this.cmd[this.step].value[4],center,this.cmd[this.step].value[5],this.owner,this.cmd[this.step].conditions[0]));
                 this.advance();
                 break;
+            }   case "dashEdge": {
+                if(this.pend) {
+                    break;
+                }
+                let p = this.owner.scene.closestChebyshevEdge(this.owner.x, this.owner.y);
+                if(this.cmd[this.step].conditions[0]) {
+                    p = this.owner.scene.oppositeEdge(p);
+                }
+                switch(p){
+                    case Bounds.TOP: {this.owner.travel(this.cmd[this.step].value[0], [Phaser.Math.Between(960-(this.cmd[this.step].value[1]/2), 960+(this.cmd[this.step].value[1]/2)), 200], true); break;}
+                    case Bounds.RIGHT: {this.owner.travel(this.cmd[this.step].value[0], [1720, Phaser.Math.Between(540-(this.cmd[this.step].value[1]/2), 540+(this.cmd[this.step].value[1]/2))], true); break;}
+                    case Bounds.BOTTOM: {this.owner.travel(this.cmd[this.step].value[0], [Phaser.Math.Between(960-(this.cmd[this.step].value[1]/2), 960+(this.cmd[this.step].value[1]/2)), 880], true); break;}
+                    case Bounds.LEFT: {this.owner.travel(this.cmd[this.step].value[0], [200, Phaser.Math.Between(540-(this.cmd[this.step].value[1]/2), 540+(this.cmd[this.step].value[1]/2))], true); break;}
+                    default: {break;}
+                }
+                this.advance();
+                break;
+            }   case "dashCorner": {
+                if(this.pend) {
+                    break;
+                }
+                let p = this.owner.scene.closestCorner(this.owner.x, this.owner.y);
+                if(this.cmd[this.step].conditions[0]) {
+                    p = this.owner.scene.oppositeCorner(p);
+                }
+                switch(p){
+                    case Bounds.TOP_LEFT: {this.owner.travel(this.cmd[this.step].value[0], [200, 200], true); break;}
+                    case Bounds.TOP_RIGHT: {this.owner.travel(this.cmd[this.step].value[0], [1720, 200], true); break;}
+                    case Bounds.BOTTOM_RIGHT: {this.owner.travel(this.cmd[this.step].value[0], [1720, 880], true); break;}
+                    case Bounds.BOTTOM_LEFT: {this.owner.travel(this.cmd[this.step].value[0], [200, 880], true); break;}
+                    default: {break;}
+                }
+                this.advance();
+                break;
+            }   case "dashAtEdge": {
+                if(this.pend) {
+                    break;
+                }
+
+                let px = this.owner.scene.input.activePointer;
+                let pr = this.owner.scene.closestChebyshevEdge(Phaser.Math.Between(860,1060), Phaser.Math.Between(440,640));
+                if( px.isDown) {
+                    pr = this.owner.scene.closestChebyshevEdge(px.x,px.y);
+                }
+                switch(pr){
+                    case Bounds.TOP: {this.owner.travel(this.cmd[this.step].value[0], [Phaser.Math.Between(960-(this.cmd[this.step].value[1]/2), 960+(this.cmd[this.step].value[1]/2)), 200], true); break;}
+                    case Bounds.RIGHT: {this.owner.travel(this.cmd[this.step].value[0], [1720, Phaser.Math.Between(540-(this.cmd[this.step].value[1]/2), 540+(this.cmd[this.step].value[1]/2))], true); break;}
+                    case Bounds.BOTTOM: {this.owner.travel(this.cmd[this.step].value[0], [Phaser.Math.Between(960-(this.cmd[this.step].value[1]/2), 960+(this.cmd[this.step].value[1]/2)), 880], true); break;}
+                    case Bounds.LEFT: {this.owner.travel(this.cmd[this.step].value[0], [200, Phaser.Math.Between(540-(this.cmd[this.step].value[1]/2), 540+(this.cmd[this.step].value[1]/2))], true); break;}
+                    default: {break;}
+                }
+                this.advance();
+                break;
+            }   case "dashAtCorner": {
+                if(this.pend) {
+                    break;
+                }
+                let px = this.owner.scene.input.activePointer;
+                let pr = this.owner.scene.closestCorner(Phaser.Math.Between(860,1060), Phaser.Math.Between(440,640));
+                if( px.isDown) {
+                    pr = this.owner.scene.closestCorner(px.x,px.y);
+                }
+                switch(pr){
+                    case Bounds.TOP_LEFT: {this.owner.travel(this.cmd[this.step].value[0], [200, 200], true); break;}
+                    case Bounds.TOP_RIGHT: {this.owner.travel(this.cmd[this.step].value[0], [1720, 200], true); break;}
+                    case Bounds.BOTTOM_RIGHT: {this.owner.travel(this.cmd[this.step].value[0], [1720, 880], true); break;}
+                    case Bounds.BOTTOM_LEFT: {this.owner.travel(this.cmd[this.step].value[0], [200, 880], true); break;}
+                    default: {break;}
+                }
+                this.advance();
+                break;
             }   case "travel": { //go towards either a fixed position (true) or random (false) - accel/x/y or accel/x1/x2/y1/y2 otherwise
                 if(this.pend) {
                     break;
@@ -174,10 +241,10 @@ export class MonsterCommand
                     break;
                 } else {
                     if(this.cmd[this.step].conditions[0]){
-                        this.owner.travel(this.cmd[this.step].value[0],[this.cmd[this.step].value[1],this.cmd[this.step].value[2]]);
+                        this.owner.travel(this.cmd[this.step].value[0],[this.cmd[this.step].value[1],this.cmd[this.step].value[2]],this.cmd[this.step].conditions[1]);
                     } else {
                         this.owner.travel(this.cmd[this.step].value[0],[this.cmd[this.step].value[1]+Math.random()*(this.cmd[this.step].value[2]-this.cmd[this.step].value[1]),
-                            this.cmd[this.step].value[3]+Math.random()*(this.cmd[this.step].value[4]-this.cmd[this.step].value[3])]);
+                            this.cmd[this.step].value[3]+Math.random()*(this.cmd[this.step].value[4]-this.cmd[this.step].value[3])],this.cmd[this.step].conditions[1]);
                     }
                     this.advance();
                 }
@@ -188,17 +255,18 @@ export class MonsterCommand
                 }
                 switch(this.cmd[this.step].conditions[0]) {
                     case true: {
-                        if(this.owner.traveling) {
-                            this.advance();
-                            break;
-                        }
+                        if(this.owner.traveling) { this.advance(); break;} else {break;}
                     } case false: {
-                        if(!this.owner.traveling) {
-                            this.advance();
-                            break;
-                        }
-                    }
+                        if(!this.owner.traveling) { this.advance(); break;} else {break;}
+                    } default: { break;}
                 }
+                break;
+            }   case "flash": {
+                if(this.pend) {
+                    break;
+                }
+                this.owner.flash(this.cmd[this.step].value[0],this.cmd[this.step].value[1]);
+                this.advance();
                 break;
             }   case "storeRandom": { //this just stores random numbers, only parameter is the amount and the key
                 if(this.pend) {
