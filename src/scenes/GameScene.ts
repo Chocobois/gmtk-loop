@@ -19,7 +19,7 @@ export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
 	private entities: Entity[];
 	private entityLayer: Phaser.GameObjects.Container;
-	private loopDrawer: LoopDrawer;
+	public loopDrawer: LoopDrawer;
 
 	// private ui: UI;
 	private debugGraphics: Phaser.GameObjects.Graphics;

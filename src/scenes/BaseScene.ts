@@ -9,6 +9,20 @@ export interface TextStyle {
 	text?: string;
 }
 
+//directions start from top/top_left and go clockwise
+
+export enum Bounds {
+	 TOP_LEFT = 0,
+	 TOP_RIGHT = 1,
+	 BOTTOM_RIGHT = 2,
+	 BOTTOM_LEFT = 3,
+
+	 TOP = 4,
+	 RIGHT = 5,
+	 BOTTOM = 6,
+	 LEFT = 7,
+}
+
 export class BaseScene extends Phaser.Scene {
 	protected flashRect: Phaser.GameObjects.Rectangle | null;
 	protected cameraShakeValue: number;
@@ -131,4 +145,57 @@ export class BaseScene extends Phaser.Scene {
 	get CY(): number {
 		return this.cameras.main.centerY;
 	}
+
+	findRandom(x1: number, x2: number, y1: number, y2: number): number[]{
+		return [
+			x1+(Math.random()*x2-x1), y1+(Math.random()*y2-y1)
+		]
+	}
+
+	closestCorner(x: number, y: number): number{
+		let r = Bounds.TOP_LEFT;
+		let d = Phaser.Math.Distance.Between(x,y,0,0);
+		let e = Phaser.Math.Distance.Between(x,y,1920,0);
+		if(e < d) { r = Bounds.TOP_RIGHT;}
+		e = Phaser.Math.Distance.Between(x,y,1920,1080);
+		if (e < d) { r = Bounds.BOTTOM_RIGHT;}
+		e = Phaser.Math.Distance.Between(x,y,0,1080);
+		if (e < d) { r = Bounds.BOTTOM_LEFT;}
+		return r;
+
+	}
+
+	closestChebyshevEdge(x: number, y: number): number{
+		let r = Bounds.TOP;
+		let d = y;
+		let e = 1920-x;
+		if(e < d) { r = Bounds.RIGHT;}
+		e = 1080-y;
+		if (e < d) { r = Bounds.BOTTOM;}
+		e = x;
+		if (e < d) { r = Bounds.LEFT;}
+		return r;
+	}
+
+	oppositeEdge(i: number): number{
+		switch(i){
+			case Bounds.TOP: {return Bounds.BOTTOM;}
+			case Bounds.RIGHT: {return Bounds.LEFT;}
+			case Bounds.BOTTOM: {return Bounds.TOP;}
+			case Bounds.LEFT: {return Bounds.RIGHT;}
+			default: {return Bounds.TOP;}
+		}
+	}
+
+	oppositeCorner(i: number): number{
+		switch(i){
+			case Bounds.TOP_LEFT: {return Bounds.BOTTOM_RIGHT;}
+			case Bounds.TOP_RIGHT: {return Bounds.BOTTOM_LEFT;}
+			case Bounds.BOTTOM_RIGHT: {return Bounds.TOP_LEFT;}
+			case Bounds.BOTTOM_LEFT: {return Bounds.TOP_RIGHT;}
+			default: {return Bounds.TOP_LEFT;}
+		}
+	}
+
+
 }

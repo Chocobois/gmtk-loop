@@ -43,17 +43,21 @@ export class Monster extends Entity {
 	private t: number = 2000;
 
 	//behavioral variables
+	private waitMultiplier: number[] = [1,0.75,2];
 	private initPos: number[];
 	private towardsPos: number[];
 	private accel: Phaser.Math.Vector2;
 	private maxV: number = 2000;
 	public traveling: boolean = false;
-	private tDist: number = 0;
+	public tDist: number = 0;
+	public cDist: number = 0;
+	private elapsedDist: number = 0;
 
 	private exhaust: number = 0;
 	private stateHP: number[] = [5,10,15];
 	private multipliers: number[] = [1,0.5,3];
 	private curState: number = 0;
+	private fTimer: number[] = [0,0,0];
 
 	constructor(scene: GameScene, x: number, y: number) {
 		super(scene, x, y);
@@ -78,7 +82,7 @@ export class Monster extends Entity {
 		};
 
 		this.captureDisp = new CaptureBar(this.scene,this.x,this.y,this);
-		this.behavior = new MonsterScriptHandler(this,"idle");
+		this.behavior = new MonsterScriptHandler(this,"dashblitz");
 		this.initPos = [this.x,this.y];
 		this.towardsPos = [0,0];
 		this.accel = new Phaser.Math.Vector2(0,0);
@@ -113,9 +117,30 @@ export class Monster extends Entity {
 		const squish = 1.0 + 0.02 * Math.sin((6 * time) / 1000);
 		this.setScale(1.0, squish);
 
+
 		this.captureDisp.update(time, delta);
 		this.behavior.update(time,delta);
+		this.updateGFX(time,delta);
 
+	}
+
+	updateGFX(t: number, d: number){
+		if(this.fTimer[2] > 0){
+			if(this.fTimer[0] > (-1*this.fTimer[1])) {
+				this.fTimer[0] -= d;
+			} else {
+				this.fTimer[0] = this.fTimer[1];
+			}
+			if(this.fTimer[0] >= 0) {
+				this.sprite.setTint(0x00FF00);
+			} else {
+				this.sprite.clearTint();
+			}
+			this.fTimer[2] -= d;
+			if(this.fTimer[2] <= 0) {
+				this.unflash();
+			}
+		}
 	}
 
 	onLoop() { 
@@ -171,8 +196,6 @@ export class Monster extends Entity {
 	}
 
 	resetVelocity(){
-		this.accel.x = 0;
-		this.accel.y = 0;
 		this.velocity.x = 0;
 		this.velocity.y = 0;
 		this.initPos = [this.x,this.y];
@@ -182,25 +205,58 @@ export class Monster extends Entity {
 }
 
 	travelCheck(){
-		if(Math.hypot(this.y-this.initPos[1],this.x-this.initPos[0]) >= this.tDist){
+		this.cDist = Math.hypot(this.y-this.initPos[1],this.x-this.initPos[0]);
+		//update your elapsed distance 
+		if(this.cDist >= this.tDist){
 			this.x=this.towardsPos[0];
 			this.y=this.towardsPos[1];
 			this.resetVelocity();
 		}
 	}
 
-	travel(a: number, pos: number[]){ //go towards a position
+	move(x: number, y: number, instantly: boolean) {
+
+			this.scene.tweens.add({
+				targets: this,
+				x,
+				y,
+				duration: 2000,
+				ease: Phaser.Math.Easing.Quadratic.InOut,
+			});
+	}
+
+	travel(v: number, pos: number[], dash: boolean = false){ //go towards a position with a stated average velocity
 		this.traveling = true;
-		this.velocity.x = 0;
-		this.velocity.y = 0;
-		//console.log("begin: " + this.x + ", " + this.y + " ; " + "end: " + pos[0] + ", " + pos[1]);
-		let theta = Math.atan2(pos[1]-this.y, pos[0]-this.x);
-		this.accel.x = a*Math.cos(theta);
-		this.accel.y = a*Math.sin(theta);
 		this.towardsPos = pos;
-		this.tDist = Math.hypot(pos[1]-this.y, pos[0]-this.x);
 		this.initPos[0] = this.x;
 		this.initPos[1] = this.y;
+		this.tDist = Math.hypot(pos[1]-this.y, pos[0]-this.x);
+		this.cDist = 0; //this variable and the one above exist to track progress along the travel path, so you can call other scripts
+		this.velocity.x = 0;//zero your velocity first
+		this.velocity.y = 0;
+		let t = 1000*this.tDist/(this.maxV*v);
+		let xx = pos[0];
+		let yy = pos[1];
+		if(!dash){
+			this.scene.tweens.add({
+				targets: this, x: xx, y: yy,
+				duration: t,
+				ease: Phaser.Math.Easing.Quadratic.InOut,
+			});
+		} else { //instantly go to max speed if it's a dash
+			let theta = Math.atan2(pos[1]-this.y, pos[0]-this.x);
+			this.velocity.x = this.maxV*v*Math.cos(theta);
+			this.velocity.y = this.maxV*v*Math.sin(theta);
+		}
+	}
+
+	flash(n: number, t: number){
+		this.fTimer = [0,n,t];
+	}
+
+	unflash(){
+		this.fTimer = [0,0,0];
+		this.sprite.clearTint;
 	}
 
 	protected shapes: Phaser.Geom.Circle[] = [
@@ -215,5 +271,17 @@ export class Monster extends Entity {
 	handleCapture() {
 		this.scene.removeMonster(this);
 	}
+
+
+	getWaitMultiplier(): number{
+		switch(this.curState){
+			case IDLE: {return this.waitMultiplier[0]}
+			case RAGE: {return this.waitMultiplier[1]}
+			case WEAK: {return this.waitMultiplier[2]}
+			default: {return 1;}
+		}
+	}
+
+
 
 }
