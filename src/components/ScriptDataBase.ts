@@ -6,7 +6,8 @@ export class ScriptDataBase {
     public owner: Monster;
     public ctrl: MonsterScriptHandler;
     public scr1: MonsterCommand[][]; public idle: MonsterCommand[][]; public weak: MonsterCommand[][]; public dashblitz: MonsterCommand[][]; public wolfidle: MonsterCommand[][];
-    public sit: MonsterCommand[][]; public shatter: MonsterCommand[][]; public inanimate: MonsterCommand[][]; public snailrage: MonsterCommand[][];
+    public sit: MonsterCommand[][]; public shatter: MonsterCommand[][]; public inanimate: MonsterCommand[][]; public snailrage: MonsterCommand[][]; public batIdle: MonsterCommand[][];
+    public batDashy: MonsterCommand[][]; public batRage: MonsterCommand[][]; public batPizza: MonsterCommand[][];
     constructor(m: Monster, ct: MonsterScriptHandler){
         //this is an array of an array of monstercommands
         //all monstercommands in the same array will run simultaneously
@@ -203,6 +204,119 @@ export class ScriptDataBase {
                 {key: "loop", value: [1], args: [], conditions: []}]),
             ],
         ]
+
+        this.batIdle = [[
+            new MonsterCommand(this.owner, this.ctrl, [
+                {key: "wait", value: [1500], args: [], conditions: []},
+                {key: "travel", value: [0.25,200,1720,200,880], args: [], conditions: [false, false]},
+                {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "wait", value: [100], args: [], conditions: []},
+                {key: "call", value: [1], args: ["teleport"], conditions: []},
+                {key: "wait", value: [3000], args: [], conditions: []},
+                {key: "travel", value: [0.25,200,1720,200,880], args: [], conditions: [false, false]},
+                {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "wait", value: [100], args: [], conditions: []},
+                {key: "call", value: [1], args: ["teleport"], conditions: []},
+                {key: "wait", value: [500], args: [], conditions: []},
+                {key: "call", value: [1], args: ["teleport"], conditions: []},
+                {key: "loop", value: [0], args: [], conditions: []}]),
+            ],
+        ]
+
+        this.batDashy = [[
+            new MonsterCommand(this.owner, this.ctrl, [
+                {key: "wait", value: [1500], args: [], conditions: []},
+                {key: "ramp", value: [800], args: [], conditions: [true]},
+                {key: "wait", value: [3000], args: [], conditions: []},
+                {key: "call", value: [1], args: ["teleport"], conditions: []},
+                {key: "wait", value: [2000], args: [], conditions: []},
+                {key: "call", value: [1], args: ["teleport"], conditions: []},
+                {key: "wait", value: [500], args: [], conditions: []},
+                {key: "call", value: [1], args: ["teleport"], conditions: []},
+                {key: "wait", value: [1500], args: [], conditions: []},
+                {key: "unramp", value: [1000], args: [], conditions: [true]},
+                {key: "wait", value: [1000], args: [], conditions: []},
+                {key: "call", value: [1], args: ["tocenter"], conditions: []},
+
+                {key: "loop", value: [0], args: [], conditions: []}]),
+            ],
+        ]
+
+        this.batRage = [[
+            new MonsterCommand(this.owner, this.ctrl, [
+                {key: "wait", value: [100], args: [], conditions: []},
+                {key: "dashAtCorner", value: [5], args: [], conditions: []},
+                {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "wait", value: [150], args: [], conditions: []},
+                {key: "call", value: [1], args: ["teleport"], conditions: []},
+                {key: "wait", value: [25], args: [], conditions: []},
+                {key: "call", value: [1], args: ["teleport"], conditions: []},
+                {key: "wait", value: [125], args: [], conditions: []},
+                {key: "dashEdge", value: [5,200], args: [], conditions: [true]},
+                {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "wait", value: [25], args: [], conditions: []},
+                {key: "dashEdge", value: [5,200], args: [], conditions: [true]},
+                {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "wait", value: [50], args: [], conditions: []},
+                {key: "call", value: [1], args: ["teleport"], conditions: []},
+                {key: "wait", value: [25], args: [], conditions: []},
+                {key: "call", value: [1], args: ["teleport"], conditions: []},
+                {key: "wait", value: [250], args: [], conditions: []},
+                {key: "call", value: [1], args: ["teleport"], conditions: []},
+                {key: "wait", value: [50], args: [], conditions: []},
+                {key: "call", value: [1], args: ["tocenter"], conditions: []},
+
+                {key: "loop", value: [0], args: [], conditions: []}]),
+            ],
+        ]
+        this.batPizza = [[
+            new MonsterCommand(this.owner, this.ctrl, [
+                {key: "wait", value: [500], args: [], conditions: []},
+                {key: "storeSliceRandom", value: [], args: ["p1"], conditions: [false]},
+                {key: "storeSliceRandom", value: [], args: ["p2"], conditions: [false]},
+                {key: "callSlice", value: [0,0,1000,250,20,2400], args: ["p1"], conditions: [false]},
+                {key: "echo", value: [0,0,10,100,1200,20,16,1250], args: ["p1"], conditions: [false]},
+                {key: "storeNextDirection", value: [], args: ["p1"], conditions: []},
+                {key: "callSlice", value: [0,0,1000,250,20,2400], args: ["p2"], conditions: [false]},
+                {key: "echo", value: [0,0,10,100,1200,20,16,1250], args: ["p2"], conditions: [false]},
+                {key: "storeNextDirection", value: [], args: ["p2"], conditions: []},
+                {key: "wait", value: [500], args: [], conditions: []},
+                {key: "callSlice", value: [0,0,1000,250,20,2400], args: ["p1"], conditions: [false]},
+                {key: "echo", value: [0,0,10,100,1200,20,16,1250], args: ["p1"], conditions: [false]},
+                {key: "storeNextDirection", value: [], args: ["p1"], conditions: []},
+                {key: "callSlice", value: [0,0,1000,250,20,2400], args: ["p2"], conditions: [false]},
+                {key: "echo", value: [0,0,10,100,1200,20,16,1250], args: ["p2"], conditions: [false]},
+                {key: "storeNextDirection", value: [], args: ["p2"], conditions: []},
+                {key: "wait", value: [500], args: [], conditions: []},
+                {key: "callSlice", value: [0,0,1000,250,20,2400], args: ["p1"], conditions: [false]},
+                {key: "echo", value: [0,0,10,100,1200,20,16,1250], args: ["p1"], conditions: [false]},
+                {key: "storeNextDirection", value: [], args: ["p1"], conditions: []},
+                {key: "callSlice", value: [0,0,1000,250,20,2400], args: ["p2"], conditions: [false]},
+                {key: "echo", value: [0,0,10,100,1200,20,16,1250], args: ["p2"], conditions: [false]},
+                {key: "storeNextDirection", value: [], args: ["p2"], conditions: []},
+                {key: "wait", value: [500], args: [], conditions: []},
+                {key: "callSlice", value: [0,0,1000,250,20,2400], args: ["p1"], conditions: [false]},
+                {key: "echo", value: [0,0,10,100,1200,20,16,1250], args: ["p1"], conditions: [false]},
+                {key: "storeNextDirection", value: [], args: ["p1"], conditions: []},
+                {key: "callSlice", value: [0,0,1000,250,20,2400], args: ["p2"], conditions: [false]},
+                {key: "echo", value: [0,0,10,100,1200,20,16,1250], args: ["p2"], conditions: [false]},
+                {key: "storeNextDirection", value: [], args: ["p2"], conditions: []},
+                {key: "wait", value: [500], args: [], conditions: []},
+                {key: "callSlice", value: [0,0,1000,250,20,2400], args: ["p1"], conditions: [false]},
+                {key: "echo", value: [0,0,10,100,1200,20,16,1250], args: ["p1"], conditions: [false]},
+                {key: "storeNextDirection", value: [], args: ["p1"], conditions: []},
+                {key: "callSlice", value: [0,0,1000,250,20,2400], args: ["p2"], conditions: [false]},
+                {key: "echo", value: [0,0,10,100,1200,20,16,1250], args: ["p2"], conditions: [false]},
+                {key: "storeNextDirection", value: [], args: ["p2"], conditions: []},
+                {key: "wait", value: [500], args: [], conditions: []},
+                {key: "callSlice", value: [0,0,1000,250,20,2400], args: ["p1"], conditions: [false]},
+                {key: "echo", value: [0,0,10,100,1200,20,16,1250], args: ["p1"], conditions: [false]},
+                {key: "callSlice", value: [0,0,1000,250,20,2400], args: ["p2"], conditions: [false]},
+                {key: "echo", value: [0,0,10,100,1200,20,16,1250], args: ["p2"], conditions: [false]},
+                {key: "wait", value: [1750], args: [], conditions: []},
+                {key: "loop", value: [0], args: [], conditions: []}]),
+            ],
+        ]
     };
 
 
@@ -217,6 +331,10 @@ export class ScriptDataBase {
             case "sit": {return this.sit;}
             case "shatter": {return this.shatter;}
             case "snailrage": {return this.snailrage;}
+            case "batIdle": {return this.batIdle;}
+            case "batDashy": {return this.batDashy;}
+            case "batRage": {return this.batRage;}
+            case "batPizza": {return this.batPizza;}
             case "inanimate": {return this.inanimate;}
             default: {return this.idle;}
         }

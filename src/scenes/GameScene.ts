@@ -18,6 +18,7 @@ import { AbraBoss } from "@/components/enemies/abra/AbraBoss";
 import BendWaves from "@/pipelines/BendWavesPostFX";
 import { Wolf } from "@/components/enemies/wolf/Wolf";
 import { Snail } from "@/components/enemies/snail/Snail";
+import { Bat } from "@/components/enemies/bat/Bat";
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -101,9 +102,9 @@ export class GameScene extends BaseScene {
 	loadMonsters(monsterList: string[]) {
 
 		this.activeBossCount = monsterList.length;
-		
+
 		if (monsterList.includes("snail")) {
-			const monster = new Snail(this, 960, 540);
+			const monster = new Bat(this, 960, 540);
 			this.addEntity(monster);
 		}
 
