@@ -85,7 +85,7 @@ export const levels = [
 		title: "Frassle",
 		key: "badger",
 		require: ["arba", "lycante"],
-		enemy: "", // badger
+		enemy: "badger",
 		background: "background_ice",
 		music: "m_fight",
 		pearl: PearlElement.Ice,
