@@ -141,8 +141,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		// Check if the current line intersects with any existing line segments, creating a loop
 		const lineSegments = this.lineSegments;
 		for (let i = 0; i < lineSegments.length - 1; i++) {
-			const line = lineSegments[i];
-			const segment = new Phaser.Geom.Line(line.x1, line.y1, line.x2, line.y2);
+			const segment = lineSegments[i];
 			if (Phaser.Geom.Intersects.LineToLine(currentLine, segment)) {
 				this.onLoop(this.points.slice(i));
 				this.points = this.points.slice(0, Math.max(i, 1));
