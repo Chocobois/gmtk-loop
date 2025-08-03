@@ -170,10 +170,8 @@ const spritesheets: SpriteSheet[] = [
 
 /* Audios */
 const audios: Audio[] = [
-	music("title", "m_main_menu"),
-	music("first", "m_first"),
 	music("lightfast", "m_lightfast"),
-
+	music("title_fade", "m_title"),
 	music("fight", "m_fight"),
 	music("map", "m_map"),
 
@@ -216,6 +214,7 @@ const audios: Audio[] = [
 
 	sound("enemy/hurt", "e_hit_generic"),
 	sound("enemy/snail_shell", "e_snail_shell"),
+	sound("enemy/gaster", "e_gaster"),
 	sound("tele", "tele"),
 ];
 

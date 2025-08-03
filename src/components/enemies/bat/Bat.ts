@@ -18,6 +18,8 @@ export class Bat extends Monster{
         this.behavior = new MonsterScriptHandler(this,"batIdle");
         this.stunOverflow = -1000;
         this.expl = new SmokeEffect(scene, 1);
+
+        this.sprite.setScale(800 / this.sprite.width);
 	}
 
     boundCheck(){

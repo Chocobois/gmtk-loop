@@ -127,7 +127,7 @@ export class TitleScene extends BaseScene {
 
 		// Music
 		if (!this.musicTitle) {
-			this.musicTitle = new Music(this, "m_first", { volume: 0.4 });
+			this.musicTitle = new Music(this, "m_title", { volume: 0.4 });
 			this.musicTitle.on("bar", this.onBar, this);
 			this.musicTitle.on("beat", this.onBeat, this);
 
@@ -211,7 +211,7 @@ export class TitleScene extends BaseScene {
 				this.fade(true, 1000, 0x000000);
 				this.addEvent(1050, () => {
 					this.musicTitle.stop();
-					this.scene.start("GameScene");
+					this.scene.start("WorldScene");
 				});
 			});
 		}
