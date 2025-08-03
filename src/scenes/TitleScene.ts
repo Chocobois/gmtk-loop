@@ -135,7 +135,7 @@ export class TitleScene extends BaseScene {
 
 		// Music
 		if (!this.musicTitle) {
-			this.musicTitle = new Music(this, "m_title", { volume: 0.3 });
+			this.musicTitle = new Music(this, "m_title", { volume: 0.2 });
 			this.musicTitle.on("bar", this.onBar, this);
 			this.musicTitle.on("beat", this.onBeat, this);
 		}
