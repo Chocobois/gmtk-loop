@@ -89,7 +89,7 @@ export class TitleScene extends BaseScene {
 		});
 		this.tap.setOrigin(0.5);
 		this.tap.setAlpha(-1);
-		this.tap.setStroke("#FFF", 4);
+		this.tap.setStroke("#FFF", 15);
 		this.tap.setPadding(2);
 
 		this.version = this.addText({
@@ -135,12 +135,9 @@ export class TitleScene extends BaseScene {
 
 		// Music
 		if (!this.musicTitle) {
-			this.musicTitle = new Music(this, "m_title", { volume: 0.4 });
+			this.musicTitle = new Music(this, "m_title", { volume: 0.3 });
 			this.musicTitle.on("bar", this.onBar, this);
 			this.musicTitle.on("beat", this.onBeat, this);
-
-			// this.select = this.sound.add("dayShift", { volume: 0.8, rate: 1.0 }) as Phaser.Sound.WebAudioSound;
-			// this.select2 = this.sound.add("nightShift", { volume: 0.8, rate: 1.0 }) as Phaser.Sound.WebAudioSound;
 		}
 		this.musicTitle.play();
 
@@ -173,12 +170,15 @@ export class TitleScene extends BaseScene {
 				(7 * Math.sin((3 * time) * 0.00061)) +
 				(14 * Math.sin((3 * time) * 0.00014));
 
+			this.loop.angle = 1 * Math.sin((3 * time) * 0.0003);
+			this.loop.alpha = 0.75 + 0.25 * Math.sin((3 * time) * 0.0002);
+
 			this.title.alpha +=
-				0.02 * ((this.title.visible ? 1 : 0) - this.title.alpha);
+				0.01 * ((this.title.visible ? 1 : 0) - this.title.alpha);
 			this.subtitle.alpha +=
-				0.02 * ((this.subtitle.visible ? 1 : 0) - this.subtitle.alpha);
+				0.01 * ((this.subtitle.visible ? 1 : 0) - this.subtitle.alpha);
 			this.version.alpha +=
-				0.02 * ((this.version.visible ? 1 : 0) - this.version.alpha);
+				0.01 * ((this.version.visible ? 1 : 0) - this.version.alpha);
 
 			if (this.credits.visible) {
 				this.credits.alpha += 0.02 * (1 - this.credits.alpha);
@@ -208,17 +208,20 @@ export class TitleScene extends BaseScene {
 			this.subtitle.setVisible(true);
 			this.subtitle.setAlpha(1);
 		} else if (!this.isStarting) {
-			this.sound.play("t_rustle", { volume: 0.3 });
-			// this.sound.play("m_slice", { volume: 0.3 });
-			// this.sound.play("u_attack_button", { volume: 0.5 });
-			// this.select2.play();
+			this.sound.play("u_game_start", { volume: 0.9 });
 			this.isStarting = true;
 			this.flash(3000, 0xffffff, 0.6);
 
+			this.tweens.add({
+				targets: this.musicTitle,
+				volume: 0,
+				duration: 2500,
+				onComplete: () => this.musicTitle.stop(),
+			})
+
 			this.addEvent(1000, () => {
-				this.fade(true, 1000, 0x000000);
-				this.addEvent(1050, () => {
-					this.musicTitle.stop();
+				this.fade(true, 1500, 0x000000);
+				this.addEvent(1550, () => {
 					this.scene.start("WorldScene");
 				});
 			});
@@ -226,12 +229,22 @@ export class TitleScene extends BaseScene {
 	}
 
 	onBar(bar: number) {
-		if (bar >= 2) {
-			this.title.setVisible(true);
+		if (bar < 1) {
+			this.flash(5000, 0xc5f7f8, 0.7);
 		}
 		if (bar >= 4) {
-			this.subtitle.setVisible(true);
-			this.credits.setVisible(true);
+			this.title.setVisible(true);
+		}
+		if (bar == 9) {
+			this.addEvent(400, () => {
+				this.flash(5000, 0xc5f7f8, 0.05);
+			})
+		}
+		if (bar >= 9) {
+			this.addEvent(400, () => {
+				this.subtitle.setVisible(true);
+				this.credits.setVisible(true);
+			});
 		}
 	}
 
