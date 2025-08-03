@@ -53,8 +53,25 @@ const images: Image[] = [
 	image("characters/abra/active", "abra_active"),
 	image("characters/abra/hurt", "abra_hurt"),
 
-	// Monsters
-	// Planning on making monsters a 1 file spritesheet
+	image("characters/bat/bat fly1", "bat_fly_1"),
+	image("characters/bat/bat fly2", "bat_fly_2"),
+	image("characters/bat/bat fly3", "bat_fly_3"),
+	image("characters/bat/bat fly4", "bat_fly_4"),
+
+	image("characters/bat/bat sit1", "bat_sit_1"),
+	image("characters/bat/bat sit2", "bat_sit_2"),
+	image("characters/bat/bat sit3", "bat_sit_3"),
+	image("characters/bat/bat sit4", "bat_sit_4"),
+	
+	image("characters/bat/bat get up1", "bat_get_up_1"),
+	image("characters/bat/bat get up2", "bat_get_up_2"),
+	image("characters/bat/bat get up3", "bat_get_up_3"),
+	image("characters/bat/bat get up4", "bat_get_up_4"),
+
+	image("characters/bat/bat attack", "bat_attack"),
+
+	
+	image("characters/enemyshadow", "enemy_shadow"),
 
 	image("characters/enemy/placeholder_enemy", "enemy_placeholder"),
 	// Attacks
