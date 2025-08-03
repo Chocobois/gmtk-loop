@@ -40,8 +40,8 @@ export class WorldScene extends BaseScene {
 		this.background.setOrigin(0);
 		this.fitToScreen(this.background);
 
-		this.foreground = this.add.image(0, 0, "hub_foreground");
-		this.foreground.setOrigin(0);
+		this.foreground = this.add.image(this.W/2, this.H/2, "hub_foreground");
+		this.foreground.setOrigin(0.5, 0.5);
 		this.fitToScreen(this.foreground);
 
 		let sampleText = this.addText({
@@ -101,6 +101,10 @@ export class WorldScene extends BaseScene {
 		if (this.pearlButton) {
 			this.pearlButton.update(time, delta);
 		}
+
+		// Idle scale animation
+		const sin = 0.5 + (Math.sin((3 * time) * 0.0001) * 0.5);
+		this.foreground.setScale(1 + (0.05 * sin));
 	}
 
 	loadShop() {
