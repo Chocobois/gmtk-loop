@@ -133,6 +133,11 @@ export class GameScene extends BaseScene {
 		this.activeBossCount = monsterList.length;
 
 		if (monsterList.includes("snail")) {
+			const monster = new Snail(this, 960, 540);
+			this.addEntity(monster);
+		}
+
+		if (monsterList.includes("bat")) {
 			const monster = new Bat(this, 960, 540);
 			this.addEntity(monster);
 		}
@@ -143,7 +148,7 @@ export class GameScene extends BaseScene {
 		}
 
 		if (monsterList.includes("snake")) {
-			const snake = new SnakeMonster(this, 960, 540);
+			const snake = new SnakeMonster(this, -100, -100);
 			this.addEntity(snake);
 		}
 
@@ -361,7 +366,7 @@ export class GameScene extends BaseScene {
 
 		this.music.stop();
 		this.sound.play("victory", { volume: 0.4 });
-		this.sound.play("machinegun", { volume: 0.6, rate: 0.2 });
+		this.sound.play("machinegun", { volume: 0.8, rate: 0.3 });
 
 		this.flash(4000, 0xffffff, 1.0);
 
@@ -404,8 +409,9 @@ export class GameScene extends BaseScene {
 
 		this.music.stop();
 		this.sound.play("game_over", { volume: 0.4 });
-		this.sound.play("machinegun", { volume: 0.6, rate: 0.2 });
+		this.sound.play("machinegun", { volume: 0.8, rate: 0.3 });
 
+		this.shake(2000, 10, 0);
 		this.flash(4000, 0xffffff, 1.0);
 		this.cameras.main.setPostPipeline(GrayScalePostFilter);
 
