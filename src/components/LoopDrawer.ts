@@ -3,6 +3,7 @@ import { loopState } from "@/state/LoopState";
 import { Entity } from "./Entity";
 import { pearlState } from "@/state/PearlState";
 import { autorun } from "mobx";
+import { PearlElement } from "./pearls/PearlElement";
 
 const SFX_FADE_OUT_DURATION = 100; //ms
 const SFX_SMOOTHING_WINDOW_SIZE = 500; //ms
@@ -150,16 +151,20 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 			}
 		}
 
+		const hasCoilAbility = pearlState.currentPearl.element == PearlElement.Coil;
+		const lengthMultiplier = hasCoilAbility ? 2 : 1;
+		const maxLoopLength = lengthMultiplier * loopState.maxLength;
+
 		// Check if total line distance exceeds maxLength
 		const distance = Phaser.Geom.Line.Length(currentLine);
-		if (distance > loopState.maxLength) {
+		if (distance > maxLoopLength) {
 			const direction = new Phaser.Math.Vector2(
 				currentLine.x1 - currentLine.x2,
 				currentLine.y1 - currentLine.y2
 			).normalize();
 			const startPoint = new Phaser.Math.Vector2(
-				currentLine.x1 - direction.x * loopState.maxLength,
-				currentLine.y1 - direction.y * loopState.maxLength
+				currentLine.x1 - direction.x * maxLoopLength,
+				currentLine.y1 - direction.y * maxLoopLength
 			);
 			this.points = [
 				startPoint,
@@ -173,7 +178,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 				const p0 = this.points[i - 1];
 				const segDist = Phaser.Math.Distance.Between(p0.x, p0.y, p1.x, p1.y);
 				totalDist += segDist;
-				if (totalDist > loopState.maxLength) {
+				if (totalDist > maxLoopLength) {
 					this.points.splice(0, i);
 					break;
 				}
