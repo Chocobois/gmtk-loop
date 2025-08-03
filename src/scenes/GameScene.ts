@@ -133,6 +133,7 @@ export class GameScene extends BaseScene {
 	// Allow multiple monster keys to be spawned
 	loadMonsters(monsterList: string[]) {
 		this.activeBossCount = monsterList.length;
+		console.log("Load monsters", monsterList);
 
 		if (monsterList.includes("snail")) {
 			const monster = new Snail(this, 960, 540);
@@ -140,7 +141,7 @@ export class GameScene extends BaseScene {
 		}
 
 		if (monsterList.includes("bat")) {
-			const monster = new Snail(this, 960, 540);
+			const monster = new Bat(this, 960, 540);
 			this.addEntity(monster);
 		}
 

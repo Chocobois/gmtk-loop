@@ -74,7 +74,7 @@ export const levels = [
 		title: "Lycante",
 		key: "wolf",
 		require: ["jester", "moler"],
-		enemy: "lycante",
+		enemy: "wolf",
 		background: "background_ice",
 		music: "m_fight",
 		pearl: PearlElement.Water,
