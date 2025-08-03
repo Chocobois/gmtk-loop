@@ -36,7 +36,7 @@ export class SnakeMonster extends BaseMonster {
 		this.add(this.rope);
 
 		// this.target = new Phaser.Math.Vector2(x, y);
-		this.velocity = new Phaser.Math.Vector2(10, 10);
+		this.velocity = new Phaser.Math.Vector2(600, 600);
 		this.border = {
 			left: 100,
 			right: scene.W - 100,
@@ -89,8 +89,8 @@ export class SnakeMonster extends BaseMonster {
 		}
 
 		// Movement
-		this.x += this.velocity.x;
-		this.y += this.velocity.y;
+		this.x += this.velocity.x * (delta / 1000);
+		this.y += this.velocity.y * (delta / 1000);
 
 		// Update tail points to follow like a chain
 		let prev = new Phaser.Math.Vector2(this.x, this.y);

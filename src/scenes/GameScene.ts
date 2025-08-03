@@ -20,6 +20,12 @@ import { Wolf } from "@/components/enemies/wolf/Wolf";
 import { Snail } from "@/components/enemies/snail/Snail";
 import { Bat } from "@/components/enemies/bat/Bat";
 
+import { Pearl } from "@/components/pearls/Pearl";
+import { pearlState } from "@/state/PearlState";
+import { PearlElement } from "@/components/pearls/PearlElement";
+import { PearlTypes } from "@/components/pearls/PearlTypes";
+import { GrayScalePostFilter } from "@/pipelines/GrayScalePostFilter";
+
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
 	private entities: Entity[];
@@ -34,12 +40,14 @@ export class GameScene extends BaseScene {
 	private projectiles: EffectTracker;
 	private indicators: EffectTracker;
 
+	private pearl: Pearl;
+	private levelDataList: LevelDefinition[]; // All currently loaded levels
 	private activeBossCount: number; // If multiple bosses are loaded, keep count
 	public winJingle: Phaser.Sound.BaseSound;
 	public loseJingle: Phaser.Sound.BaseSound;
-	private gameOverText: Phaser.GameObjects.Image;
 
 	private music: Music;
+	private combo: number = 0;
 
 	constructor() {
 		super({ key: "GameScene" });
@@ -48,6 +56,7 @@ export class GameScene extends BaseScene {
 	// Allow for multiple levels to be loaded at the same time
 	create(levelDataList: LevelDefinition[]): void {
 		this.fade(false, 200, 0x000000);
+		this.levelDataList = levelDataList;
 
 		// Restore health
 		loopState.health = loopState.maxHealth;
@@ -70,41 +79,62 @@ export class GameScene extends BaseScene {
 
 		this.textParticles = new TextParticle(this);
 
+		this.debugGraphics = this.add.graphics();
+		this.debugGraphics.setVisible(false);
+
+		/* UI */
+
 		this.ui = new UI(this);
 
-		this.debugGraphics = this.add.graphics();
+		this.setupPearlUI();
 
 		this.initGraphics();
 
 		// Music
-		if (!this.music) {
-			// TODO: Add music track in LevelDefinition
-			this.music = new Music(this, "m_fight", { volume: 0.2 });
-			// this.music = new Music(this, "m_lightfast", { volume: 0.2 });
-		}
+		if (this.music) this.music.destroy();
+		this.music = new Music(this, levelDataList[0].music, { volume: 0.2 });
 		this.music.play();
 
-		// Temporary
-		let text = this.addText({
+		/*  Temporary */
+
+		let returnButton = this.addText({
+			x: 20,
+			y: 20,
 			text: "Return to map",
 			size: 48,
 			color: "white",
 		});
-		text.setInteractive().on("pointerdown", () => {
-			this.loopDrawer.setEnabled(false);
-			this.music.stop();
-			this.scene.start("WorldScene");
-			this.music.stop();
+		returnButton.setInteractive().on("pointerdown", () => {
+			this.goToWorldHub(0);
+		});
+
+		let debugButton = this.addText({
+			x: this.W - 20,
+			y: 20,
+			text: "Show colliders",
+			size: 48,
+			color: "white",
+		});
+		debugButton.setOrigin(1, 0);
+		debugButton.setInteractive().on("pointerdown", () => {
+			this.debugGraphics.setVisible(!this.debugGraphics.visible);
+			debugButton.setText(
+				this.debugGraphics.visible ? "Hide colliders" : "Show colliders"
+			);
 		});
 	}
 
 	// Allow multiple monster keys to be spawned
 	loadMonsters(monsterList: string[]) {
-
 		this.activeBossCount = monsterList.length;
 
 		if (monsterList.includes("snail")) {
 			const monster = new Bat(this, 960, 540);
+			this.addEntity(monster);
+		}
+
+		if (monsterList.includes("wolf")) {
+			const monster = new Wolf(this, 960, 540);
 			this.addEntity(monster);
 		}
 
@@ -117,7 +147,7 @@ export class GameScene extends BaseScene {
 			const mole = new MoleBoss(this, 960, 540);
 			this.addEntity(mole);
 			mole.addFakeMoles(3);
-			mole.moveAllMoles(true);
+			mole.moveAllMoles(0);
 		}
 
 		if (monsterList.includes("jester")) {
@@ -143,7 +173,7 @@ export class GameScene extends BaseScene {
 		entity.on("addEntity", this.addEntity, this);
 		entity.on("removeEntity", this.removeEntity, this);
 		entity.on("damage", this.damagePlayer, this);
-		entity.on("victory", this.win, this);
+		entity.on("victory", this.onVictory, this);
 	}
 
 	removeEntity(entity: Entity) {
@@ -154,15 +184,16 @@ export class GameScene extends BaseScene {
 	removeMonster(monster: Monster) {
 		this.removeEntity(monster);
 		if (this.entities.length === 0) {
-			this.win();
+			this.onVictory();
 		}
 	}
 
 	initGraphics() {
 		this.background.setDepth(0);
 		this.entityLayer.setDepth(19);
-		this.textParticles.setDepth(30);
 		this.debugGraphics.setDepth(100);
+		this.ui.setDepth(200);
+		this.textParticles.setDepth(300);
 		this.loopDrawer.setDepth(1000);
 
 		this.indicators = new EffectTracker(this, 0, 0);
@@ -178,11 +209,27 @@ export class GameScene extends BaseScene {
 		this.hitEffects.setDepth(16);
 	}
 
+	// Purely visual Pearl entity to show what pearl is in use
+	setupPearlUI() {
+		this.pearl = new Pearl(
+			this,
+			this.W - 100,
+			this.H - 100,
+			pearlState.currentPearl
+		);
+		this.pearl.setScale(0.8);
+		this.pearl.setDepth(200);
+
+		if (this.pearl.isNone) {
+			this.pearl.setVisible(false);
+		}
+	}
+
 	update(time: number, delta: number) {
 		this.updateEntities(time, delta);
 
 		this.loopDrawer.update(time, delta);
-		this.loopDrawer.checkCollisions(this.entities);
+		this.loopDrawer.checkCollisions(this.entities, delta);
 		this.textParticles.update(time, delta);
 
 		this.drawColliders();
@@ -223,16 +270,28 @@ export class GameScene extends BaseScene {
 	}
 
 	onLoop(polygon: Phaser.Geom.Polygon) {
+		let emptyLoop = true;
+
 		this.entities.forEach((entity) => {
 			if (Phaser.Geom.Polygon.Contains(polygon, entity.x, entity.y)) {
 				if (entity instanceof Entity && entity.enabled) {
 					entity.onLoop();
+					emptyLoop = false;
 				}
 			}
 		});
+
+		if (emptyLoop) return;
+
+		// We circled something
+		this.combo++;
+		const soundIndex = Phaser.Math.Clamp(this.combo, 1, 7);
+		this.sound.play(`d_combo_${soundIndex}`, { volume: 0.4 });
+		// console.debug("Combo", this.combo);
 	}
 
 	onLoopBreak(entity: Entity) {
+		this.combo = 0;
 		this.damagePlayer(entity.entityDamage);
 	}
 
@@ -248,13 +307,13 @@ export class GameScene extends BaseScene {
 		// Reduce player health
 		loopState.health = Math.max(0, loopState.health - damage);
 		if (loopState.health <= 0) {
-			this.lose();
+			this.onGameOver();
 		}
 	}
 
 	drawColliders() {
 		this.debugGraphics.clear();
-		this.debugGraphics.fillStyle(0xff0000, 0.25);
+		this.debugGraphics.fillStyle(0xff0000, 0.75);
 		this.colliders.forEach((collider) => {
 			this.debugGraphics.fillCircle(collider.x, collider.y, collider.radius);
 		});
@@ -291,18 +350,97 @@ export class GameScene extends BaseScene {
 		return this.entities.flatMap((entity) => entity.colliders);
 	}
 
-	win() {
+	onVictory() {
 		// Continue to battle if multiple bosses are loaded
 		this.activeBossCount -= 1;
 		if (this.activeBossCount > 0) return;
 
 		this.loopDrawer.setEnabled(false);
 		this.music.stop();
-		this.sound.play("u_level_enter", { volume: 0.4 });
+		this.sound.play("victory", { volume: 0.4 });
+		this.sound.play("machinegun", { volume: 0.6, rate: 0.2 });
 
-		this.gameOverText = this.add.image(this.CX, 1000, "win");
+		this.flash(4000, 0xffffff, 1.0);
 
-		this.addEvent(3000, () => {
+		// Check level for pearl rewards (allow only one reward)
+		let pearlReward: PearlElement = PearlElement.None;
+		for (const levelData of this.levelDataList) {
+			if (levelData.pearl != PearlElement.None) {
+				const hasPearl = pearlState.acquiredPearls[levelData.pearl];
+
+				if (!hasPearl) {
+					pearlReward = levelData.pearl;
+					break;
+				}
+			}
+		}
+
+		// Pearl reward ending
+		if (pearlReward != PearlElement.None) {
+			this.addEvent(3000, () => {
+				// Save pearl in state
+				pearlState.acquiredPearls[pearlReward] = true;
+				pearlState.currentPearl = PearlTypes[pearlReward];
+				this.pearl.setPearlType(PearlTypes[pearlReward]);
+
+				this.animatePearlReward();
+			});
+
+			this.goToWorldHub(8000);
+		}
+		// Normal ending
+		else {
+			this.goToWorldHub(5000);
+		}
+	}
+
+	onGameOver() {
+		this.loopDrawer.setEnabled(false);
+		this.music.stop();
+		this.sound.play("game_over", { volume: 0.4 });
+		this.sound.play("machinegun", { volume: 0.6, rate: 0.2 });
+
+		this.flash(4000, 0xffffff, 1.0);
+		this.cameras.main.setPostPipeline(GrayScalePostFilter);
+
+		// Animate black fade
+		let black = this.add.rectangle(0, 0, this.W, this.H, 0).setOrigin(0);
+		black.setDepth(150);
+		this.tweens.add({
+			targets: black,
+			alpha: { from: 0, to: 0.3 },
+			duration: 5000,
+		});
+
+		// Animate text
+		let text = this.addText({
+			x: this.CX,
+			y: this.CY,
+			text: "Game Over",
+			size: 96,
+			color: "white",
+		});
+		text.setOrigin(0.5);
+		text.setStroke("black", 16);
+		text.setDepth(150);
+		text.setScale(0);
+		this.tweens.add({
+			targets: text,
+			scaleX: 1,
+			scaleY: 1,
+			ease: "Back.Out",
+			duration: 4000,
+			delay: 2000,
+		});
+
+		this.goToWorldHub(8000);
+	}
+
+	goToWorldHub(delay: number) {
+		this.loopDrawer.setEnabled(false);
+		this.music.stop();
+
+		this.addEvent(delay, () => {
 			this.fade(true, 100, 0x000000);
 			this.addEvent(100, () => {
 				this.scene.start("WorldScene");
@@ -310,18 +448,61 @@ export class GameScene extends BaseScene {
 		});
 	}
 
-	lose() {
-		this.loopDrawer.setEnabled(false);
-		this.music.stop();
-		this.sound.play("u_level_enter", { volume: 0.4 });
+	animatePearlReward() {
+		// Animate black fade
+		let black = this.add.rectangle(0, 0, this.W, this.H, 0).setOrigin(0);
+		black.setDepth(150);
+		this.tweens.add({
+			targets: black,
+			alpha: { from: 0, to: 0.5 },
+			duration: 500,
+		});
 
-		this.gameOverText = this.add.image(this.CX, 1000, "lose");
+		// Animate light
+		let light = this.add.image(this.CX, this.CY, "light");
+		light.setScale(0);
+		this.tweens.add({
+			targets: light,
+			scaleX: 1,
+			scaleY: 1,
+			ease: "Back.Out",
+			duration: 500,
+			delay: 300,
+		});
 
-		this.addEvent(3000, () => {
-			this.fade(true, 100, 0x000000);
-			this.addEvent(100, () => {
-				this.scene.start("WorldScene");
-			});
+		// Animate pearl
+		this.pearl.setVisible(true);
+		this.pearl.setPosition(this.CX, this.CY);
+		light.setDepth(150);
+		this.pearl.setScale(0);
+		this.tweens.add({
+			targets: this.pearl,
+			scaleX: 1.5,
+			scaleY: 1.5,
+			ease: "Back.Out",
+			duration: 500,
+			delay: 600,
+		});
+
+		// Animate text
+		let text = this.addText({
+			x: this.CX,
+			y: this.CY + 250,
+			text: `${this.pearl.pearlType.name} acquired!`,
+			size: 64,
+			color: "white",
+		});
+		text.setOrigin(0.5);
+		text.setStroke("black", 16);
+		text.setDepth(150);
+		text.setScale(0);
+		this.tweens.add({
+			targets: text,
+			scaleX: 1,
+			scaleY: 1,
+			ease: "Back.Out",
+			duration: 500,
+			delay: 900,
 		});
 	}
 

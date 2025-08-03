@@ -5,6 +5,10 @@ import { levels } from "@/components/WorldHub/Levels";
 import { Entity } from "@/components/Entity";
 import { LevelDefinition } from "@/components/WorldHub/LevelDefinition";
 import { Music } from "@/components/Music";
+import { Pearl } from "@/components/pearls/Pearl";
+import { PearlTypes } from "@/components/pearls/PearlTypes";
+import { pearlState } from "@/state/PearlState";
+import { PearlElement } from "@/components/pearls/PearlElement";
 
 export class WorldScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -12,12 +16,12 @@ export class WorldScene extends BaseScene {
 
 	private entities: Entity[];
 	private hubs: HubLevel[];
-	private pearlButton: HubLevel;
+	private pearlButton: Pearl;
 
 	private music: Music;
 
 	// Special case in case two levels are selected
-	private levelIsStarting: boolean;
+	private levelIsStarting: boolean = false;
 	private queuedLevels: LevelDefinition[];
 
 	constructor() {
@@ -57,51 +61,42 @@ export class WorldScene extends BaseScene {
 
 		this.addHubLines();
 
-		this.pearlButton = new HubLevel(this, {
-			x: 200,
-			y: this.H - 200,
-			title: "Pearls",
-			key: "",
-			background: "",
-			enemy: "",
-			require: [],
-		});
-		this.pearlButton.setDepth(100);
-		this.entities.push(this.pearlButton);
-		this.pearlButton.on("selected", this.loadShop, this);
+		this.addPearlButton();
 
 		this.loopDrawer = new LoopDrawer(this);
 		this.loopDrawer.setDepth(1000);
 		this.loopDrawer.on("loop", this.onLoop, this);
 
 		// Music
-		if (!this.music) {
-			this.music = new Music(this, "m_map");
-		}
-		this.music.play();
-		this.music.setVolume(0.2);
+		if (!this.music || !this.music.isPlaying) {
+			if (!this.music) {
+				this.music = new Music(this, "m_map");
+			}
+			this.music.play();
+			this.music.setVolume(0.2);
 
-		this.levelIsStarting = false;
-		this.queuedLevels = [];
+			this.levelIsStarting = false;
+			this.queuedLevels = [];
+		}
 	}
 
 	update(time: number, delta: number) {
 		this.loopDrawer.update(time, delta);
-		this.loopDrawer.checkCollisions(this.entities);
+		this.loopDrawer.checkCollisions(this.entities, delta);
 
 		const barTime = this.music.getBarTime();
-		this.hubs.forEach((hub) => hub.update(barTime));
-		this.pearlButton.update(barTime);
+		this.hubs.forEach((hub) => hub.setBarTime(barTime));
+
+		if (this.pearlButton) {
+			this.pearlButton.update(time, delta);
+		}
 	}
 
 	loadShop() {
 		this.loopDrawer.setEnabled(false);
-		this.flash(1000, 0xffffff, 0.3);
-		this.addEvent(1000, () => {
-			this.fade(true, 100, 0x000000);
-			this.addEvent(100, () => {
-				this.scene.start("ShopScene");
-			});
+		this.fade(true, 100, 0x000000);
+		this.addEvent(100, () => {
+			this.scene.start("ShopScene");
 		});
 	}
 
@@ -116,7 +111,10 @@ export class WorldScene extends BaseScene {
 
 		// Set volume to 0 so that animations may continue
 		this.music.setVolume(0);
-		this.sound.play("h_map_select", { volume: 0.2 });
+		this.addEvent(5, () => {
+			const key = "h_map_select" + (this.queuedLevels.length < 2 ? "" : "_multiple");
+			this.sound.play(key, { volume: 0.2 });
+		});
 
 		// Flash the screen and start the level
 		this.flash(1000, 0xffffff, 0.3);
@@ -146,9 +144,52 @@ export class WorldScene extends BaseScene {
 		});
 	}
 
+	addPearlButton() {
+		if (!pearlState.anyPearlsUnlocked) {
+			return;
+		}
+
+		this.pearlButton = new Pearl(
+			this,
+			this.W - 200,
+			this.H - 200,
+			PearlTypes[PearlElement.None]
+		);
+		this.pearlButton.setDepth(100);
+		this.entities.push(this.pearlButton);
+		this.pearlButton.on("selected", this.loadShop, this);
+
+		// Update pearl type
+		this.pearlButton.setPearlType(pearlState.currentPearl);
+		if (pearlState.currentPearl.element == PearlElement.None) {
+			this.pearlButton.setHighlight(false);
+		}
+
+		const label = this.addText({
+			x: this.pearlButton.x,
+			y: this.pearlButton.y + 150,
+			text: "Pearls",
+			size: 48,
+			color: "white",
+		});
+		label.setStroke("black", 16);
+		label.setOrigin(0.5);
+	}
+
 	onLoop(polygon: Phaser.Geom.Polygon) {
 		const selectedEntities = this.entities.filter((entity) =>
 			Phaser.Geom.Polygon.Contains(polygon, entity.x, entity.y)
+		);
+
+		// Only one selected
+		if (selectedEntities.length == 1) {
+			selectedEntities[0].onLoop();
+			return;
+		}
+
+		const midpoint = new Phaser.Math.Vector2(
+			Phaser.Math.Average(selectedEntities.map((e) => e.x)),
+			Phaser.Math.Average(selectedEntities.map((e) => e.y))
 		);
 
 		// If all selected entities are level hubs, then start the levels simultaneously
@@ -156,15 +197,22 @@ export class WorldScene extends BaseScene {
 			selectedEntities.length > 0 &&
 			selectedEntities.every((e) => e instanceof HubLevel && e.levelData.enemy)
 		) {
-			if (selectedEntities.length > 1) {
-				// Add some other sound here, Mato
-			}
 
-			selectedEntities.forEach((e) => e.onLoop());
+			selectedEntities.forEach((e) => {
+				e.onLoop();
+				this.tweens.add({
+					targets: e,
+					x: midpoint.x,
+					y: midpoint.y,
+					duration: 1100,
+					ease: "Quad.In",
+				})
+			});
 			return;
 		}
+
 		// Easter eggs when selecting multiple non-levels at once
-		else {
+		else if (selectedEntities.length > 1) {
 			selectedEntities.forEach((e, i) => {
 				if (i == 0) return;
 				this.sound.play("u_question", {
@@ -173,11 +221,6 @@ export class WorldScene extends BaseScene {
 					rate: 1 + 0.25 * (i - 1),
 				});
 			});
-
-			const midpoint = new Phaser.Math.Vector2(
-				Phaser.Math.Average(selectedEntities.map((e) => e.x)),
-				Phaser.Math.Average(selectedEntities.map((e) => e.y))
-			);
 
 			const questionMark = this.add.sprite(midpoint.x, midpoint.y, "question");
 			questionMark.setScale(0.35);

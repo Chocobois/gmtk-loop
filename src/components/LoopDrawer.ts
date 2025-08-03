@@ -3,6 +3,7 @@ import { loopState } from "@/state/LoopState";
 import { Entity } from "./Entity";
 import { pearlState } from "@/state/PearlState";
 import { autorun } from "mobx";
+import { PearlElement } from "./pearls/PearlElement";
 
 const SFX_FADE_OUT_DURATION = 100; //ms
 const SFX_SMOOTHING_WINDOW_SIZE = 500; //ms
@@ -16,6 +17,8 @@ enum InputFlipMode {
 	FLIP_X_Y,
 	SWAP_X_Y,
 }
+
+const ROCK_ARMOR_DURATION = 200; // Milliseconds of invulnerability
 
 export class LoopDrawer extends Phaser.GameObjects.Container {
 	public scene: BaseScene;
@@ -35,9 +38,14 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	// Manipulate how pointer x/y input is read. Used in the Jester fight.
 	private inputFlipMode: InputFlipMode;
 
+	// Rock pearl ability, how many seconds you can sustain damage without breaking
+	private rockPearlTimer: number;
+
 	public muted: boolean = false;
+	public sfxMaxVolume: number = 1;
 	private sfxLoop: Phaser.Sound.WebAudioSound;
 	private sfxTween: Phaser.Tweens.Tween;
+	private cursorTween: Phaser.Tweens.Tween;
 
 	constructor(scene: BaseScene) {
 		super(scene);
@@ -80,15 +88,37 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 			},
 		});
 
+		this.cursorTween = this.scene.tweens.add({
+			targets: this.cursor,
+			persist: true,
+			paused: true,
+			alpha: {from: 1, to: 0},
+			// angle: 0, // For some reason this sets it instantly
+			duration: SFX_FADE_OUT_DURATION,
+			onComplete: () => {
+				this.cursor.setVisible(false);
+				this.cursor.setAlpha(1);
+			},
+			onStop: () => {
+				this.cursor.setAlpha(1);
+				this.cursor.setAngle(0);
+			},
+		})
+
 		autorun(() => {
-			console.log("New color");
-			this.loopColor = pearlState.pearlLoopColor;
-			this.lineColor = pearlState.pearlLineColor;
+			if (!this.scene) {
+				console.warn("LoopDrawer `autorun` bug");
+				return;
+			}
+
+			this.loopColor = pearlState.currentPearl.loopColor;
+			this.lineColor = pearlState.currentPearl.lineColor;
 		});
 	}
 
 	update(time: number, delta: number) {
 		this.sfxLoop.mute = this.muted;
+		this.sfxLoop.volume = Math.min(1, this.sfxLoop.rate + 0.2) * this.sfxMaxVolume;
 		this.graphics.lineStyle(this.lineWidth, this.lineColor);
 
 		if (this.pointTimes.length > 0) {
@@ -106,9 +136,11 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 	touchStart(pointer: Phaser.Input.Pointer) {
 		const { pointerX, pointerY } = this.getPointer(pointer);
+		this.cursorTween.stop();
 		this.cursor.setVisible(true).setPosition(pointerX, pointerY);
 		this.points = [new Phaser.Math.Vector2(pointerX, pointerY)];
 		this.pointTimes = [pointer.time];
+		this.rockPearlTimer = ROCK_ARMOR_DURATION;
 
 		if (!this.muted)
 			this.scene.sound.play("d_tap", {
@@ -137,8 +169,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		// Check if the current line intersects with any existing line segments, creating a loop
 		const lineSegments = this.lineSegments;
 		for (let i = 0; i < lineSegments.length - 1; i++) {
-			const line = lineSegments[i];
-			const segment = new Phaser.Geom.Line(line.x1, line.y1, line.x2, line.y2);
+			const segment = lineSegments[i];
 			if (Phaser.Geom.Intersects.LineToLine(currentLine, segment)) {
 				this.onLoop(this.points.slice(i));
 				this.points = this.points.slice(0, Math.max(i, 1));
@@ -147,16 +178,20 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 			}
 		}
 
+		const hasCoilAbility = pearlState.currentPearl.element == PearlElement.Coil;
+		const lengthMultiplier = hasCoilAbility ? 2 : 1;
+		const maxLoopLength = lengthMultiplier * loopState.maxLength;
+
 		// Check if total line distance exceeds maxLength
 		const distance = Phaser.Geom.Line.Length(currentLine);
-		if (distance > loopState.maxLength) {
+		if (distance > maxLoopLength) {
 			const direction = new Phaser.Math.Vector2(
 				currentLine.x1 - currentLine.x2,
 				currentLine.y1 - currentLine.y2
 			).normalize();
 			const startPoint = new Phaser.Math.Vector2(
-				currentLine.x1 - direction.x * loopState.maxLength,
-				currentLine.y1 - direction.y * loopState.maxLength
+				currentLine.x1 - direction.x * maxLoopLength,
+				currentLine.y1 - direction.y * maxLoopLength
 			);
 			this.points = [
 				startPoint,
@@ -170,7 +205,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 				const p0 = this.points[i - 1];
 				const segDist = Phaser.Math.Distance.Between(p0.x, p0.y, p1.x, p1.y);
 				totalDist += segDist;
-				if (totalDist > loopState.maxLength) {
+				if (totalDist > maxLoopLength) {
 					this.points.splice(0, i);
 					break;
 				}
@@ -193,6 +228,9 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		});
 		this.graphics.lineTo(pointerX, pointerY);
 		this.graphics.strokePath();
+
+		// Tilt cursor based on horizontal speed
+		this.cursor.angle = Phaser.Math.Clamp(pointer.velocity.x / 2, -20, 20);
 
 		// Sound stuff
 
@@ -235,15 +273,6 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 				Math.max(...recentPointTimes) - Math.min(...recentPointTimes);
 			const recentSpeed = 1000 * Phaser.Math.GetSpeed(recentDist, recentSpan);
 
-			/* console.debug({
-				len: this.pointTimes.length,
-				window: recentWindowSize,
-				dist: Math.round(recentDist),
-				span: Math.round(recentTimeSpan),
-				speed: Number(recentSpeed.toFixed(4)),
-				times: recentPointTimes
-			}) */
-
 			// The sound clip has 4 loops per 4.745 seconds -> about 0.843 loops/sec
 			this.sfxLoop.setRate(
 				Phaser.Math.Clamp(0.843 * recentSpeed, minRate, maxRate)
@@ -263,7 +292,9 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		this.onLineBreak();
 	}
 
-	checkCollisions(entities: Entity[]) {
+	// Check if any of the loop's line segments touch any entity colliders
+	checkCollisions(entities: Entity[], delta: number) {
+		// No line segments have been drawn yet
 		if (this.points.length == 0) return;
 
 		// Break line if it intersects with any collider
@@ -271,6 +302,14 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 			for (const collider of entity.colliders) {
 				for (const line of this.lineSegments) {
 					if (Phaser.Geom.Intersects.LineToCircle(line, collider)) {
+						// If Pearl Rock ability is active, tank damage and abort
+						if (pearlState.currentPearl.element == PearlElement.Rock) {
+							this.rockPearlTimer -= delta;
+							if (this.rockPearlTimer > 0) {
+								return;
+							}
+						}
+
 						if (!this.muted)
 							this.scene.sound.play("d_break", {
 								volume: 0.4,
@@ -303,7 +342,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 	onLineBreak() {
 		if (!this.lineBroken) this.fadeLineEffect(); // Must be before clearing `points`
-		this.cursor.setVisible(false);
+		this.cursorFade();
 		this.points = [];
 		this.pointTimes = [];
 		this.graphics.clear();
@@ -427,6 +466,12 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	unmute() {
 		this.muted = false;
 		return this;
+	}
+
+	cursorFade() {
+		if (this.cursorTween.isPlaying()) return;
+		this.cursorTween.restart();
+		this.cursorTween.play();
 	}
 
 	getPointer(pointer: Phaser.Input.Pointer): {

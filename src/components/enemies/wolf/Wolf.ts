@@ -14,6 +14,8 @@ export class Wolf extends Monster{
         this.stateHP = [5,10,10];
         this.behavior = new MonsterScriptHandler(this,"wolfidle");
         this.stunOverflow = -1000;
+
+        this.sprite.setScale(500 / this.sprite.width);
 	}
 
     spawnIce(){
@@ -95,5 +97,18 @@ export class Wolf extends Monster{
 			this.advanceState();
 		}
 		//this.doABarrelRoll();
+	}
+
+    protected shapes: Phaser.Geom.Circle[] = [
+		new Phaser.Geom.Circle(),
+		new Phaser.Geom.Circle(),
+		new Phaser.Geom.Circle(),
+	];
+	get colliders(): Phaser.Geom.Circle[] {
+		return [
+			this.shapes[0].setTo(this.x, this.y-100, 50),
+			this.shapes[1].setTo(this.x, this.y, 50),
+			this.shapes[2].setTo(this.x, this.y+100, 50),
+		];
 	}
 }

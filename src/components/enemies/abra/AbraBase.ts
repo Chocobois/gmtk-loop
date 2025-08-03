@@ -92,7 +92,7 @@ export class AbraBase extends BaseMonster {
 	get colliders(): Phaser.Geom.Circle[] {
 		if (!this.enabled) return [];
 		if (this.shapes.length === 0) {
-			this.shapes = [new Phaser.Geom.Circle(0, 0, 70)];
+			this.shapes = [new Phaser.Geom.Circle(0, 0, 60)];
 		}
 
 		return this.shapes.map((shape) =>

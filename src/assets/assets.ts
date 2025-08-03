@@ -19,11 +19,14 @@ const images: Image[] = [
 	image("backgrounds/shelves", "background_shelves"),
 
 	// Pearls
+	image("pearls/shell_inner", "pearl_shell_inner"),
+	image("pearls/shell_outer", "pearl_shell_outer"),
+	image("pearls/none", "pearl_none"),
+	image("pearls/coil", "pearl_coil"),
 	image("pearls/fire", "pearl_fire"),
-	image("pearls/grass", "pearl_grass"),
+	image("pearls/psychic", "pearl_psychic"),
+	image("pearls/rock", "pearl_rock"),
 	image("pearls/water", "pearl_water"),
-	image("pearls/electric", "pearl_electric"),
-
 
 	// Sans
 	image("characters/sans/enemy_1", "enemy_1"),	
@@ -75,6 +78,7 @@ const images: Image[] = [
 	image("characters/abra/active", "abra_active"),
 	image("characters/abra/hurt", "abra_hurt"),
 
+	// Bat
 	image("characters/bat/bat fly1", "bat_fly_1"),
 	image("characters/bat/bat fly2", "bat_fly_2"),
 	image("characters/bat/bat fly3", "bat_fly_3"),
@@ -91,6 +95,35 @@ const images: Image[] = [
 	image("characters/bat/bat get up4", "bat_get_up_4"),
 
 	image("characters/bat/bat attack", "bat_attack"),
+
+	// Badger
+	image("characters/badger/badger idle1", "badger_idle_1"),
+	image("characters/badger/badger idle2", "badger_idle_2"),
+	image("characters/badger/badger idle3", "badger_idle_3"),
+	image("characters/badger/badger idle4", "badger_idle_4"),
+	
+	image("characters/badger/badger dig1", "badger_dig_1"),
+	image("characters/badger/badger dig2", "badger_dig_2"),
+	image("characters/badger/badger dig3", "badger_dig_3"),
+	image("characters/badger/badger dig4", "badger_dig_4"),
+	
+	image("characters/badger/badger hole", "badger_hole"),
+	image("characters/badger/dirtmound", "dirtmound"),
+
+	// Badger ice alt
+	image("characters/badger/badger alt idle1", "badger_ice_idle_1"),
+	image("characters/badger/badger alt idle2", "badger_ice_idle_2"),
+	image("characters/badger/badger alt idle3", "badger_ice_idle_3"),
+	image("characters/badger/badger alt idle4", "badger_ice_idle_4"),
+	
+	image("characters/badger/badger alt dig1", "badger_ice_dig_1"),
+	image("characters/badger/badger alt dig2", "badger_ice_dig_2"),
+	image("characters/badger/badger alt dig3", "badger_ice_dig_3"),
+	image("characters/badger/badger alt dig4", "badger_ice_dig_4"),
+	
+	image("characters/badger/badger alt hole", "badger_ice_hole"),
+	image("characters/badger/snowmound", "snowmound"),
+
 
 	
 	image("characters/enemyshadow", "enemy_shadow"),
@@ -144,6 +177,8 @@ const audios: Audio[] = [
 	music("map", "m_map"),
 
 	sound("machinegun", "machinegun", 0.5),
+	sound("game_over", "game_over", 0.5),
+	sound("victory", "victory", 0.5),
 
 	sound("tree/rustle", "t_rustle", 0.5),
 	sound("drawing/sine", "d_sine", 0.3),
@@ -152,11 +187,20 @@ const audios: Audio[] = [
 	sound("drawing/tap", "d_tap"),
 	sound("drawing/break", "d_break"),
 
+	sound("drawing/combo1", "d_combo_1"),
+	sound("drawing/combo2", "d_combo_2"),
+	sound("drawing/combo3", "d_combo_3"),
+	sound("drawing/combo4", "d_combo_4"),
+	sound("drawing/combo5", "d_combo_5"),
+	sound("drawing/combo6", "d_combo_6"),
+	sound("drawing/combo7", "d_combo_7"),
+
 	sound("ui/screen_transition", "u_level_enter"),
 	sound("ui/what", "u_question"),
 	sound("ui/disabled", "u_disabled"),
 
 	sound("hub/map_select", "h_map_select"),
+	sound("hub/map_select_evil", "h_map_select_multiple"),
 	sound("tele", "tele"),
 ];
 
