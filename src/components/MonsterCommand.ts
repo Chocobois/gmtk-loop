@@ -38,6 +38,8 @@ import { Bounds } from "@/scenes/BaseScene";
 import { DashLine } from "./DashLine";
 import { CircleEffect } from "./CircleEffect";
 import type { Wolf } from "./enemies/wolf/Wolf";
+import { HitCircle } from "./HitCircle";
+import { Echo } from "./Echo";
 
 export interface MonsterAction{
     key: string;
@@ -298,7 +300,195 @@ export class MonsterCommand
                 this.owner.scene.pushHitEffect(new CircleEffect(this.owner.scene,this.owner.x,this.owner.y,this.owner,600,750));
                 this.advance();
                 break;
-            }  case "call": {
+            }   case "callSlice": {
+                if(this.pend) {
+                    break;
+                }
+                let ns = {
+                    key: "",
+                    value: [-1],
+                    args: [""],
+                    conditions: [false],
+                }
+                if(this.variableMap.has(this.cmd[this.step].args[0])){
+                    ns = this.variableMap.get(this.cmd[this.step].args[0])!;
+                }
+                //console.log("New slice at: " + ns.value[0] + ", " + ns.value[1] +" at angle of: " + Phaser.Math.RadToDeg(ns.value[2]));
+                this.owner.scene.pushIndicator(new WedgeIndicator(this.owner.scene,ns.value[0],ns.value[1],this.cmd[this.step].value[2],this.cmd[this.step].value[3],
+                    this.cmd[this.step].value[4],Phaser.Math.RadToDeg(ns.value[2]),this.cmd[this.step].value[5],this.owner,false));
+                this.advance();
+                break;
+            }   case "echo": {
+                if(this.pend) {
+                    break;
+                }
+                let ns = {
+                    key: "",
+                    value: [-1],
+                    args: [""],
+                    conditions: [false],
+                }
+                if(this.variableMap.has(this.cmd[this.step].args[0])){
+                    ns = this.variableMap.get(this.cmd[this.step].args[0])!;
+                }
+                let i = Phaser.Math.RadToDeg(ns.value[2]);
+                let span = this.cmd[this.step].value[5];
+
+                this.owner.scene.pushHitEffect(new Echo(this.owner.scene, ns.value[0],ns.value[1],this.owner,i,span,this.cmd[this.step].value[7],this.cmd[this.step].value[4],2000));
+
+                for(let ii = 0; ii < this.cmd[this.step].value[6]; ii++){
+                    this.owner.scene.addEntity(new HitCircle(this.owner.scene,ns.value[0],ns.value[1],this.cmd[this.step].value[2]
+                        ,this.cmd[this.step].value[3],this.cmd[this.step].value[4], (i-span/2)+(ii*(span/(this.cmd[this.step].value[6]-1))), this.cmd[this.step].value[7]));
+                    /*this.owner.scene.addEntity(new HitCircle(this.owner.scene,this.cmd[this.step].value[0],this.cmd[this.step].value[1],this.cmd[this.step].value[2]
+                        ,this.cmd[this.step].value[3],this.cmd[this.step].value[4]*(2/3), (i-span/2)+(i*(span/(this.cmd[this.step].value[6]-1))), this.cmd[this.step].value[7]));
+                    this.owner.scene.addEntity(new HitCircle(this.owner.scene,this.cmd[this.step].value[0],this.cmd[this.step].value[1],this.cmd[this.step].value[2]
+                        ,this.cmd[this.step].value[3],this.cmd[this.step].value[4]*(1/3), (i-span/2)+(i*(span/(this.cmd[this.step].value[6]-1))), this.cmd[this.step].value[7]));*/
+                }
+
+                this.advance();
+                break;
+            }   case "storeSliceRandom": {
+                if(this.pend) {
+                    break;
+                }
+                let tmp = {
+                    key: this.cmd[this.step].args[0],
+                    value: [this.owner.x,this.owner.y,Phaser.Math.DegToRad(Math.random()*360),-1],
+                    args: this.cmd[this.step].args,
+                    conditions: [this.cmd[this.step].conditions[0]],
+                }
+                this.variableMap.set(this.cmd[this.step].args[0],tmp);
+                this.advance();
+                break;
+            }   case "storeNextDirection": { // this one is a hot mess
+                if(this.pend) {
+                    break;
+                }
+
+                let ns = {
+                    key: "",
+                    value: [-1],
+                    args: [""],
+                    conditions: [false],
+                }
+                if(this.variableMap.has(this.cmd[this.step].args[0])){
+                    ns = this.variableMap.get(this.cmd[this.step].args[0])!;
+                }
+                let x1 = ns.value[0];
+                let y1 = ns.value[1];
+
+                let curdir =  -1;
+                if(ns.conditions[0]){
+                    curdir = ns.value[3]
+                }
+                let selected = -1;
+
+                let ex = -99999;
+                let ey = -99999;
+                let maxDist = 999999;
+                let h = 0;
+                let a = ns.value[2];
+                let tpp = 0;
+
+                //top
+                //console.log("Calculating from angle: " + a);
+                h = (0-y1)/Math.sin(a);
+                tpp = h*Math.cos(a);
+                //console.log("top x: " + tpp+x1 + " h: "+ h);
+                if((tpp+x1) < -1 || (tpp+x1) > 1921) {
+                    //ex = -99999;
+                } else {
+                    if((h < maxDist) && (h > 0)){
+                        ex = tpp;
+                        maxDist = h;
+                        selected = Bounds.TOP;
+                        //console.log("selecting top");
+                    }
+                }
+                //bottom 
+                h = (1080-y1)/Math.sin(a);
+                tpp = h*Math.cos(a);
+                //console.log("bottom x: " + tpp+x1 + " h: "+ h);
+                if((tpp+x1) < -1 || (tpp+x1) > 1921) {
+                    //ex = -99999;
+                } else {
+                    if((h < maxDist) && (h > 0)){
+                        ex = tpp;
+                        maxDist = h;
+                        selected = Bounds.BOTTOM;
+                        //console.log("selecting bottom");
+                    }
+                }
+                //left
+                h = (0-x1)/Math.cos(a);
+                tpp = h*Math.sin(a);
+                //console.log("left y: " + tpp+y1 + " h: "+ h);
+                if((tpp+y1) < -1 || (tpp+y1) > 1081) {
+                   //ey = -99999;
+                } else {
+                    if((h < maxDist) && (h > 0)){
+                        ey = tpp;
+                        maxDist = h;
+                        selected = Bounds.LEFT;
+                        //console.log("selecting left");
+                    }
+                }
+                //right
+                h = (1920-x1)/Math.cos(a);
+                tpp = h*Math.sin(a);
+                //console.log("right y: " + tpp+y1 + " h: "+ h);
+                if((tpp+y1) < -1 || (tpp+y1) > 1081) {
+                    //ey = -99999;
+                } else {
+                    if((h < maxDist) && (h > 0)){
+                        ey = tpp;
+                        maxDist = h;
+                        selected = Bounds.RIGHT;
+                        //console.log("selecting right");
+                    }
+                }
+                let pos = [0,0]; let dir = -1; //-1 sides 1 top/bottom
+                let newA = 0;
+                //now we have the correct intersection point, just reflect it
+                switch(selected){
+                    case Bounds.TOP: {if(ex == -99999) {console.log("CALCULATION FAIL TOP")} pos = [x1+ex,0]; dir = 1; 
+                        newA = Math.atan2((0-y1)*-1, (ex)); break;}
+                    case Bounds.BOTTOM: {if(ex == -99999) {console.log("CALCULATION FAIL BOTTOM")} pos = [x1+ex,1080]; dir = 1; 
+                        newA = Math.atan2((1080-y1)*-1, (ex)); break;}
+                    case Bounds.LEFT: {if(ey == -99999) {console.log("CALCULATION FAIL LEFT")} pos = [0,y1+ey]; dir = -1; 
+                        newA = Math.atan2((ey), (0-x1)*-1); break;}
+                    case Bounds.RIGHT: {if(ey == -99999) {console.log("CALCULATION FAIL RIGHT")} pos = [1920,y1+ey]; dir = -1; 
+                        newA = Math.atan2((ey), (1920-x1)*-1); break;}
+                    default: {break;}
+                }
+                let tmp = {
+                    key: this.cmd[this.step].args[0],
+                    value: [pos[0],pos[1],newA,],
+                    args: this.cmd[this.step].args,
+                    conditions: this.cmd[this.step].conditions,
+                }
+                this.variableMap.set(this.cmd[this.step].args[0],tmp);
+                this.advance();
+                break;
+            }   case "unramp": {
+                if(this.pend) {
+                    break;
+                }
+                this.owner.unramp(this.cmd[this.step].value[0]);
+                this.advance();
+                break;
+            }   case "ramp": {
+                if(this.pend) {
+                    break;
+                }
+                if(this.cmd[this.step].conditions[0]){
+                    this.owner.ramp(this.cmd[this.step].value[0],Math.random()*360);
+                } else {
+                    this.owner.ramp(this.cmd[this.step].value[0],this.cmd[this.step].value[1]);
+                }
+                this.advance();
+                break;
+            }   case "call": {
                 if(this.pend) {
                     break;
                 }

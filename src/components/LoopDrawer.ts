@@ -4,11 +4,11 @@ import { Entity } from "./Entity";
 import { pearlState } from "@/state/PearlState";
 import { autorun } from "mobx";
 import { PearlElement } from "./pearls/PearlElement";
+import { BurnEffect } from "./particles/BurnEffect";
 
 const SFX_FADE_OUT_DURATION = 100; //ms
 const SFX_SMOOTHING_WINDOW_SIZE = 500; //ms
 const SFX_TIMEOUT = 60; //ms
-const SFX_PAN_INTENSITY = 0.3; // 30%
 
 enum InputFlipMode {
 	NORMAL,
@@ -22,6 +22,7 @@ const ROCK_ARMOR_DURATION = 200; // Milliseconds of invulnerability
 
 export class LoopDrawer extends Phaser.GameObjects.Container {
 	public scene: BaseScene;
+	public combo: number = 0;
 
 	public loopColor: number = 0xffffff;
 	public lineColor: number = 0xffffff;
@@ -40,9 +41,11 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 	// Rock pearl ability, how many seconds you can sustain damage without breaking
 	private rockPearlTimer: number;
+	protected burnEffect: BurnEffect;
 
 	public muted: boolean = false;
 	public sfxMaxVolume: number = 1;
+	public sfxPanIntensity = 0.3; // 30%
 	private sfxLoop: Phaser.Sound.WebAudioSound;
 	private sfxTween: Phaser.Tweens.Tween;
 	private cursorTween: Phaser.Tweens.Tween;
@@ -92,7 +95,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 			targets: this.cursor,
 			persist: true,
 			paused: true,
-			alpha: {from: 1, to: 0},
+			alpha: { from: 1, to: 0 },
 			// angle: 0, // For some reason this sets it instantly
 			duration: SFX_FADE_OUT_DURATION,
 			onComplete: () => {
@@ -103,7 +106,11 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 				this.cursor.setAlpha(1);
 				this.cursor.setAngle(0);
 			},
-		})
+		});
+
+		// Pearl effects
+		this.rockPearlTimer = 0;
+		this.burnEffect = new BurnEffect(scene);
 
 		autorun(() => {
 			if (!this.scene) {
@@ -118,7 +125,8 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 	update(time: number, delta: number) {
 		this.sfxLoop.mute = this.muted;
-		this.sfxLoop.volume = Math.min(1, this.sfxLoop.rate + 0.2) * this.sfxMaxVolume;
+		this.sfxLoop.volume =
+			Math.min(1, this.sfxLoop.rate + 0.2) * this.sfxMaxVolume;
 		this.graphics.lineStyle(this.lineWidth, this.lineColor);
 
 		if (this.pointTimes.length > 0) {
@@ -126,6 +134,17 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 			// SFX timeout
 			if (sinceLastMove > SFX_TIMEOUT) this.sfxFadeOut(SFX_FADE_OUT_DURATION);
+		}
+
+		// Special particles if Fire pearl is in use
+		if (pearlState.currentPearl.element == PearlElement.Fire) {
+			const lineSegments = this.lineSegments;
+			lineSegments.forEach((line) => {
+				if (Math.random() < 0.02) {
+					const p = line.getRandomPoint();
+					this.burnEffect.play(p.x, p.y);
+				}
+			});
 		}
 	}
 
@@ -144,7 +163,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 		if (!this.muted)
 			this.scene.sound.play("d_tap", {
-				pan: SFX_PAN_INTENSITY * this.scene.getPan(pointerX),
+				pan: this.sfxPanIntensity * this.scene.getPan(pointerX),
 			});
 	}
 
@@ -237,7 +256,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		this.sfxTween.stop(); // Cancel SFX fade-out
 		if (!this.sfxLoop.isPlaying) this.sfxLoop.play();
 
-		this.sfxLoop.setPan(SFX_PAN_INTENSITY * this.scene.getPan(pointerX, true));
+		this.sfxLoop.setPan(this.sfxPanIntensity * this.scene.getPan(pointerX, true));
 
 		// Dynamic sound playing rate (pitch)
 		const minRate = 0.2;
@@ -284,9 +303,15 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		if (!this.muted && !this.lineBroken) {
 			const { pointerX } = this.getPointer(pointer);
 			this.scene.sound.play("d_raise", {
-				pan: SFX_PAN_INTENSITY * this.scene.getPan(pointerX),
+				pan: this.sfxPanIntensity * this.scene.getPan(pointerX),
 			});
 		}
+
+		// Combo lost when releasing (rest of the logic in onLineBreak -> resetCombo)
+		if (this.combo > 2) this.scene.sound.play("d_combo_lost", {
+			volume: 0.2,
+			delay: 0.2, //seconds
+		});
 
 		this.lineBroken = false;
 		this.onLineBreak();
@@ -313,7 +338,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 						if (!this.muted)
 							this.scene.sound.play("d_break", {
 								volume: 0.4,
-								pan: SFX_PAN_INTENSITY * this.scene.getPan(collider.x),
+								pan: this.sfxPanIntensity * this.scene.getPan(collider.x),
 							});
 
 						this.lineBroken = true;
@@ -347,6 +372,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		this.pointTimes = [];
 		this.graphics.clear();
 		this.sfxStop();
+		this.resetCombo();
 	}
 
 	addLoopGraphic(points: Phaser.Math.Vector2[]) {
@@ -529,6 +555,21 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	resetInputFlipMode() {
 		this.inputFlipMode = InputFlipMode.NORMAL;
 		this.onLineBreak();
+	}
+
+	incrementCombo(playSound: boolean = true) {
+		if (playSound && this.combo >= 1) {
+			const soundIndex = Math.min(this.combo, 7);
+			this.scene.sound.play(`d_combo_${soundIndex}`, { volume: 0.3 });
+		}
+
+		this.combo++;
+		return this.combo;
+	}
+
+	resetCombo() {
+		this.combo = 0;
+		return this.combo;
 	}
 
 	get lineSegments(): Phaser.Geom.Line[] {

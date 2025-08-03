@@ -31,13 +31,14 @@ export class DashLine extends Effect{
 
     update(t: number, d: number){
         super.update(t,d);
-        if(this.owner.traveling){
+        if(this.owner.traveling && !this.finalDraw){
             this.ePos = [this.owner.x-this.ofs[0],this.owner.y-this.ofs[1]];
             this.a = Math.atan2(this.ePos[1]-this.iPos[1], this.ePos[0]-this.iPos[0]);
             this.redraw();
         } else {
             if(!this.finalDraw) {
                 this.redraw();
+                this.finalDraw = true;
             }
             if(this.timer > 0) {
                 this.timer -=d;

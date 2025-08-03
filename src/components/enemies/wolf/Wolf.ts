@@ -38,8 +38,12 @@ export class Wolf extends Monster{
         this.sprite.setAlpha(this.fade);
         this.captureDisp.setAlpha(this.fade);
         if(this.fade <= 0){
-            this.setVisible(false);
-            this.emit("victory");
+            if(!this.rip){
+                this.setVisible(false);
+                this.emit("victory");
+                this.rip = true;
+            }
+
         }
     }
 
@@ -87,7 +91,7 @@ export class Wolf extends Monster{
             this.scene.pushHitEffect(new BasicEffect(this.scene,"boom",this.x,this.y,6,75,false,0,0,[1.5,1.5]));
             this.scene.tweens.add({
                 targets: this,
-                duration: 1000,
+                duration: 2000,
                 fade: 0,
                 ease: Phaser.Math.Easing.Back.Out,
             });
