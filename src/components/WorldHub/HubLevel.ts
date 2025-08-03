@@ -1,13 +1,16 @@
 import { BaseScene } from "@/scenes/BaseScene";
 import { Entity } from "../Entity";
-import { debug } from "@neutralinojs/lib";
 import { LevelDefinition } from "./LevelDefinition";
+import { PearlTypes } from "../pearls/PearlTypes";
+import { pearlState } from "@/state/PearlState";
 
 export class HubLevel extends Entity {
 	public scene: BaseScene;
 	public levelData: LevelDefinition;
 
+	private container: Phaser.GameObjects.Container;
 	private image: Phaser.GameObjects.Image;
+	private pearl: Phaser.GameObjects.Image;
 	private label: Phaser.GameObjects.Text;
 
 	constructor(scene: BaseScene, levelData: LevelDefinition) {
@@ -16,10 +19,24 @@ export class HubLevel extends Entity {
 		this.scene = scene;
 		this.levelData = levelData;
 
-		// Level icon
-		this.image = scene.add.image(0, 0, "hub_level");
-		this.add(this.image);
+		// For animations
+		this.container = scene.add.container();
+		this.add(this.container);
 
+		// Level image
+		this.image = scene.add.image(0, 0, "hub_level");
+		this.container.add(this.image);
+
+		// Level pearl
+		let pearlTexture = PearlTypes[levelData.pearl].image;
+		this.pearl = scene.add
+			.image(0, 0, pearlTexture)
+			.setTint(0)
+			.setAlpha(0.3)
+			.setScale(0.55);
+		this.container.add(this.pearl);
+
+		// Level name
 		this.label = scene.addText({
 			x: 0,
 			y: 130,
@@ -30,6 +47,13 @@ export class HubLevel extends Entity {
 		this.label.setStroke("white", 16);
 		this.label.setOrigin(0.5);
 		this.add(this.label);
+
+		// Check if level has been beaten before
+		if (pearlState.acquiredPearls[levelData.pearl]) {
+			this.image.setTint(PearlTypes[levelData.pearl].pearlColor);
+			this.pearl.setTint(0xffffff);
+			this.pearl.setAlpha(1);
+		}
 	}
 
 	onLoop() {
@@ -62,15 +86,11 @@ export class HubLevel extends Entity {
 		const a = Math.sin(time * Math.PI);
 		// const b = Phaser.Math.Easing.Sine.InOut(a);
 		const squish = 1.0 + 0.04 * a;
-		this.image.setScale(2 - squish, squish);
+		this.container.setScale(2 - squish, squish);
 	}
 
 	setImageScale(value: number) {
 		this.image.setScale(value);
-	}
-
-	squish() {
-		this.image.scaleY = 0.95;
 	}
 
 	setEnabled(value: boolean) {
