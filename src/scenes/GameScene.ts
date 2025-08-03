@@ -68,9 +68,10 @@ export class GameScene extends BaseScene {
 
 		this.textParticles = new TextParticle(this);
 
-		this.ui = new UI(this);
-
 		this.debugGraphics = this.add.graphics();
+		this.debugGraphics.setVisible(false);
+
+		this.ui = new UI(this);
 
 		this.initGraphics();
 
@@ -82,17 +83,35 @@ export class GameScene extends BaseScene {
 		}
 		this.music.play();
 
-		// Temporary
-		let text = this.addText({
+		/*  Temporary */
+
+		let returnButton = this.addText({
+			x: 20,
+			y: 20,
 			text: "Return to map",
 			size: 48,
 			color: "white",
 		});
-		text.setInteractive().on("pointerdown", () => {
+		returnButton.setInteractive().on("pointerdown", () => {
 			this.loopDrawer.setEnabled(false);
 			this.music.stop();
 			this.scene.start("WorldScene");
 			this.music.stop();
+		});
+
+		let debugButton = this.addText({
+			x: this.W - 20,
+			y: 20,
+			text: "Show colliders",
+			size: 48,
+			color: "white",
+		});
+		debugButton.setOrigin(1, 0);
+		debugButton.setInteractive().on("pointerdown", () => {
+			this.debugGraphics.setVisible(!this.debugGraphics.visible);
+			debugButton.setText(
+				this.debugGraphics.visible ? "Hide colliders" : "Show colliders"
+			);
 		});
 	}
 
@@ -251,7 +270,7 @@ export class GameScene extends BaseScene {
 
 	drawColliders() {
 		this.debugGraphics.clear();
-		this.debugGraphics.fillStyle(0xff0000, 0.25);
+		this.debugGraphics.fillStyle(0xff0000, 0.75);
 		this.colliders.forEach((collider) => {
 			this.debugGraphics.fillCircle(collider.x, collider.y, collider.radius);
 		});
