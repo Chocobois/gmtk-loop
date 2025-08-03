@@ -58,11 +58,15 @@ export class HubLevel extends Entity {
 	}
 
 	// update(time: number, delta: number) {
-	update(time: number) {
+	setBarTime(time: number) {
 		const a = Math.sin(time * Math.PI);
 		// const b = Phaser.Math.Easing.Sine.InOut(a);
 		const squish = 1.0 + 0.04 * a;
 		this.image.setScale(2 - squish, squish);
+	}
+
+	setImageScale(value: number) {
+		this.image.setScale(value);
 	}
 
 	squish() {

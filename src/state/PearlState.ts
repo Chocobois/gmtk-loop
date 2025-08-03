@@ -1,12 +1,39 @@
 import { makeAutoObservable } from "mobx";
+import { PearlType, PearlTypes } from "@/components/pearls/PearlTypes";
+import { PearlElement } from "@/components/pearls/PearlElement";
 
 export class PearlState {
-	pearlLoopColor: number = 0xffffff;
-	pearlLineColor: number = 0xffffff;
+	// Currently used pearl
+	currentPearl: PearlType = PearlTypes[PearlElement.None];
 
-    constructor() {
-        makeAutoObservable(this);
-    }
+	// Map over which pearls have been obtained
+	acquiredPearls: {
+		[key in PearlElement]: boolean;
+	};
+
+	constructor() {
+		// TODO: Save and load to localStorage
+		this.acquiredPearls = {
+			[PearlElement.None]: true,
+			[PearlElement.Coil]: false,
+			[PearlElement.Fire]: false,
+			[PearlElement.Psychic]: false,
+			[PearlElement.Rock]: false,
+			[PearlElement.Water]: false,
+		};
+
+		makeAutoObservable(this);
+	}
+
+	// True if any pearl has been acquired (ignoring Pearl.None)
+	get anyPearlsUnlocked(): boolean {
+		return Object.values(this.acquiredPearls).filter(Boolean).length >= 2;
+	}
+
+	// True if all pearls have been acquired
+	get allPearlsUnlocked(): boolean {
+		return Object.values(this.acquiredPearls).every(Boolean);
+	}
 }
 
 export const pearlState = new PearlState();

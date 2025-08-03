@@ -19,11 +19,14 @@ const images: Image[] = [
 	image("backgrounds/shelves", "background_shelves"),
 
 	// Pearls
+	image("pearls/shell_inner", "pearl_shell_inner"),
+	image("pearls/shell_outer", "pearl_shell_outer"),
+	image("pearls/none", "pearl_none"),
+	image("pearls/coil", "pearl_coil"),
 	image("pearls/fire", "pearl_fire"),
-	image("pearls/grass", "pearl_grass"),
+	image("pearls/psychic", "pearl_psychic"),
+	image("pearls/rock", "pearl_rock"),
 	image("pearls/water", "pearl_water"),
-	image("pearls/electric", "pearl_electric"),
-
 
 	// Sans
 	image("characters/sans/enemy_1", "enemy_1"),	

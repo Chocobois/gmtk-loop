@@ -15,7 +15,7 @@ export class MoleBoss extends MoleBase {
 
 		this.fakeMoles = [];
 		this.digCount = 0;
-		this.health = 1000;
+		this.health = 2000;
 
 		this.sprite.setTexture("mole_boss_1");
 
@@ -36,7 +36,7 @@ export class MoleBoss extends MoleBase {
 				}
 
 				this.animateAppear();
-				this.stateTimer = this.scene.addEvent(3000, () =>
+				this.stateTimer = this.scene.addEvent(2000, () =>
 					this.setMoleState(MoleState.DIGGING)
 				);
 				break;
@@ -44,10 +44,10 @@ export class MoleBoss extends MoleBase {
 			case MoleState.DIGGING:
 				// Command all moles to move together
 				this.digCount++;
-				this.moveAllMoles(false);
+				this.moveAllMoles(2000);
 
 				this.animateDisappear();
-				this.stateTimer = this.scene.addEvent(3000, () =>
+				this.stateTimer = this.scene.addEvent(2200, () =>
 					this.setMoleState(MoleState.IDLE)
 				);
 				break;
@@ -79,8 +79,7 @@ export class MoleBoss extends MoleBase {
 		}
 	}
 
-	moveAllMoles(instantly: boolean) {
-		const duration = instantly ? 0 : 2000;
+	moveAllMoles(duration: number) {
 		const points = this.getRandomPositions(1 + this.fakeMoles.length);
 
 		this.move(points[0].x, points[0].y, duration);

@@ -47,7 +47,7 @@ export class IceChunk extends Monster {
 
 	onLoop() {
 		super.onLoop();
-		this.animateShake(500);
+		this.animateShake(this.sprite, 500);
         this.spark.play(this.x,this.y);
 	}
 

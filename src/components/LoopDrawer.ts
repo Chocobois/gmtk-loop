@@ -3,6 +3,7 @@ import { loopState } from "@/state/LoopState";
 import { Entity } from "./Entity";
 import { pearlState } from "@/state/PearlState";
 import { autorun } from "mobx";
+import { PearlElement } from "./pearls/PearlElement";
 
 const SFX_FADE_OUT_DURATION = 100; //ms
 const SFX_SMOOTHING_WINDOW_SIZE = 500; //ms
@@ -99,9 +100,13 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		})
 
 		autorun(() => {
-			console.log("New color");
-			this.loopColor = pearlState.pearlLoopColor;
-			this.lineColor = pearlState.pearlLineColor;
+			if (!this.scene) {
+				console.warn("LoopDrawer `autorun` bug");
+				return;
+			}
+
+			this.loopColor = pearlState.currentPearl.loopColor;
+			this.lineColor = pearlState.currentPearl.lineColor;
 		});
 	}
 
@@ -156,8 +161,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		// Check if the current line intersects with any existing line segments, creating a loop
 		const lineSegments = this.lineSegments;
 		for (let i = 0; i < lineSegments.length - 1; i++) {
-			const line = lineSegments[i];
-			const segment = new Phaser.Geom.Line(line.x1, line.y1, line.x2, line.y2);
+			const segment = lineSegments[i];
 			if (Phaser.Geom.Intersects.LineToLine(currentLine, segment)) {
 				this.onLoop(this.points.slice(i));
 				this.points = this.points.slice(0, Math.max(i, 1));
@@ -166,16 +170,20 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 			}
 		}
 
+		const hasCoilAbility = pearlState.currentPearl.element == PearlElement.Coil;
+		const lengthMultiplier = hasCoilAbility ? 2 : 1;
+		const maxLoopLength = lengthMultiplier * loopState.maxLength;
+
 		// Check if total line distance exceeds maxLength
 		const distance = Phaser.Geom.Line.Length(currentLine);
-		if (distance > loopState.maxLength) {
+		if (distance > maxLoopLength) {
 			const direction = new Phaser.Math.Vector2(
 				currentLine.x1 - currentLine.x2,
 				currentLine.y1 - currentLine.y2
 			).normalize();
 			const startPoint = new Phaser.Math.Vector2(
-				currentLine.x1 - direction.x * loopState.maxLength,
-				currentLine.y1 - direction.y * loopState.maxLength
+				currentLine.x1 - direction.x * maxLoopLength,
+				currentLine.y1 - direction.y * maxLoopLength
 			);
 			this.points = [
 				startPoint,
@@ -189,7 +197,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 				const p0 = this.points[i - 1];
 				const segDist = Phaser.Math.Distance.Between(p0.x, p0.y, p1.x, p1.y);
 				totalDist += segDist;
-				if (totalDist > loopState.maxLength) {
+				if (totalDist > maxLoopLength) {
 					this.points.splice(0, i);
 					break;
 				}

@@ -3,7 +3,7 @@ import { loopState } from "@/state/LoopState";
 import { CaptureBar } from "./CaptureBar";
 import { WedgeIndicator } from "./Indicators/WedgeIndicator";
 import { MonsterScriptHandler } from "./MonsterScriptHandler";
-import { Entity } from "./Entity";
+import { BaseMonster } from "./BaseMonster";
 
 
 const ACCELERATION = 150;
@@ -20,7 +20,7 @@ export interface DifficultyStats {
 	attackrate: number;	
 }
 
-export class Monster extends Entity {
+export class Monster extends BaseMonster {
 
 	protected IDLE = 0;
 	protected RAGE = 1;
@@ -164,18 +164,8 @@ export class Monster extends Entity {
 		if(!this.stunImmune){
 			this.stunTime = n;
 		}
-		this.animateShake(n);
-	}
-
-	animateShake(t: number) {
-		this.scene.tweens.addCounter({
-			duration: t,
-			ease: Phaser.Math.Easing.Sine.Out,
-			onUpdate: (tween) => {
-				let t = 1 - (tween.getValue() || 0);
-				this.sprite.setOrigin(0.5 + t * 0.1 * Math.sin(20 * t), 0.5);
-			},
-		});
+		this.animateShake(this.sprite, n);
+		this.sparkEffect.play(this.x, this.y);
 	}
 
 	onLoop() { 
@@ -254,17 +244,6 @@ export class Monster extends Entity {
 
 	die(){
 
-	}
-
-	move(x: number, y: number, instantly: boolean) {
-
-			this.scene.tweens.add({
-				targets: this,
-				x,
-				y,
-				duration: 2000,
-				ease: Phaser.Math.Easing.Quadratic.InOut,
-			});
 	}
 
 	travel(v: number, pos: number[], dash: boolean = false){ //go towards a position with a stated average velocity
