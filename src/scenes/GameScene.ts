@@ -32,6 +32,7 @@ export class GameScene extends BaseScene {
 	private projectiles: EffectTracker;
 	private indicators: EffectTracker;
 
+	private activeBossCount: number; // If multiple bosses are loaded, keep count
 	public winJingle: Phaser.Sound.BaseSound;
 	public loseJingle: Phaser.Sound.BaseSound;
 	private gameOverText: Phaser.GameObjects.Image;
@@ -97,6 +98,8 @@ export class GameScene extends BaseScene {
 
 	// Allow multiple monster keys to be spawned
 	loadMonsters(monsterList: string[]) {
+		this.activeBossCount = monsterList.length;
+
 		if (monsterList.includes("wolf")) {
 			const monster = new Wolf(this, 960, 540);
 			this.addEntity(monster);
@@ -286,6 +289,10 @@ export class GameScene extends BaseScene {
 	}
 
 	win() {
+		// Continue to battle if multiple bosses are loaded
+		this.activeBossCount -= 1;
+		if (this.activeBossCount > 0) return;
+
 		this.loopDrawer.setEnabled(false);
 		this.music.stop();
 		this.sound.play("u_level_enter", { volume: 0.4 });
