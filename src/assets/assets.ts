@@ -209,6 +209,7 @@ const audios: Audio[] = [
 	sound("pearl/pearl_water", "p_water"),
 
 	sound("enemy/hurt", "e_hit_generic"),
+	sound("enemy/snail_shell", "e_snail_shell"),
 ];
 
 /* Fonts */
