@@ -37,6 +37,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	private inputFlipMode: InputFlipMode;
 
 	public muted: boolean = false;
+	public sfxMaxVolume: number = 1;
 	private sfxLoop: Phaser.Sound.WebAudioSound;
 	private sfxTween: Phaser.Tweens.Tween;
 	private cursorTween: Phaser.Tweens.Tween;
@@ -112,6 +113,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 	update(time: number, delta: number) {
 		this.sfxLoop.mute = this.muted;
+		this.sfxLoop.volume = Math.min(1, this.sfxLoop.rate + 0.2) * this.sfxMaxVolume;
 		this.graphics.lineStyle(this.lineWidth, this.lineColor);
 
 		if (this.pointTimes.length > 0) {
@@ -285,6 +287,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	}
 
 	checkCollisions(entities: Entity[]) {
+		// No line segments have been drawn yet
 		if (this.points.length == 0) return;
 
 		// Break line if it intersects with any collider

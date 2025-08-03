@@ -45,6 +45,7 @@ export class GameScene extends BaseScene {
 	public loseJingle: Phaser.Sound.BaseSound;
 
 	private music: Music;
+	private combo: number = 0;
 
 	constructor() {
 		super({ key: "GameScene" });
@@ -267,16 +268,28 @@ export class GameScene extends BaseScene {
 	}
 
 	onLoop(polygon: Phaser.Geom.Polygon) {
+		let emptyLoop = true;
+
 		this.entities.forEach((entity) => {
 			if (Phaser.Geom.Polygon.Contains(polygon, entity.x, entity.y)) {
 				if (entity instanceof Entity && entity.enabled) {
 					entity.onLoop();
+					emptyLoop = false;
 				}
 			}
 		});
+
+		if (emptyLoop) return;
+
+		// We circled something
+		this.combo++;
+		const soundIndex = Phaser.Math.Clamp(this.combo, 1, 7);
+		this.sound.play(`d_combo_${soundIndex}`, { volume: 0.4 });
+		// console.debug("Combo", this.combo);
 	}
 
 	onLoopBreak(entity: Entity) {
+		this.combo = 0;
 		this.damagePlayer(entity.entityDamage);
 	}
 
