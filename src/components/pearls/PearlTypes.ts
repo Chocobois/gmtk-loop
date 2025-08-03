@@ -3,6 +3,8 @@ import { PearlElement } from "./PearlElement";
 
 export type PearlType = {
 	element: PearlElement;
+	name: string;
+	description: string;
 	image: string;
 	pearlColor: number;
 	lineColor: number;
@@ -14,6 +16,8 @@ export type PearlType = {
 export const PearlTypes = {
 	[PearlElement.None]: {
 		element: PearlElement.None,
+		name: "No pearl",
+		description: "Missing description",
 		image: "pearl_none",
 		pearlColor: Color.Slate300,
 		lineColor: Color.White,
@@ -23,6 +27,8 @@ export const PearlTypes = {
 	},
 	[PearlElement.Coil]: {
 		element: PearlElement.Coil,
+		name: "Coil pearl",
+		description: "Missing description",
 		image: "pearl_coil",
 		pearlColor: Color.Pink400,
 		lineColor: Color.Pink200,
@@ -32,6 +38,8 @@ export const PearlTypes = {
 	},
 	[PearlElement.Fire]: {
 		element: PearlElement.Fire,
+		name: "Fire pearl",
+		description: "Missing description",
 		image: "pearl_fire",
 		pearlColor: Color.Red600,
 		lineColor: Color.Red400,
@@ -41,6 +49,8 @@ export const PearlTypes = {
 	},
 	[PearlElement.Psychic]: {
 		element: PearlElement.Psychic,
+		name: "Psychic pearl",
+		description: "Missing description",
 		image: "pearl_psychic",
 		pearlColor: Color.Violet700,
 		lineColor: Color.Violet300,
@@ -50,6 +60,8 @@ export const PearlTypes = {
 	},
 	[PearlElement.Rock]: {
 		element: PearlElement.Rock,
+		name: "Rock pearl",
+		description: "Missing description",
 		image: "pearl_rock",
 		pearlColor: Color.Amber800,
 		lineColor: Color.Amber200,
@@ -59,6 +71,8 @@ export const PearlTypes = {
 	},
 	[PearlElement.Water]: {
 		element: PearlElement.Water,
+		name: "Water pearl",
+		description: "Missing description",
 		image: "pearl_water",
 		pearlColor: Color.Blue500,
 		lineColor: Color.Blue200,

@@ -1,3 +1,4 @@
+import { PearlElement } from "../pearls/PearlElement";
 import { LevelDefinition } from "./LevelDefinition";
 
 export const levels = [
@@ -10,6 +11,7 @@ export const levels = [
 		enemy: "snail",
 		background: "background_plains_0",
 		music: "m_fight",
+		pearl: PearlElement.Water,
 	},
 	{
 		x: 800,
@@ -20,6 +22,7 @@ export const levels = [
 		enemy: "snake",
 		background: "background_ice",
 		music: "m_lightfast",
+		pearl: PearlElement.Coil,
 	},
 	{
 		x: 800,
@@ -30,6 +33,7 @@ export const levels = [
 		enemy: "mole",
 		background: "background_plains_2",
 		music: "m_fight",
+		pearl: PearlElement.Rock,
 	},
 	{
 		x: 1200,
@@ -40,6 +44,7 @@ export const levels = [
 		enemy: "jester",
 		background: "background_plains_4",
 		music: "m_lightfast",
+		pearl: PearlElement.Psychic,
 	},
 	{
 		x: 1200,
@@ -50,6 +55,7 @@ export const levels = [
 		enemy: "abra",
 		background: "background_magma",
 		music: "m_lightfast",
+		pearl: PearlElement.Fire,
 	},
 	{
 		x: 1600,
@@ -60,6 +66,7 @@ export const levels = [
 		enemy: "wolf",
 		background: "background_ice",
 		music: "m_fight",
+		pearl: PearlElement.None,
 	},
 ] as const satisfies LevelDefinition[];
 

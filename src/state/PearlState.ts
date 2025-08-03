@@ -16,7 +16,7 @@ export class PearlState {
 		this.acquiredPearls = {
 			[PearlElement.None]: true,
 			[PearlElement.Coil]: false,
-			[PearlElement.Fire]: true,
+			[PearlElement.Fire]: false,
 			[PearlElement.Psychic]: false,
 			[PearlElement.Rock]: false,
 			[PearlElement.Water]: false,

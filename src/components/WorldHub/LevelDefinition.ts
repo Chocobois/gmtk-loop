@@ -1,3 +1,5 @@
+import { PearlElement } from "../pearls/PearlElement";
+
 export type LevelDefinition = {
 	x: number;
 	y: number;
@@ -7,4 +9,5 @@ export type LevelDefinition = {
 	enemy: string;
 	background: string;
 	music: "m_fight" | "m_lightfast";
+	pearl: PearlElement;
 };

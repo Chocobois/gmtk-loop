@@ -25,7 +25,7 @@ export class ShopScene extends BaseScene {
 		this.pearls = [];
 		this.initGraphics();
 
-		// Back button
+		// Back button (ugly hack)
 		this.backButton = new HubLevel(this, {
 			x: 200,
 			y: this.H - 200,
@@ -35,6 +35,7 @@ export class ShopScene extends BaseScene {
 			enemy: "",
 			background: "",
 			music: "m_fight",
+			pearl: PearlElement.None,
 		});
 		this.backButton.setImageScale(1.2);
 		this.entities.push(this.backButton);

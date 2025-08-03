@@ -3,11 +3,11 @@ import { Entity } from "../Entity";
 import { PearlType } from "./PearlTypes";
 import { Color } from "@/util/colors";
 import { interpolateColor } from "@/util/functions";
+import { PearlElement } from "./PearlElement";
 
 export class Pearl extends Entity {
 	public scene: BaseScene;
-
-	private pearlType: PearlType;
+	public pearlType: PearlType;
 
 	private container: Phaser.GameObjects.Container; // Just for animation
 	private pearlShellBack: Phaser.GameObjects.Image;
@@ -62,7 +62,7 @@ export class Pearl extends Entity {
 			onUpdate: (tween) => {
 				const x = tween.getValue() || 0;
 				const y = Math.sin(10 * x) * Math.pow(1 - x, 2);
-				this.setScale(1.0 + 0.5 * y);
+				this.container.setScale(1.0 + 0.5 * y);
 			},
 		});
 
@@ -100,5 +100,9 @@ export class Pearl extends Entity {
 
 	get element() {
 		return this.pearlType.element;
+	}
+
+	get isNone() {
+		return this.element == PearlElement.None;
 	}
 }
