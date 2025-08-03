@@ -125,7 +125,8 @@ const images: Image[] = [
 	image("characters/badger/snowmound", "snowmound"),
 
 
-	
+	image("characters/bigicicle", "icicle"),
+	image("characters/tracks", "tread"),
 	image("characters/enemyshadow", "enemy_shadow"),
 
 	// Items
@@ -156,10 +157,12 @@ const images: Image[] = [
 /* Spritesheets */
 const spritesheets: SpriteSheet[] = [
 	spritesheet("characters/sans/sansplane", "sansplane", 256, 196),
+	spritesheet("characters/zamboni", "zamboni", 320, 260),
+	spritesheet("characters/snowball", "snowball", 128, 128),
 	spritesheet("characters/snail/snail", "snail", 256, 256),
 	// spritesheet("characters/wolf_old", "wolf", 256, 256),
 	spritesheet("effects/boom", "boom", 512, 512),
-
+	spritesheet("effects/boom2", "boom2", 512, 512),
 	// Particles
 	spritesheet("particles/bubbles", "bubbles", 128, 128),
 	spritesheet("particles/smoke3", "smoke", 128, 128),

@@ -25,6 +25,7 @@ import { pearlState } from "@/state/PearlState";
 import { PearlElement } from "@/components/pearls/PearlElement";
 import { PearlTypes } from "@/components/pearls/PearlTypes";
 import { GrayScalePostFilter } from "@/pipelines/GrayScalePostFilter";
+import { Badger } from "@/components/frassy/Badger";
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -32,7 +33,7 @@ export class GameScene extends BaseScene {
 	private entityLayer: Phaser.GameObjects.Container;
 	public loopDrawer: LoopDrawer;
 
-	private ui: UI;
+	public ui: UI;
 	private debugGraphics: Phaser.GameObjects.Graphics;
 	private textParticles: TextParticle;
 
@@ -133,7 +134,7 @@ export class GameScene extends BaseScene {
 		this.activeBossCount = monsterList.length;
 
 		if (monsterList.includes("snail")) {
-			const monster = new Bat(this, 960, 540);
+			const monster = new Snail(this, 960, 540);
 			this.addEntity(monster);
 		}
 
@@ -305,10 +306,13 @@ export class GameScene extends BaseScene {
 		this.textParticle(x, y, "red", `${-damage}`, false, 96, 3);
 
 		// Reduce player health
-		loopState.health = Math.max(0, loopState.health - damage);
-		if (loopState.health <= 0) {
-			this.onGameOver();
+		if(loopState.health > 0) {
+			loopState.health = Math.max(0, loopState.health - damage);
+			if (loopState.health <= 0) {
+				this.onGameOver();
+			}
 		}
+
 	}
 
 	drawColliders() {

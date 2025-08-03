@@ -7,7 +7,8 @@ export class ScriptDataBase {
     public ctrl: MonsterScriptHandler;
     public scr1: MonsterCommand[][]; public idle: MonsterCommand[][]; public weak: MonsterCommand[][]; public dashblitz: MonsterCommand[][]; public wolfidle: MonsterCommand[][];
     public sit: MonsterCommand[][]; public shatter: MonsterCommand[][]; public inanimate: MonsterCommand[][]; public snailrage: MonsterCommand[][]; public batIdle: MonsterCommand[][];
-    public batDashy: MonsterCommand[][]; public batSadge: MonsterCommand[][]; public batPizza: MonsterCommand[][];
+    public batDashy: MonsterCommand[][]; public batSadge: MonsterCommand[][]; public batPizza: MonsterCommand[][]; public badgerrage: MonsterCommand[][];
+    public badgersit: MonsterCommand[][];
     constructor(m: Monster, ct: MonsterScriptHandler){
         //this is an array of an array of monstercommands
         //all monstercommands in the same array will run simultaneously
@@ -361,6 +362,42 @@ export class ScriptDataBase {
                 {key: "loop", value: [0], args: [], conditions: []}]),
             ],
         ]
+
+        this.badgerrage = [[
+            new MonsterCommand(this.owner, this.ctrl, [
+                {key: "wait", value: [1500], args: [], conditions: []},
+                {key: "travel", value: [0.5,200,1720,200,880], args: [], conditions: [false, false]},
+                {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "wait", value: [100], args: [], conditions: []},
+                {key: "call", value: [1], args: ["frassy"], conditions: []},
+                {key: "call", value: [], args: ["snowball"], conditions: []},
+                {key: "wait", value: [250], args: [], conditions: []},
+                {key: "travel", value: [0.5,200,1720,200,880], args: [], conditions: [false, false]},
+                {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "call", value: [3], args: ["snowball"], conditions: []},
+                {key: "wait", value: [250], args: [], conditions: []},
+                {key: "call", value: [3], args: ["snowball"], conditions: []},
+                {key: "wait", value: [250], args: [], conditions: []},
+                {key: "travel", value: [0.5,200,1720,200,880], args: [], conditions: [false, false]},
+                {key: "call", value: [3], args: ["snowball"], conditions: []},
+                {key: "wait", value: [250], args: [], conditions: []},
+                {key: "wait", value: [4000], args: [], conditions: []},
+                {key: "loop", value: [1], args: [], conditions: []}]),
+            ],
+        ]
+        this.badgersit = [[
+            new MonsterCommand(this.owner, this.ctrl, [
+                {key: "call", value: [1], args: ["unfrassy"], conditions: []},]),
+            new MonsterCommand(this.owner, this.ctrl, [
+                {key: "wait", value: [1500], args: [], conditions: []},
+                {key: "travel", value: [0.025,200,1720,200,880], args: [], conditions: [false, false]},
+                {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "travel", value: [0.025,200,1720,200,880], args: [], conditions: [false, false]},
+                {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "wait", value: [1500], args: [], conditions: []},
+                {key: "loop", value: [0], args: [], conditions: []}]),
+            ],
+        ]
     };
 
 
@@ -379,6 +416,8 @@ export class ScriptDataBase {
             case "batDashy": {return this.batDashy;}
             case "batSadge": {return this.batSadge;}
             case "batPizza": {return this.batPizza;}
+            case "badgerrage": {return this.badgerrage;}
+            case "badgersit": {return this.badgersit;}
             case "inanimate": {return this.inanimate;}
             default: {return this.idle;}
         }
