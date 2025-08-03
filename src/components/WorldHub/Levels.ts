@@ -49,7 +49,7 @@ export const levels = [
 	{
 		x: 1200,
 		y: 740,
-		title: "Abra",
+		title: "Arba",
 		key: "3b",
 		require: ["2b"],
 		enemy: "abra",

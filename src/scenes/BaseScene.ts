@@ -41,11 +41,12 @@ export class BaseScene extends Phaser.Scene {
 
 	// Start a white camera flash effect
 	flash(time: number, hexColor: number = 0xffffff, alpha: number = 1.0) {
-		if (!this.flashRect) {
-			this.flashRect = this.add.rectangle(this.CX, this.CY, this.W, this.H, 0);
-			this.flashRect.setDepth(9999999999);
+		if (this.flashRect) {
+			this.flashRect.destroy();
 		}
 
+		this.flashRect = this.add.rectangle(this.CX, this.CY, this.W, this.H, 0);
+		this.flashRect.setDepth(9999999999);
 		this.flashRect.setAlpha(alpha);
 		this.flashRect.fillColor = hexColor;
 

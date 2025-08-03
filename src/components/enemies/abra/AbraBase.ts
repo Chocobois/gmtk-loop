@@ -12,8 +12,6 @@ export enum AbraState {
 
 // Shared Abra functionality between AbraBoss and AbraFake
 export class AbraBase extends BaseMonster {
-	public scene: GameScene;
-
 	// Number of hits an Abra can take before its magic form is broken
 	// When out or armor, a Fake disappears, a Boss gets stunned
 	protected magicArmor: number;
@@ -29,8 +27,6 @@ export class AbraBase extends BaseMonster {
 
 	constructor(scene: GameScene, x: number, y: number) {
 		super(scene, x, y);
-		scene.add.existing(this);
-		this.scene = scene;
 		this.hideValue = 1;
 		this.magicArmor = 0;
 
@@ -72,6 +68,8 @@ export class AbraBase extends BaseMonster {
 	}
 
 	update(time: number, delta: number) {
+		super.update(time, delta);
+
 		const wobble = this.abraState == AbraState.DEAD ? 0 : 0.02;
 		const squish = 1.0 + wobble * Math.sin((4 / 1000) * time);
 		this.sprite.setScale(2 - squish, squish);
@@ -84,6 +82,8 @@ export class AbraBase extends BaseMonster {
 	}
 
 	onLoop() {
+		super.onLoop();
+
 		this.animateShake(this.sprite);
 		this.sparkEffect.play(this.x, this.y);
 	}
@@ -92,7 +92,7 @@ export class AbraBase extends BaseMonster {
 	get colliders(): Phaser.Geom.Circle[] {
 		if (!this.enabled) return [];
 		if (this.shapes.length === 0) {
-			this.shapes = [new Phaser.Geom.Circle(0, 0, 70)];
+			this.shapes = [new Phaser.Geom.Circle(0, 0, 60)];
 		}
 
 		return this.shapes.map((shape) =>
