@@ -313,7 +313,7 @@ export class MonsterCommand
                 if(this.variableMap.has(this.cmd[this.step].args[0])){
                     ns = this.variableMap.get(this.cmd[this.step].args[0])!;
                 }
-                console.log("New slice at: " + ns.value[0] + ", " + ns.value[1] +" at angle of: " + Phaser.Math.RadToDeg(ns.value[2]));
+                //console.log("New slice at: " + ns.value[0] + ", " + ns.value[1] +" at angle of: " + Phaser.Math.RadToDeg(ns.value[2]));
                 this.owner.scene.pushIndicator(new WedgeIndicator(this.owner.scene,ns.value[0],ns.value[1],this.cmd[this.step].value[2],this.cmd[this.step].value[3],
                     this.cmd[this.step].value[4],Phaser.Math.RadToDeg(ns.value[2]),this.cmd[this.step].value[5],this.owner,false));
                 this.advance();

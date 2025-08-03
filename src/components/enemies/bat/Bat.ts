@@ -15,7 +15,7 @@ export class Bat extends Monster{
     constructor(scene: GameScene, x: number, y: number, spr: string = "bat_fly_1") {
 		super(scene, x, y, spr);
         this.stateHP = [5,10,10];
-        this.behavior = new MonsterScriptHandler(this,"batPizza");
+        this.behavior = new MonsterScriptHandler(this,"batIdle");
         this.stunOverflow = -1000;
         this.expl = new SmokeEffect(scene, 1);
 	}
@@ -118,7 +118,7 @@ export class Bat extends Monster{
 		this.resetVelocity();
 		this.exhaust = 0;
 		switch(this.curState){
-			case this.IDLE: { this.curState = this.RAGE; this.behavior.swapScriptList("batDashy"); this.sprite.setFrame(1); break;} 
+			case this.IDLE: { this.curState = this.RAGE; this.behavior.swapScriptList("batPizza"); this.sprite.setFrame(1); break;} 
 			case this.RAGE: { this.curState = this.WEAK; this.behavior.swapScriptList("sit"); this.sprite.setFrame(2); break;}
 			case this.WEAK: { this.curState = this.IDLE; this.behavior.swapScriptList("batIdle");this.sprite.setFrame(0);  break;}
 			default: { this.curState = this.IDLE; break;}
