@@ -203,7 +203,10 @@ const audios: Audio[] = [
 	sound("hub/map_select", "h_map_select"),
 	sound("hub/map_select_evil", "h_map_select_multiple"),
 
-	// Todo: play extra hitsounds based on what pearl is equipped
+	sound("pearl/equip", "p_equip"),
+	sound("pearl/clink", "p_unequip"),
+	sound("pearl/shop_enter", "p_shop_enter"),
+
 	sound("pearl/pearl_fire", "p_fire"),
 	sound("pearl/pearl_coil", "p_coil"),
 	sound("pearl/pearl_psychic", "p_psychic"),

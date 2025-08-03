@@ -4,6 +4,7 @@ import { Entity } from "./Entity";
 import { SparkEffect } from "@/components/particles/SparkEffect";
 import { ExplosionEffect } from "@/components/particles/ExplosionEffect";
 import { pearlState } from "@/state/PearlState";
+import { PearlTypes } from "./pearls/PearlTypes";
 import { PearlElement } from "./pearls/PearlElement";
 import { BurnEffect } from "./particles/BurnEffect";
 
@@ -15,6 +16,9 @@ export class BaseMonster extends Entity {
 	protected burnEffect: BurnEffect;
 
 	protected burningTimer: number; // Remaining burn status in seconds
+
+	/** Set this to false for a custom SFX override */
+	protected genericHitSound: boolean = true;
 
 	constructor(scene: GameScene, x: number, y: number) {
 		super(scene, x, y);
@@ -46,6 +50,12 @@ export class BaseMonster extends Entity {
 	// When the monster is encircled by the player's loop
 	onLoop() {
 		super.onLoop();
+
+		// Play SFX
+		if (this.genericHitSound) {
+			this.scene.hitSound("e_hit_generic", this.x, 0.4);
+			this.playPearlHitsound();
+		}
 
 		// If Fire pearl is in use, apply burn
 		if (pearlState.currentPearl.element == PearlElement.Fire) {
@@ -102,6 +112,13 @@ export class BaseMonster extends Entity {
 				sprite.setOrigin(0.5 + t * 0.1 * Math.sin(20 * t), sprite.originY);
 			},
 		});
+	}
+
+	/** Play a sound layer that changes based on currently equipped pearl */
+	playPearlHitsound() {
+		if (pearlState.currentPearl.sfxKey) {
+			this.scene.hitSound(pearlState.currentPearl.sfxKey, this.x, 0.4);
+		}
 	}
 
 	get isBurning() {
