@@ -95,12 +95,6 @@ const images: Image[] = [
 	
 	image("characters/enemyshadow", "enemy_shadow"),
 
-	image("characters/enemy/placeholder_enemy", "enemy_placeholder"),
-	// Attacks
-	image("characters/hazards/placeholder_attack", "projectile_placeholder"),
-	// Hazards (spritesheets 512px * Y (how many frames))
-	image("characters/hazards/placeholder_hazard", "hazard_placeholder"),
-
 	// Items
 	image("items/pbullet", "pbullet"),
 	// image("items/spellback", "spellback"),
