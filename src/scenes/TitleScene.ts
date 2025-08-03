@@ -3,26 +3,29 @@ import { Music } from "@/components/Music";
 
 import { title, version } from "@/version.json";
 
-const creditsLeft = `${title} 
+const creditsLeft = `Please
+Someone
+Write
+This`;
 
-@Handle
-@Handle
-@Handle`;
+const creditsRight = `I
+Didn't
+Keep
+Track`;
 
-const creditsRight = `
-
-role
-role
-role`;
+const pos = {
+	loop: new Phaser.Geom.Point(1450, 500),
+	title: new Phaser.Geom.Point(570, 270),
+	dragon: new Phaser.Geom.Point(1150, 750),
+}
 
 export class TitleScene extends BaseScene {
 	public sky: Phaser.GameObjects.Image;
-	public background: Phaser.GameObjects.Image;
-	public foreground: Phaser.GameObjects.Image;
-	public character: Phaser.GameObjects.Image;
+	public loop: Phaser.GameObjects.Image;
+	public title: Phaser.GameObjects.Image;
+	public dragon: Phaser.GameObjects.Image;
 
 	public credits: Phaser.GameObjects.Container;
-	public title: Phaser.GameObjects.Text;
 	public subtitle: Phaser.GameObjects.Text;
 	public tap: Phaser.GameObjects.Text;
 	public version: Phaser.GameObjects.Text;
@@ -40,47 +43,31 @@ export class TitleScene extends BaseScene {
 	create(): void {
 		this.fade(false, 200, 0x000000);
 
-		this.sky = this.add.image(this.CX, this.CY, "title_sky");
+		const dragonX = 1200;
+
+		this.sky    = this.add.image(this.CX, this.CY, "title_sky");
+		this.loop   = this.add.image(pos.loop.x, pos.loop.y, "title_loop");
+		this.dragon = this.add.image(pos.dragon.x, pos.dragon.y, "title_dragon");
+		this.title  = this.add.image(pos.title.x, pos.title.y, "title_logo");
+
 		this.containToScreen(this.sky);
-		this.background = this.add.image(
-			this.CX,
-			0.9 * this.CY,
-			"title_background"
-		);
-		this.containToScreen(this.background);
-		this.foreground = this.add.image(this.CX, this.CY, "title_foreground");
-		this.containToScreen(this.foreground);
-		this.character = this.add.image(this.CX, this.CY, "title_character");
-		this.containToScreen(this.character);
+		this.title.setScale(0.75);
 
-		this.background.setVisible(false);
-		this.background.setAlpha(0);
-		this.background.y += 4000;
-		this.foreground.y += 1000;
-		this.character.y += 1000;
-
-		this.title = this.addText({
-			x: 0.25 * this.W,
-			y: 0.7 * this.H,
-			size: 160,
-			color: "#000",
-			text: "Game Title",
-		});
-		this.title.setOrigin(0.5);
-		this.title.setStroke("#FFF", 8);
-		this.title.setPadding(2);
-		this.title.setVisible(false);
-		this.title.setAlpha(0);
+		this.loop.setVisible(false);
+		this.loop.setAlpha(0);
+		this.loop.x += 1400;
+		this.title.y -= 1000;
+		this.dragon.x += 1700;
 
 		this.subtitle = this.addText({
 			x: 0.25 * this.W,
 			y: 0.87 * this.H,
 			size: 120,
-			color: "#000",
+			color: "#d9fff8",
 			text: "Tap to start",
 		});
 		this.subtitle.setOrigin(0.5);
-		this.subtitle.setStroke("#FFF", 3);
+		this.subtitle.setStroke("#307196", 15);
 		this.subtitle.setPadding(2);
 		this.subtitle.setVisible(false);
 		this.subtitle.setAlpha(0);
@@ -89,7 +76,7 @@ export class TitleScene extends BaseScene {
 			x: this.CX,
 			y: this.CY,
 			size: 140,
-			color: "#000",
+			color: "#2a0720",
 			text: "Tap to focus",
 		});
 		this.tap.setOrigin(0.5);
@@ -101,12 +88,12 @@ export class TitleScene extends BaseScene {
 			x: this.W,
 			y: this.H,
 			size: 40,
-			color: "#000",
+			color: "#307096",
 			text: version,
 		});
+
 		this.version.setOrigin(1, 1);
 		this.version.setAlpha(-1);
-		this.version.setStroke("#FFF", 4);
 		this.version.setPadding(2);
 
 		this.credits = this.add.container(0, 0);
@@ -114,25 +101,26 @@ export class TitleScene extends BaseScene {
 		this.credits.setAlpha(0);
 
 		let credits1 = this.addText({
-			x: 0.65 * this.W,
-			y: 0,
-			size: 40,
-			color: "#c2185b",
+			x: 0.70 * this.W,
+			y: 0.02 * this.H,
+			size: 35,
+			color: "#fff398",
 			text: creditsLeft,
 		});
-		credits1.setStroke("#FFF", 10);
+
+		credits1.setStroke("#2a0720", 10);
 		credits1.setPadding(2);
 		credits1.setLineSpacing(0);
 		this.credits.add(credits1);
 
 		let credits2 = this.addText({
-			x: 0.85 * this.W,
-			y: 0,
-			size: 40,
-			color: "#c2185b",
+			x: 0.86 * this.W,
+			y: 0.02 * this.H,
+			size: 35,
+			color: "#a8f7ff",
 			text: creditsRight,
 		});
-		credits2.setStroke("#FFF", 10);
+		credits2.setStroke("#2a0720", 10);
 		credits2.setPadding(2);
 		credits2.setLineSpacing(0);
 		this.credits.add(credits2);
@@ -166,13 +154,16 @@ export class TitleScene extends BaseScene {
 	}
 
 	update(time: number, delta: number) {
-		if (this.background.visible) {
-			this.background.y += 0.02 * (this.CY - this.background.y);
-			this.foreground.y += 0.025 * (this.CY - this.foreground.y);
-			this.character.y += 0.02 * (this.CY - this.character.y);
+		if (this.loop.visible) {
+			this.loop.x += 0.009 * (pos.loop.x - this.loop.x);
+			this.title.y += 0.018 * (pos.title.y - this.title.y);
+			this.dragon.x += 0.016 * (pos.dragon.x - this.dragon.x);
 
-			this.background.alpha += 0.03 * (1 - this.background.alpha);
-			this.character.scaleX = Math.sin((3 * time) / 1000);
+			this.loop.alpha += 0.03 * (1 - this.loop.alpha);
+			this.dragon.angle =
+				(2 * Math.sin((3 * time) * 0.00123)) +
+				(7 * Math.sin((3 * time) * 0.00061)) +
+				(14 * Math.sin((3 * time) * 0.00014));
 
 			this.title.alpha +=
 				0.02 * ((this.title.visible ? 1 : 0) - this.title.alpha);
@@ -188,7 +179,7 @@ export class TitleScene extends BaseScene {
 			this.tap.alpha += 0.01 * (1 - this.tap.alpha);
 
 			if (this.musicTitle.seek > 0) {
-				this.background.setVisible(true);
+				this.loop.setVisible(true);
 				this.tap.setVisible(false);
 			}
 		}
@@ -201,7 +192,7 @@ export class TitleScene extends BaseScene {
 	}
 
 	progress() {
-		if (!this.background.visible) {
+		if (!this.loop.visible) {
 			this.onBar(1);
 		} else if (!this.subtitle.visible) {
 			this.title.setVisible(true);

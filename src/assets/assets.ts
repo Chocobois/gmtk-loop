@@ -11,6 +11,7 @@ const images: Image[] = [
 	image("backgrounds/battlefloor/grassyplains_alt4", "background_plains_4"),
 
 	image("backgrounds/battlefloor/stone", "background_stone_0"),
+	image("backgrounds/battlefloor/snow", "background_snow"),
 	image("backgrounds/battlefloor/ice", "background_ice"),
 	image("backgrounds/battlefloor/magma", "background_magma"),
 	image("backgrounds/battlefloor/stone", "background_stone"),
@@ -145,9 +146,9 @@ const images: Image[] = [
 
 	// Titlescreen
 	image("titlescreen/sky", "title_sky"),
-	image("titlescreen/grass", "title_background"),
-	image("titlescreen/title3", "title_foreground"),
-	image("titlescreen/dragon", "title_character"),
+	image("titlescreen/loop", "title_loop"),
+	image("titlescreen/title3", "title_logo"),
+	image("titlescreen/dragon", "title_dragon"),
 
 	// Particles
 	image("particles/light", "light"),
