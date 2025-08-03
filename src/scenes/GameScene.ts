@@ -226,7 +226,7 @@ export class GameScene extends BaseScene {
 		this.updateEntities(time, delta);
 
 		this.loopDrawer.update(time, delta);
-		this.loopDrawer.checkCollisions(this.entities);
+		this.loopDrawer.checkCollisions(this.entities, delta);
 		this.textParticles.update(time, delta);
 
 		this.drawColliders();

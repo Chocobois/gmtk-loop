@@ -18,6 +18,8 @@ enum InputFlipMode {
 	SWAP_X_Y,
 }
 
+const ROCK_ARMOR_DURATION = 200; // Milliseconds of invulnerability
+
 export class LoopDrawer extends Phaser.GameObjects.Container {
 	public scene: BaseScene;
 
@@ -35,6 +37,9 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 	// Manipulate how pointer x/y input is read. Used in the Jester fight.
 	private inputFlipMode: InputFlipMode;
+
+	// Rock pearl ability, how many seconds you can sustain damage without breaking
+	private rockPearlTimer: number;
 
 	public muted: boolean = false;
 	private sfxLoop: Phaser.Sound.WebAudioSound;
@@ -114,6 +119,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		this.cursor.setVisible(true).setPosition(pointerX, pointerY);
 		this.points = [new Phaser.Math.Vector2(pointerX, pointerY)];
 		this.pointTimes = [pointer.time];
+		this.rockPearlTimer = ROCK_ARMOR_DURATION;
 
 		if (!this.muted)
 			this.scene.sound.play("d_tap", {
@@ -271,7 +277,8 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		this.onLineBreak();
 	}
 
-	checkCollisions(entities: Entity[]) {
+	// Check if any of the loop's line segments touch any entity colliders
+	checkCollisions(entities: Entity[], delta: number) {
 		if (this.points.length == 0) return;
 
 		// Break line if it intersects with any collider
@@ -279,6 +286,14 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 			for (const collider of entity.colliders) {
 				for (const line of this.lineSegments) {
 					if (Phaser.Geom.Intersects.LineToCircle(line, collider)) {
+						// If Pearl Rock ability is active, tank damage and abort
+						if (pearlState.currentPearl.element == PearlElement.Rock) {
+							this.rockPearlTimer -= delta;
+							if (this.rockPearlTimer > 0) {
+								return;
+							}
+						}
+
 						if (!this.muted)
 							this.scene.sound.play("d_break", {
 								volume: 0.4,
