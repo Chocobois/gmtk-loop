@@ -17,6 +17,7 @@ import { AbraBoss } from "@/components/enemies/abra/AbraBoss";
 
 import BendWaves from "@/pipelines/BendWavesPostFX";
 import { Wolf } from "@/components/enemies/wolf/Wolf";
+import { Snail } from "@/components/enemies/snail/Snail";
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -97,8 +98,8 @@ export class GameScene extends BaseScene {
 
 	// Allow multiple monster keys to be spawned
 	loadMonsters(monsterList: string[]) {
-		if (monsterList.includes("wolf")) {
-			const monster = new Wolf(this, 960, 540);
+		if (monsterList.includes("snail")) {
+			const monster = new Snail(this, 960, 540);
 			this.addEntity(monster);
 		}
 
