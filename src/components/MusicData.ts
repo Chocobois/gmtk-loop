@@ -45,6 +45,13 @@ const Data = {
 		start: 26.221,
 		end: 61.130,
 	},
+	m_title: {
+		offset: 0.039,
+		bpm: 92,
+		loop: true,
+		start: 6.269,
+		end: 38.877,
+	},
 	m_map_select: {
 		offset: 1348 / 44100,
 		bpm: 160,
