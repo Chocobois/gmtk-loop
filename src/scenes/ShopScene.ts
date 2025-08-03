@@ -54,6 +54,10 @@ export class ShopScene extends BaseScene {
 		this.description.setOrigin(1);
 		this.description.setWordWrapWidth(700);
 		this.description.setStroke("black", 15);
+
+		this.description.setText(
+			`${pearlState.currentPearl.name}: ${pearlState.currentPearl.description}`
+		);
 	}
 
 	initGraphics() {
@@ -77,15 +81,14 @@ export class ShopScene extends BaseScene {
 				// Select pearl if not in use
 				if (pearlState.currentPearl.element != pearlType.element) {
 					pearlState.currentPearl = pearlType;
-					this.description.setText(
-						`${pearlState.currentPearl.name}: ${pearlState.currentPearl.description}`
-					);
 				}
 				// Unequip pearl if already in use
 				else {
 					pearlState.currentPearl = PearlTypes[PearlElement.None];
-					this.description.setText(pearlState.currentPearl.description);
 				}
+				this.description.setText(
+					`${pearlState.currentPearl.name}: ${pearlState.currentPearl.description}`
+				);
 				this.refreshPearls();
 			});
 		}
