@@ -109,6 +109,19 @@ const images: Image[] = [
 	
 	image("characters/badger/badger hole", "badger_hole"),
 
+	// Badger ice alt
+	image("characters/badger/badger alt idle1", "badger_ice_idle_1"),
+	image("characters/badger/badger alt idle2", "badger_ice_idle_2"),
+	image("characters/badger/badger alt idle3", "badger_ice_idle_3"),
+	image("characters/badger/badger alt idle4", "badger_ice_idle_4"),
+	
+	image("characters/badger/badger alt dig1", "badger_ice_dig_1"),
+	image("characters/badger/badger alt dig2", "badger_ice_dig_2"),
+	image("characters/badger/badger alt dig3", "badger_ice_dig_3"),
+	image("characters/badger/badger alt dig4", "badger_ice_dig_4"),
+	
+	image("characters/badger/badger alt hole", "badger_ice_hole"),
+
 
 	
 	image("characters/enemyshadow", "enemy_shadow"),
