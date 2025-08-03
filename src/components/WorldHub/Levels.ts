@@ -11,7 +11,7 @@ export const levels = [
 		enemy: "snail",
 		background: "background_plains_0",
 		music: "m_fight",
-		pearl: PearlElement.Water,
+		pearl: PearlElement.None,
 	},
 	{
 		x: 1142,
@@ -77,7 +77,7 @@ export const levels = [
 		enemy: "lycante",
 		background: "background_ice",
 		music: "m_fight",
-		pearl: PearlElement.None,
+		pearl: PearlElement.Water,
 	},
 	{
 		x: 1576,
@@ -85,10 +85,10 @@ export const levels = [
 		title: "Frassle",
 		key: "badger",
 		require: ["arba", "lycante"],
-		enemy: "badger",
+		enemy: "", // badger
 		background: "background_ice",
 		music: "m_fight",
-		pearl: PearlElement.None,
+		pearl: PearlElement.Ice,
 	},
 ] as const satisfies LevelDefinition[];
 

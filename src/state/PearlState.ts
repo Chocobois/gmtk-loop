@@ -17,6 +17,7 @@ export class PearlState {
 			[PearlElement.None]: true,
 			[PearlElement.Coil]: false,
 			[PearlElement.Fire]: false,
+			[PearlElement.Ice]: false,
 			[PearlElement.Psychic]: false,
 			[PearlElement.Rock]: false,
 			[PearlElement.Water]: false,
