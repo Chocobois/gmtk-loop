@@ -148,6 +148,10 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		}
 	}
 
+	getEnabled() {
+		return this.inputArea.input!.enabled;
+	}
+
 	setEnabled(enabled: boolean) {
 		this.inputArea.input!.enabled = enabled;
 		this.onLineBreak();

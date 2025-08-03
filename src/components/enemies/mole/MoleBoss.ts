@@ -15,7 +15,7 @@ export class MoleBoss extends MoleBase {
 
 		this.fakeMoles = [];
 		this.digCount = 0;
-		this.health = 2000;
+		this.health = 1500;
 
 		this.sprite.setTexture("mole_boss_1");
 
@@ -36,7 +36,7 @@ export class MoleBoss extends MoleBase {
 				}
 
 				this.animateAppear();
-				this.stateTimer = this.scene.addEvent(2000, () =>
+				this.stateTimer = this.scene.addEvent(2500, () =>
 					this.setMoleState(MoleState.DIGGING)
 				);
 				break;
@@ -47,7 +47,7 @@ export class MoleBoss extends MoleBase {
 				this.moveAllMoles(2000);
 
 				this.animateDisappear();
-				this.stateTimer = this.scene.addEvent(2200, () =>
+				this.stateTimer = this.scene.addEvent(2100, () =>
 					this.setMoleState(MoleState.IDLE)
 				);
 				break;

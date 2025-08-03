@@ -97,6 +97,8 @@ export class Monster extends BaseMonster {
 
 
 	update(time: number, delta: number) {
+		super.update(time, delta);
+
 		this.boundCheck();
 		this.updateGFX(time,delta);
 		const squish = 1.0 + 0.02 * Math.sin((6 * time) / 1000);
@@ -174,6 +176,8 @@ export class Monster extends BaseMonster {
 	}
 
 	onLoop() {
+		super.onLoop();
+
 		this.damage(loopState.attackPower);
 	}
 

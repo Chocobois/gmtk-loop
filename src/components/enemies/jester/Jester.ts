@@ -79,6 +79,7 @@ export class Jester extends BaseMonster {
 					this.hasActiveMagic = true;
 					this.scene.onInputFlipModeAttack();
 				}
+				this.scene.sound.play("e_gaster", { volume: 0.3 });
 
 				this.sprite.setTexture("jester_attack");
 				this.animateShake(this.sprite, 1500);

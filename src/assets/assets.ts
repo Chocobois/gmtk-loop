@@ -146,9 +146,9 @@ const images: Image[] = [
 
 	// Titlescreen
 	image("titlescreen/sky", "title_sky"),
-	image("titlescreen/grass", "title_background"),
-	image("titlescreen/title3", "title_foreground"),
-	image("titlescreen/dragon", "title_character"),
+	image("titlescreen/loop", "title_loop"),
+	image("titlescreen/title3", "title_logo"),
+	image("titlescreen/dragon", "title_dragon"),
 
 	// Particles
 	image("particles/light", "light"),
@@ -171,10 +171,8 @@ const spritesheets: SpriteSheet[] = [
 
 /* Audios */
 const audios: Audio[] = [
-	music("title", "m_main_menu"),
-	music("first", "m_first"),
 	music("lightfast", "m_lightfast"),
-
+	music("title_fade", "m_title"),
 	music("fight", "m_fight"),
 	music("map", "m_map"),
 
@@ -217,6 +215,7 @@ const audios: Audio[] = [
 
 	sound("enemy/hurt", "e_hit_generic"),
 	sound("enemy/snail_shell", "e_snail_shell"),
+	sound("enemy/gaster", "e_gaster"),
 	sound("tele", "tele"),
 ];
 
