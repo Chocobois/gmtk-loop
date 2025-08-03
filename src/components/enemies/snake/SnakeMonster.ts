@@ -48,8 +48,6 @@ export class SnakeMonster extends BaseMonster {
 			bottom: scene.H - 200,
 		};
 
-		this.add(scene.add.circle(0, 0, 10, 0xff0000, 1.0));
-
 		this.setSnakeState(SnakeState.SLITHERING);
 	}
 
@@ -157,7 +155,7 @@ export class SnakeMonster extends BaseMonster {
 		if (this.shapes.length === 0) {
 			this.shapes = [];
 			for (let i = 0; i < SNAKE_SEGMENTS - 2; i++) {
-				const radius = 50 - 30 * (i / SNAKE_SEGMENTS);
+				const radius = 40 - 30 * (i / SNAKE_SEGMENTS);
 				this.shapes.push(new Phaser.Geom.Circle(0, 0, radius));
 			}
 		}

@@ -4,13 +4,13 @@ import { MonsterScriptHandler } from "@/components/MonsterScriptHandler";
 import { BasicEffect } from "@/components/BasicEffect";
 
 export class Snail extends Monster{
-    protected hp: number = 100000;
+    protected hp: number = 2010; // 30 hits for now
     protected fade: number = 1;
     protected fading: boolean = false;
     protected hyperArmor: boolean = false;
     constructor(scene: GameScene, x: number, y: number, spr: string = "snail") {
 		super(scene, x, y, spr);
-        this.stateHP = [10,20,99999];
+        this.stateHP = [10,10,99999];
         this.behavior = new MonsterScriptHandler(this,"idle");
         this.stunOverflow = -1000;
         this.maxV = 300;

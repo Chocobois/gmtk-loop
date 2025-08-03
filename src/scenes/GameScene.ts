@@ -56,6 +56,7 @@ export class GameScene extends BaseScene {
 	create(levelDataList: LevelDefinition[]): void {
 		this.fade(false, 200, 0x000000);
 		this.levelDataList = levelDataList;
+		this.cameraShakeValue = 0;
 
 		// Restore health
 		loopState.health = loopState.maxHealth;
@@ -112,20 +113,20 @@ export class GameScene extends BaseScene {
 			this.goToWorldHub(0);
 		});
 
-		let debugButton = this.addText({
-			x: this.W - 20,
-			y: 20,
-			text: "Show colliders",
-			size: 48,
-			color: "white",
-		});
-		debugButton.setOrigin(1, 0);
-		debugButton.setInteractive().on("pointerdown", () => {
-			this.debugGraphics.setVisible(!this.debugGraphics.visible);
-			debugButton.setText(
-				this.debugGraphics.visible ? "Hide colliders" : "Show colliders"
-			);
-		});
+		// let debugButton = this.addText({
+		// 	x: this.W - 20,
+		// 	y: 20,
+		// 	text: "Show colliders",
+		// 	size: 48,
+		// 	color: "white",
+		// });
+		// debugButton.setOrigin(1, 0);
+		// debugButton.setInteractive().on("pointerdown", () => {
+		// 	this.debugGraphics.setVisible(!this.debugGraphics.visible);
+		// 	debugButton.setText(
+		// 		this.debugGraphics.visible ? "Hide colliders" : "Show colliders"
+		// 	);
+		// });
 	}
 
 	// Allow multiple monster keys to be spawned
