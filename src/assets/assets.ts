@@ -157,6 +157,7 @@ const audios: Audio[] = [
 	sound("ui/disabled", "u_disabled"),
 
 	sound("hub/map_select", "h_map_select"),
+	sound("hub/map_select_evil", "h_map_select_multiple"),
 ];
 
 /* Fonts */

@@ -17,7 +17,7 @@ export class WorldScene extends BaseScene {
 	private music: Music;
 
 	// Special case in case two levels are selected
-	private levelIsStarting: boolean;
+	private levelIsStarting: boolean = false;
 	private queuedLevels: LevelDefinition[];
 
 	constructor() {
@@ -116,7 +116,10 @@ export class WorldScene extends BaseScene {
 
 		// Set volume to 0 so that animations may continue
 		this.music.setVolume(0);
-		this.sound.play("h_map_select", { volume: 0.2 });
+		this.addEvent(5, () => {
+			const key = "h_map_select" + (this.queuedLevels.length < 2 ? "" : "_multiple");
+			this.sound.play(key, { volume: 0.2 });
+		});
 
 		// Flash the screen and start the level
 		this.flash(1000, 0xffffff, 0.3);
@@ -156,9 +159,6 @@ export class WorldScene extends BaseScene {
 			selectedEntities.length > 0 &&
 			selectedEntities.every((e) => e instanceof HubLevel && e.levelData.enemy)
 		) {
-			if (selectedEntities.length > 1) {
-				// Add some other sound here, Mato
-			}
 
 			selectedEntities.forEach((e) => e.onLoop());
 			return;
