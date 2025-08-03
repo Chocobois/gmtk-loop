@@ -82,7 +82,7 @@ export class WorldScene extends BaseScene {
 
 	update(time: number, delta: number) {
 		this.loopDrawer.update(time, delta);
-		this.loopDrawer.checkCollisions(this.entities);
+		this.loopDrawer.checkCollisions(this.entities, delta);
 
 		const barTime = this.music.getBarTime();
 		this.hubs.forEach((hub) => hub.setBarTime(barTime));

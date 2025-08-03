@@ -78,6 +78,7 @@ const images: Image[] = [
 	image("characters/abra/active", "abra_active"),
 	image("characters/abra/hurt", "abra_hurt"),
 
+	// Bat
 	image("characters/bat/bat fly1", "bat_fly_1"),
 	image("characters/bat/bat fly2", "bat_fly_2"),
 	image("characters/bat/bat fly3", "bat_fly_3"),
@@ -94,6 +95,20 @@ const images: Image[] = [
 	image("characters/bat/bat get up4", "bat_get_up_4"),
 
 	image("characters/bat/bat attack", "bat_attack"),
+
+	// Badger
+	image("characters/badger/badger idle1", "badger_idle_1"),
+	image("characters/badger/badger idle2", "badger_idle_2"),
+	image("characters/badger/badger idle3", "badger_idle_3"),
+	image("characters/badger/badger idle4", "badger_idle_4"),
+	
+	image("characters/badger/badger dig1", "badger_dig_1"),
+	image("characters/badger/badger dig2", "badger_dig_2"),
+	image("characters/badger/badger dig3", "badger_dig_3"),
+	image("characters/badger/badger dig4", "badger_dig_4"),
+	
+	image("characters/badger/badger hole", "badger_hole"),
+
 
 	
 	image("characters/enemyshadow", "enemy_shadow"),
