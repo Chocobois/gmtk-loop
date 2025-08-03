@@ -144,9 +144,9 @@ const images: Image[] = [
 
 	// Titlescreen
 	image("titlescreen/sky", "title_sky"),
-	image("titlescreen/background", "title_background"),
-	image("titlescreen/foreground", "title_foreground"),
-	image("titlescreen/character", "title_character"),
+	image("titlescreen/grass", "title_background"),
+	image("titlescreen/title3", "title_foreground"),
+	image("titlescreen/dragon", "title_character"),
 
 	// Particles
 	image("particles/light", "light"),
