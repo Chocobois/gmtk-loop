@@ -400,7 +400,7 @@ export class GameScene extends BaseScene {
 		}
 		// Normal ending
 		else {
-			this.goToWorldHub(5000);
+			this.goToWorldHub(7000);
 		}
 	}
 
