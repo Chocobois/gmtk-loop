@@ -17,9 +17,9 @@ export interface Audio {
 	rate?: number;
 }
 
-const imageGlob = import.meta.glob<string>('./images/**/*.png', {query: '?url', import: 'default', eager: true});
+const imageGlob = import.meta.glob<string>('./images/**/*', {query: '?url', import: 'default', eager: true});
 export const image = (path: string, key: string): Image => {
-	return { key, path: imageGlob[`./images/${path}.png`] };
+	return { key, path: imageGlob[`./images/${path}`] };
 }
 
 export const spritesheet = (path: string, key: string, width: number, height: number): SpriteSheet => {
