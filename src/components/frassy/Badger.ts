@@ -15,7 +15,7 @@ export class Badger extends Monster{
     constructor(scene: GameScene, x: number, y: number, spr: string = "badger_idle_1") {
 		super(scene, x, y, spr);
         this.stateHP = [10,20,10];
-        this.behavior = new MonsterScriptHandler(this,"badgerrage");
+        this.behavior = new MonsterScriptHandler(this,"wolfidle");
         this.stunOverflow = -1000;
 
         this.sprite.setScale(500 / this.sprite.width);
