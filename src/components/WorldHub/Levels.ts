@@ -72,7 +72,7 @@ export const levels = [
 		x: 1216,
 		y: 597,
 		title: "Lycante",
-		key: "lycante",
+		key: "wolf",
 		require: ["jester", "moler"],
 		enemy: "lycante",
 		background: "background_ice",
