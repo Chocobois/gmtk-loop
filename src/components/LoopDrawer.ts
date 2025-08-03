@@ -13,6 +13,7 @@ enum InputFlipMode {
 	NORMAL,
 	FLIP_X,
 	FLIP_Y,
+	FLIP_X_Y,
 	SWAP_X_Y,
 }
 
@@ -78,9 +79,9 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 				this.sfxLoop.setVolume(1);
 			},
 		});
-		
+
 		autorun(() => {
-			console.log("New color")
+			console.log("New color");
 			this.loopColor = pearlState.pearlLoopColor;
 			this.lineColor = pearlState.pearlLineColor;
 		});
@@ -448,6 +449,11 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 				y = this.scene.H - y;
 				break;
 
+			case InputFlipMode.FLIP_X_Y:
+				x = this.scene.W - x;
+				y = this.scene.H - y;
+				break;
+
 			case InputFlipMode.SWAP_X_Y:
 				let _ = x;
 				x = (y / this.scene.H) * this.scene.W;
@@ -465,7 +471,8 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		const modes = [
 			InputFlipMode.FLIP_X,
 			InputFlipMode.FLIP_Y,
-			InputFlipMode.SWAP_X_Y,
+			InputFlipMode.FLIP_X_Y,
+			// InputFlipMode.SWAP_X_Y, Honestly this one is too hard
 		];
 		const availableModes = modes.filter((mode) => mode !== this.inputFlipMode);
 		const mode = Phaser.Math.RND.pick(availableModes);

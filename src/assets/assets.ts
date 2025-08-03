@@ -63,6 +63,7 @@ const images: Image[] = [
 	image("characters/jester/idle", "jester_idle"),
 	image("characters/jester/charge", "jester_charge"),
 	image("characters/jester/attack", "jester_attack"),
+	image("characters/jester/stunned", "jester_stunned"),
 	image("characters/jester/dead", "jester_dead"),
 	image("characters/jester/card_heart", "jester_card_heart"),
 	image("characters/jester/card_diamond", "jester_card_diamond"),

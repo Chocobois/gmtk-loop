@@ -6,6 +6,7 @@ enum JesterState {
 	IDLE,
 	CHARGING,
 	ATTACKING,
+	STUNNED,
 	DEAD,
 }
 
@@ -32,7 +33,7 @@ export class Jester extends BaseMonster {
 
 		this.health = 1500;
 		this.hasActiveMagic = false;
-		this.hitsUntilAggro = 1;
+		this.hitsUntilAggro = 2;
 
 		this.sprite = scene.add.sprite(0, 0, "jester");
 		this.add(this.sprite);
@@ -52,8 +53,8 @@ export class Jester extends BaseMonster {
 			case JesterState.IDLE:
 				this.sprite.setTexture("jester_idle");
 
-				// If magic is applied, accept more hits. Otherwise use magic.
-				this.hitsUntilAggro = this.hasActiveMagic ? 3 : 1;
+				// If magic is applied, one hit stuns.
+				this.hitsUntilAggro = this.hasActiveMagic ? 1 : 2;
 
 				// Determine speed
 				this.velocity.setLength(this.hasActiveMagic ? 1 : 5);
@@ -68,7 +69,7 @@ export class Jester extends BaseMonster {
 			case JesterState.CHARGING:
 				this.sprite.setTexture("jester_charge");
 
-				this.stateTimer = this.scene.addEvent(800, () =>
+				this.stateTimer = this.scene.addEvent(1000, () =>
 					this.setJesterState(JesterState.ATTACKING)
 				);
 				break;
@@ -91,8 +92,22 @@ export class Jester extends BaseMonster {
 				);
 				break;
 
+			case JesterState.STUNNED:
+				this.sprite.setTexture("jester_stunned");
+
+				this.stateTimer = this.scene.addEvent(3000, () =>
+					this.setJesterState(JesterState.CHARGING)
+				);
+				break;
+
 			case JesterState.DEAD:
 				this.sprite.setTexture("jester_dead");
+				this.animateShake(this.sprite, 3000);
+
+				this.scene.addEvent(1000, () => {
+					this.explosionEffect.play(this.x, this.y);
+					this.emit("removeEntity", this);
+				});
 				break;
 		}
 	}
@@ -134,10 +149,15 @@ export class Jester extends BaseMonster {
 		this.animateShake(this.sprite);
 		this.sparkEffect.play(this.x, this.y);
 
-		// If attacked when no magic is applied, attack immediately
+		// If attacked when magic is applied, Jester gets stunned
+		// If attacked when no magic is applied, Jester performs an attack
 		this.hitsUntilAggro--;
-		if (this.hitsUntilAggro <= 0 && this.jesterState == JesterState.IDLE) {
-			this.setJesterState(JesterState.CHARGING);
+		if (this.jesterState == JesterState.IDLE) {
+			if (this.hasActiveMagic) {
+				this.setJesterState(JesterState.STUNNED);
+			} else if (this.hitsUntilAggro <= 0) {
+				this.setJesterState(JesterState.CHARGING);
+			}
 		}
 
 		this.health -= loopState.attackPower;
