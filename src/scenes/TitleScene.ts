@@ -6,7 +6,7 @@ import { title, version } from "@/version.json";
 const creditsLeft = `@Golenchu
 @LuxxArt
 @MatoCookies
-Lumie
+@Nightlightlumie
 @ArcticFqx
 @Dreedawott
 @lmosteverywhere
@@ -19,13 +19,13 @@ code
 code
 code
 music
-art & game design`;
+art & ideas`;
 
 const pos = {
 	loop: new Phaser.Geom.Point(1450, 500),
 	title: new Phaser.Geom.Point(570, 270),
 	dragon: new Phaser.Geom.Point(1150, 750),
-}
+};
 
 export class TitleScene extends BaseScene {
 	public sky: Phaser.GameObjects.Image;
@@ -53,10 +53,10 @@ export class TitleScene extends BaseScene {
 
 		const dragonX = 1200;
 
-		this.sky    = this.add.image(this.CX, this.CY, "title_sky");
-		this.loop   = this.add.image(pos.loop.x, pos.loop.y, "title_loop");
+		this.sky = this.add.image(this.CX, this.CY, "title_sky");
+		this.loop = this.add.image(pos.loop.x, pos.loop.y, "title_loop");
 		this.dragon = this.add.image(pos.dragon.x, pos.dragon.y, "title_dragon");
-		this.title  = this.add.image(pos.title.x, pos.title.y, "title_logo");
+		this.title = this.add.image(pos.title.x, pos.title.y, "title_logo");
 
 		this.containToScreen(this.sky);
 		this.title.setScale(0.75);
@@ -109,7 +109,7 @@ export class TitleScene extends BaseScene {
 		this.credits.setAlpha(0);
 
 		let credits1 = this.addText({
-			x: 0.60 * this.W,
+			x: 0.6 * this.W,
 			y: 0.02 * this.H,
 			size: 35,
 			color: "#fff398",
@@ -135,7 +135,7 @@ export class TitleScene extends BaseScene {
 
 		// Music
 		if (!this.musicTitle) {
-			this.musicTitle = new Music(this, "m_title", { volume: 0.3 });
+			this.musicTitle = new Music(this, "m_title", { volume: 0.2 });
 			this.musicTitle.on("bar", this.onBar, this);
 			this.musicTitle.on("beat", this.onBeat, this);
 		}
@@ -166,12 +166,12 @@ export class TitleScene extends BaseScene {
 
 			this.loop.alpha += 0.03 * (1 - this.loop.alpha);
 			this.dragon.angle =
-				(2 * Math.sin((3 * time) * 0.00123)) +
-				(7 * Math.sin((3 * time) * 0.00061)) +
-				(14 * Math.sin((3 * time) * 0.00014));
+				2 * Math.sin(3 * time * 0.00123) +
+				7 * Math.sin(3 * time * 0.00061) +
+				14 * Math.sin(3 * time * 0.00014);
 
-			this.loop.angle = 1 * Math.sin((3 * time) * 0.0003);
-			this.loop.alpha = 0.75 + 0.25 * Math.sin((3 * time) * 0.0002);
+			this.loop.angle = 1 * Math.sin(3 * time * 0.0003);
+			this.loop.alpha = 0.75 + 0.25 * Math.sin(3 * time * 0.0002);
 
 			this.title.alpha +=
 				0.01 * ((this.title.visible ? 1 : 0) - this.title.alpha);
@@ -217,7 +217,7 @@ export class TitleScene extends BaseScene {
 				volume: 0,
 				duration: 2500,
 				onComplete: () => this.musicTitle.stop(),
-			})
+			});
 
 			this.addEvent(1000, () => {
 				this.fade(true, 1500, 0x000000);
@@ -238,7 +238,7 @@ export class TitleScene extends BaseScene {
 		if (bar == 9) {
 			this.addEvent(400, () => {
 				this.flash(5000, 0xc5f7f8, 0.05);
-			})
+			});
 		}
 		if (bar >= 9) {
 			this.addEvent(400, () => {

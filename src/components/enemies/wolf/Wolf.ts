@@ -77,7 +77,7 @@ export class Wolf extends Monster{
         if(this.fading){
             return;
         }
-        this.stun(500);
+        this.stun(50);
 		this.scene.textParticle(this.x + Math.random()*50, this.y+Math.random()*50, "OrangeRed", ""+amount);
 		//console.log("Particle");
 		//this.captureDisp.takeDamage(amount);
