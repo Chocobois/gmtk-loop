@@ -4,6 +4,7 @@ import { Entity } from "./Entity";
 import { pearlState } from "@/state/PearlState";
 import { autorun } from "mobx";
 import { PearlElement } from "./pearls/PearlElement";
+import { BurnEffect } from "./particles/BurnEffect";
 
 const SFX_FADE_OUT_DURATION = 100; //ms
 const SFX_SMOOTHING_WINDOW_SIZE = 500; //ms
@@ -40,6 +41,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 	// Rock pearl ability, how many seconds you can sustain damage without breaking
 	private rockPearlTimer: number;
+	protected burnEffect: BurnEffect;
 
 	public muted: boolean = false;
 	public sfxMaxVolume: number = 1;
@@ -92,7 +94,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 			targets: this.cursor,
 			persist: true,
 			paused: true,
-			alpha: {from: 1, to: 0},
+			alpha: { from: 1, to: 0 },
 			// angle: 0, // For some reason this sets it instantly
 			duration: SFX_FADE_OUT_DURATION,
 			onComplete: () => {
@@ -103,7 +105,11 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 				this.cursor.setAlpha(1);
 				this.cursor.setAngle(0);
 			},
-		})
+		});
+
+		// Pearl effects
+		this.rockPearlTimer = 0;
+		this.burnEffect = new BurnEffect(scene);
 
 		autorun(() => {
 			if (!this.scene) {
@@ -118,7 +124,8 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 	update(time: number, delta: number) {
 		this.sfxLoop.mute = this.muted;
-		this.sfxLoop.volume = Math.min(1, this.sfxLoop.rate + 0.2) * this.sfxMaxVolume;
+		this.sfxLoop.volume =
+			Math.min(1, this.sfxLoop.rate + 0.2) * this.sfxMaxVolume;
 		this.graphics.lineStyle(this.lineWidth, this.lineColor);
 
 		if (this.pointTimes.length > 0) {
@@ -126,6 +133,17 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 			// SFX timeout
 			if (sinceLastMove > SFX_TIMEOUT) this.sfxFadeOut(SFX_FADE_OUT_DURATION);
+		}
+
+		// Special particles if Fire pearl is in use
+		if (pearlState.currentPearl.element == PearlElement.Fire) {
+			const lineSegments = this.lineSegments;
+			lineSegments.forEach((line) => {
+				if (Math.random() < 0.02) {
+					const p = line.getRandomPoint();
+					this.burnEffect.play(p.x, p.y);
+				}
+			});
 		}
 	}
 
