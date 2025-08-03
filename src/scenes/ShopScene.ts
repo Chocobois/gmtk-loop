@@ -19,15 +19,16 @@ export class ShopScene extends BaseScene {
 		this.initGraphics();
 
 		// Temporary
-		this.addText({
-			text: "(Press ESC to return)",
+		let text = this.addText({
+			text: "Return to map",
 			size: 48,
 			color: "white",
 		});
-		this.input.keyboard?.on("keydown-ESC", () => {
+		
+		text.setInteractive().on("pointerdown", () => {
 			this.loopDrawer.setEnabled(false);
 			this.scene.start("WorldScene");
-		});
+		})
 	}
 
 	initGraphics() {
