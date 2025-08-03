@@ -22,11 +22,12 @@ export class HubLevel extends Entity {
 
 		this.label = scene.addText({
 			x: 0,
-			y: 150,
+			y: 130,
 			text: levelData.title,
-			size: 32,
+			size: 48,
 			color: "black",
 		});
+		this.label.setStroke("white", 16);
 		this.label.setOrigin(0.5);
 		this.add(this.label);
 	}
@@ -53,13 +54,29 @@ export class HubLevel extends Entity {
 			},
 		});
 
-		this.scene.sound.play("h_map_select", { volume: 0.2 });
-
 		this.emit("selected", this.levelData);
+	}
+
+	// update(time: number, delta: number) {
+	update(time: number) {
+		const a = Math.sin(time * Math.PI);
+		// const b = Phaser.Math.Easing.Sine.InOut(a);
+		const squish = 1.0 + 0.04 * a;
+		this.image.setScale(2 - squish, squish);
+	}
+
+	squish() {
+		this.image.scaleY = 0.95;
 	}
 
 	setEnabled(value: boolean) {
 		super.setEnabled(value);
 		this.setAlpha(0.25);
+	}
+
+	protected shapes: Phaser.Geom.Circle[] = [new Phaser.Geom.Circle()];
+	get colliders(): Phaser.Geom.Circle[] {
+		if (!this.enabled) return [];
+		return [this.shapes[0].setTo(this.x, this.y, 20)];
 	}
 }

@@ -7,7 +7,7 @@ export const levels = [
 		title: "Wolf",
 		key: "1",
 		require: [],
-		enemy: "sans",
+		enemy: "wolf",
 		background: "background_plains_0",
 	},
 	{

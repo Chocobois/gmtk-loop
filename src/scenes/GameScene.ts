@@ -42,14 +42,15 @@ export class GameScene extends BaseScene {
 		super({ key: "GameScene" });
 	}
 
-	create(levelData: LevelDefinition): void {
+	// Allow for multiple levels to be loaded at the same time
+	create(levelDataList: LevelDefinition[]): void {
 		this.fade(false, 200, 0x000000);
 
 		// Restore health
 		loopState.health = loopState.maxHealth;
 
 		this.cameras.main.setBackgroundColor(0xffffff);
-		this.background = this.add.image(0, 0, levelData.background);
+		this.background = this.add.image(0, 0, levelDataList[0].background);
 		this.background.setOrigin(0);
 		this.fitToScreen(this.background);
 
@@ -57,7 +58,8 @@ export class GameScene extends BaseScene {
 		this.entityLayer = new Phaser.GameObjects.Container(this, 0, 0);
 		this.add.existing(this.entityLayer);
 
-		this.loadMonster(levelData.enemy);
+		const enemiesToSpawn = levelDataList.map((level) => level.enemy);
+		this.loadMonsters(enemiesToSpawn);
 
 		this.loopDrawer = new LoopDrawer(this);
 		this.loopDrawer.on("loop", this.onLoop, this);
@@ -88,41 +90,41 @@ export class GameScene extends BaseScene {
 		this.input.keyboard?.on("keydown-ESC", () => {
 			this.loopDrawer.setEnabled(false);
 			this.scene.start("WorldScene");
+			this.music.stop();
 		});
 	}
 
-	loadMonster(enemyKey: string) {
-		switch (enemyKey) {
-			case "sans":
-				const monster = new Wolf(this, 960, 540);
-				this.addEntity(monster);
-				break;
+	// Allow multiple monster keys to be spawned
+	loadMonsters(monsterList: string[]) {
+		if (monsterList.includes("wolf")) {
+			const monster = new Wolf(this, 960, 540);
+			this.addEntity(monster);
+		}
 
-			case "snake":
-				const snake = new SnakeMonster(this, 960, 540);
-				this.addEntity(snake);
-				break;
+		if (monsterList.includes("snake")) {
+			const snake = new SnakeMonster(this, 960, 540);
+			this.addEntity(snake);
+		}
 
-			case "mole":
-				const mole = new MoleBoss(this, 960, 540);
-				this.addEntity(mole);
-				mole.addFakeMoles(3);
-				mole.moveAllMoles(true);
-				break;
+		if (monsterList.includes("mole")) {
+			const mole = new MoleBoss(this, 960, 540);
+			this.addEntity(mole);
+			mole.addFakeMoles(3);
+			mole.moveAllMoles(true);
+		}
 
-			case "jester":
-				const jester = new Jester(this, 960, 540);
-				this.addEntity(jester);
-				break;
+		if (monsterList.includes("jester")) {
+			const jester = new Jester(this, 960, 540);
+			this.addEntity(jester);
+		}
 
-			case "abra":
-				const abra = new AbraBoss(this, 960, 540);
-				this.addEntity(abra);
-				break;
+		if (monsterList.includes("abra")) {
+			const abra = new AbraBoss(this, 960, 540);
+			this.addEntity(abra);
+		}
 
-			default:
-				console.warn(`Unknown enemy type: ${enemyKey}`);
-				break;
+		if (this.entities.length === 0) {
+			console.warn("No monsters were loaded for the given monsterList.");
 		}
 	}
 
@@ -170,7 +172,7 @@ export class GameScene extends BaseScene {
 	}
 
 	update(time: number, delta: number) {
-		this.updateEntities(time,delta);
+		this.updateEntities(time, delta);
 
 		this.loopDrawer.update(time, delta);
 		this.loopDrawer.checkCollisions(this.entities);
@@ -203,12 +205,12 @@ export class GameScene extends BaseScene {
 		this.projectiles.update(t, d);
 	}
 
-	updateEntities(t: number, d: number){
-		for(let h = (this.entities.length-1); h >= 0; h--){
+	updateEntities(t: number, d: number) {
+		for (let h = this.entities.length - 1; h >= 0; h--) {
 			this.entities[h].update(t, d);
-			if(this.entities[h].deleteFlag) {
+			if (this.entities[h].deleteFlag) {
 				this.entities[h].destroy();
-				this.entities.splice(h,1);
+				this.entities.splice(h, 1);
 			}
 		}
 	}
