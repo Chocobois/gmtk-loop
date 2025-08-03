@@ -179,7 +179,6 @@ const audios: Audio[] = [
 	sound("game_over", "game_over", 0.5),
 	sound("victory", "victory", 0.5),
 
-	sound("tree/rustle", "t_rustle", 0.5),
 	sound("drawing/sine", "d_sine", 0.3),
 	sound("drawing/brush", "d_brush"),
 	sound("drawing/raise", "d_raise"),
@@ -195,7 +194,7 @@ const audios: Audio[] = [
 	sound("combo/combo7", "d_combo_7"),
 	sound("combo/combo_lost", "d_combo_lost"),
 
-	sound("ui/screen_transition", "u_level_enter"),
+	sound("ui/titlescreen", "u_game_start"),
 	sound("ui/what", "u_question"),
 	sound("ui/disabled", "u_disabled"),
 
