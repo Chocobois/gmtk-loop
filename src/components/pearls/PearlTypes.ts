@@ -6,6 +6,7 @@ export type PearlType = {
 	name: string;
 	description: string;
 	image: string;
+	sfxKey?: string;
 	pearlColor: number;
 	lineColor: number;
 	loopColor: number;
@@ -30,6 +31,7 @@ export const PearlTypes = {
 		name: "Coil pearl",
 		description: "Missing description",
 		image: "pearl_coil",
+		sfxKey: "p_coil",
 		pearlColor: Color.Pink400,
 		lineColor: Color.Pink200,
 		loopColor: Color.Pink200,
@@ -41,6 +43,7 @@ export const PearlTypes = {
 		name: "Fire pearl",
 		description: "Missing description",
 		image: "pearl_fire",
+		sfxKey: "p_fire",
 		pearlColor: Color.Red600,
 		lineColor: Color.Red600,
 		loopColor: Color.Red600,
@@ -52,6 +55,7 @@ export const PearlTypes = {
 		name: "Psychic pearl",
 		description: "Missing description",
 		image: "pearl_psychic",
+		sfxKey: "p_psychic",
 		pearlColor: Color.Violet700,
 		lineColor: Color.Violet300,
 		loopColor: Color.Violet300,
@@ -63,6 +67,7 @@ export const PearlTypes = {
 		name: "Rock pearl",
 		description: "Missing description",
 		image: "pearl_rock",
+		sfxKey: "p_rock",
 		pearlColor: Color.Amber800,
 		lineColor: Color.Amber200,
 		loopColor: Color.Amber200,
@@ -74,6 +79,7 @@ export const PearlTypes = {
 		name: "Water pearl",
 		description: "Missing description",
 		image: "pearl_water",
+		sfxKey: "p_water",
 		pearlColor: Color.Blue500,
 		lineColor: Color.Blue200,
 		loopColor: Color.Blue200,

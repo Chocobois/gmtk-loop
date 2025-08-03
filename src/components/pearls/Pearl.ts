@@ -1,6 +1,7 @@
 import { BaseScene } from "@/scenes/BaseScene";
 import { Entity } from "../Entity";
 import { PearlType } from "./PearlTypes";
+import { pearlState } from "@/state/PearlState";
 import { Color } from "@/util/colors";
 import { interpolateColor } from "@/util/functions";
 import { PearlElement } from "./PearlElement";
@@ -67,6 +68,23 @@ export class Pearl extends Entity {
 		});
 
 		this.emit("selected", this.pearlType);
+
+		// Sound effects
+
+		if (this.pearlType.sfxKey) {
+			if (pearlState.currentPearl.element == this.pearlType.element) {
+				// Equip sound
+				this.scene.sound.play("p_equip", {volume: 0.3});
+				this.scene.sound.play(this.pearlType.sfxKey, {delay: 0.1, volume: 0.7});
+			} else {
+				// Unequip sound
+				this.scene.sound.play("p_unequip");
+				this.scene.sound.play("p_unequip", {delay: 0.07, rate: 0.96, volume: 0.5});
+			}
+		} else {
+			// This branch triggers when entering the shop (I dunno why)
+			this.scene.sound.play("p_shop_enter", {pan: 0.6});
+		}
 	}
 
 	update(time: number, delta: number) {

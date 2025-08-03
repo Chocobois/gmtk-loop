@@ -390,6 +390,7 @@ export class GameScene extends BaseScene {
 				pearlState.acquiredPearls[pearlReward] = true;
 				pearlState.currentPearl = PearlTypes[pearlReward];
 				this.pearl.setPearlType(PearlTypes[pearlReward]);
+				localStorage.setItem(pearlReward.toString(), "true");
 
 				this.animatePearlReward();
 			});
