@@ -15,7 +15,7 @@ export class AbraBoss extends AbraBase {
 
 		this.fakeAbras = [];
 		this.maxFakeAbras = 3;
-		this.health = 1000;
+		this.health = 2000;
 
 		this.sprite.setTexture("abra_idle");
 
@@ -60,7 +60,7 @@ export class AbraBoss extends AbraBase {
 				this.filter.amplitude = 0;
 				this.sprite.setTexture("abra_hurt");
 
-				this.stateTimer = this.scene.addEvent(3000, () =>
+				this.stateTimer = this.scene.addEvent(2000, () =>
 					this.setAbraState(AbraState.IDLE)
 				);
 				break;

@@ -65,7 +65,7 @@ export class MoleBase extends BaseMonster {
 		this.moleState = state;
 	}
 
-	animateAppear(duration: number = 500) {
+	animateAppear(duration: number = 400) {
 		this.setEnabled(true);
 
 		this.scene.tweens.add({
