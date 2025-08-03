@@ -1,11 +1,11 @@
 {
   "team": "Chocobois",
-  "title": "Loop 2025",
-  "description": "We make game, but faster!",
+  "title": "Dragon Rangers",
+  "description": "Draw magical loops around monsters to defeat them!",
   "itch": {
-    "upload": true,
+    "upload": false,
     "username": "golen",
-    "game": "loop-2025"
+    "game": "dragon-rangers"
   },
   "neutralino": {
     "allow": ["app.exit", "window.center", "storage.*"],
