@@ -6,7 +6,7 @@ export class ScriptDataBase {
     public owner: Monster;
     public ctrl: MonsterScriptHandler;
     public scr1: MonsterCommand[][]; public idle: MonsterCommand[][]; public weak: MonsterCommand[][]; public dashblitz: MonsterCommand[][]; public wolfidle: MonsterCommand[][];
-    public sit: MonsterCommand[][]; public shatter: MonsterCommand[][]; public inanimate: MonsterCommand[][];
+    public sit: MonsterCommand[][]; public shatter: MonsterCommand[][]; public inanimate: MonsterCommand[][]; public snailrage: MonsterCommand[][];
     constructor(m: Monster, ct: MonsterScriptHandler){
         //this is an array of an array of monstercommands
         //all monstercommands in the same array will run simultaneously
@@ -193,6 +193,16 @@ export class ScriptDataBase {
                 {key: "die", value: [], args: [], conditions: []}]),
             ],
         ]
+
+        this.snailrage = [[
+            new MonsterCommand(this.owner, this.ctrl, [
+                {key: "wait", value: [1500], args: [], conditions: []},
+                {key: "travel", value: [0.15,200,1720,200,880], args: [], conditions: [false, false]},
+                {key: "tsa", value: [], args: [], conditions: [false]},
+                {key: "wait", value: [100], args: [], conditions: []},
+                {key: "loop", value: [1], args: [], conditions: []}]),
+            ],
+        ]
     };
 
 
@@ -206,6 +216,7 @@ export class ScriptDataBase {
             case "wolfidle": {return this.wolfidle;}
             case "sit": {return this.sit;}
             case "shatter": {return this.shatter;}
+            case "snailrage": {return this.snailrage;}
             case "inanimate": {return this.inanimate;}
             default: {return this.idle;}
         }

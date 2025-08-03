@@ -4,10 +4,10 @@ export const levels = [
 	{
 		x: 400,
 		y: 540,
-		title: "Wolf",
+		title: "Snail",
 		key: "1",
 		require: [],
-		enemy: "wolf",
+		enemy: "snail",
 		background: "background_plains_0",
 		music: "m_fight",
 	},

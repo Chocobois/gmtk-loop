@@ -17,6 +17,8 @@ import { AbraBoss } from "@/components/enemies/abra/AbraBoss";
 
 import BendWaves from "@/pipelines/BendWavesPostFX";
 import { Wolf } from "@/components/enemies/wolf/Wolf";
+import { Snail } from "@/components/enemies/snail/Snail";
+
 import { Pearl } from "@/components/pearls/Pearl";
 import { pearlState } from "@/state/PearlState";
 import { PearlElement } from "@/components/pearls/PearlElement";
@@ -121,10 +123,11 @@ export class GameScene extends BaseScene {
 
 	// Allow multiple monster keys to be spawned
 	loadMonsters(monsterList: string[]) {
-		this.activeBossCount = monsterList.length;
 
-		if (monsterList.includes("wolf")) {
-			const monster = new Wolf(this, 960, 540);
+		this.activeBossCount = monsterList.length;
+		
+		if (monsterList.includes("snail")) {
+			const monster = new Snail(this, 960, 540);
 			this.addEntity(monster);
 		}
 
