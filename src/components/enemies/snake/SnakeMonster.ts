@@ -1,4 +1,4 @@
-import { BaseScene } from "@/scenes/BaseScene";
+import { GameScene } from "@/scenes/GameScene";
 import { BaseMonster } from "../../BaseMonster";
 
 enum SnakeState {
@@ -12,8 +12,6 @@ const SNAKE_SEGMENTS = 20;
 const SEGMENT_LENGTH = SNAKE_LENGTH / SNAKE_SEGMENTS;
 
 export class SnakeMonster extends BaseMonster {
-	public scene: BaseScene;
-
 	private snakeState: SnakeState;
 
 	// private target: Phaser.Math.Vector2; // Target position for the snake to slither towards
@@ -23,10 +21,8 @@ export class SnakeMonster extends BaseMonster {
 	private rope: Phaser.GameObjects.Rope;
 	private tailPoints: Phaser.Math.Vector2[] = [];
 
-	constructor(scene: BaseScene, x: number, y: number) {
+	constructor(scene: GameScene, x: number, y: number) {
 		super(scene, x, y);
-		scene.add.existing(this);
-		this.scene = scene;
 
 		this.tailPoints = [];
 		for (let i = 0; i < SNAKE_SEGMENTS; i++)
@@ -71,6 +67,8 @@ export class SnakeMonster extends BaseMonster {
 	}
 
 	update(time: number, delta: number) {
+		super.update(time, delta);
+
 		if (this.x < this.border.left)
 			this.velocity.setAngle(this.velocity.angle() + 0.1);
 		if (this.x > this.border.right)
@@ -113,7 +111,7 @@ export class SnakeMonster extends BaseMonster {
 
 	// When the entity is encircled by the player's loop
 	onLoop() {
-		console.log("SnakeMonster looped");
+		super.onLoop();
 	}
 
 	protected shapes: Phaser.Geom.Circle[] = [];

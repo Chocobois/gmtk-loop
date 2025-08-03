@@ -46,8 +46,7 @@ export class GameScene extends BaseScene {
 	public winJingle: Phaser.Sound.BaseSound;
 	public loseJingle: Phaser.Sound.BaseSound;
 
-	private music: Music;
-	private combo: number = 0;
+	public music: Music;
 
 	constructor() {
 		super({ key: "GameScene" });
@@ -72,6 +71,11 @@ export class GameScene extends BaseScene {
 
 		const enemiesToSpawn = levelDataList.map((level) => level.enemy);
 		this.loadMonsters(enemiesToSpawn);
+
+		if (this.loopDrawer) {
+			this.loopDrawer.sfxStop();
+			this.loopDrawer.destroy();
+		}
 
 		this.loopDrawer = new LoopDrawer(this);
 		this.loopDrawer.on("loop", this.onLoop, this);
@@ -284,14 +288,10 @@ export class GameScene extends BaseScene {
 		if (emptyLoop) return;
 
 		// We circled something
-		this.combo++;
-		const soundIndex = Phaser.Math.Clamp(this.combo, 1, 7);
-		this.sound.play(`d_combo_${soundIndex}`, { volume: 0.4 });
-		// console.debug("Combo", this.combo);
+		this.loopDrawer.incrementCombo(true);
 	}
 
 	onLoopBreak(entity: Entity) {
-		this.combo = 0;
 		this.damagePlayer(entity.entityDamage);
 	}
 
@@ -542,6 +542,18 @@ export class GameScene extends BaseScene {
 			onComplete: () => {
 				this.cameras.main.resetPostPipeline();
 			},
+		});
+	}
+
+	getSfxPan(x: number = this.loopDrawer.cursorPosition.x) {
+		return this.getPan(x) * this.loopDrawer.sfxPanIntensity;
+	}
+
+	hitSound(key: string, x: number = this.W/2, volume: number = 1) {
+		this.sound.play(key, {
+				volume,
+				pan: this.getSfxPan(x),
+				rate: Phaser.Math.FloatBetween(0.9, 1.1),
 		});
 	}
 }

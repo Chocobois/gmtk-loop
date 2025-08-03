@@ -65,6 +65,9 @@ export class Monster extends BaseMonster {
 	public stunImmune: boolean = false;
 	protected rip: boolean = false;
 
+	// Sounds and visuals
+	protected genericHitSound: boolean = true;
+
 	constructor(scene: GameScene, x: number, y: number, spr: string = "sansplane") {
 		super(scene, x, y);
 		scene.add.existing(this);
@@ -173,8 +176,11 @@ export class Monster extends BaseMonster {
 		this.sparkEffect.play(this.x, this.y);
 	}
 
-	onLoop() { 
+	onLoop() {
 		this.damage(loopState.attackPower);
+		if (this.genericHitSound) {
+			this.scene.hitSound("e_hit_generic", this.x, 0.4);
+		}
 	}
 
 	damage(amount: number) {

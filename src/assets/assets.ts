@@ -187,13 +187,14 @@ const audios: Audio[] = [
 	sound("drawing/tap", "d_tap"),
 	sound("drawing/break", "d_break"),
 
-	sound("drawing/combo1", "d_combo_1"),
-	sound("drawing/combo2", "d_combo_2"),
-	sound("drawing/combo3", "d_combo_3"),
-	sound("drawing/combo4", "d_combo_4"),
-	sound("drawing/combo5", "d_combo_5"),
-	sound("drawing/combo6", "d_combo_6"),
-	sound("drawing/combo7", "d_combo_7"),
+	sound("combo/combo1", "d_combo_1"),
+	sound("combo/combo2", "d_combo_2"),
+	sound("combo/combo3", "d_combo_3"),
+	sound("combo/combo4", "d_combo_4"),
+	sound("combo/combo5", "d_combo_5"),
+	sound("combo/combo6", "d_combo_6"),
+	sound("combo/combo7", "d_combo_7"),
+	sound("combo/combo_lost", "d_combo_lost"),
 
 	sound("ui/screen_transition", "u_level_enter"),
 	sound("ui/what", "u_question"),
@@ -201,6 +202,16 @@ const audios: Audio[] = [
 
 	sound("hub/map_select", "h_map_select"),
 	sound("hub/map_select_evil", "h_map_select_multiple"),
+
+	// Todo: play extra hitsounds based on what pearl is equipped
+	sound("pearl/pearl_fire", "p_fire"),
+	sound("pearl/pearl_coil", "p_coil"),
+	sound("pearl/pearl_psychic", "p_psychic"),
+	sound("pearl/pearl_rock", "p_rock"),
+	sound("pearl/pearl_water", "p_water"),
+
+	sound("enemy/hurt", "e_hit_generic"),
+	sound("enemy/snail_shell", "e_snail_shell"),
 	sound("tele", "tele"),
 ];
 

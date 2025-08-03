@@ -1,28 +1,56 @@
-import { BaseScene } from "@/scenes/BaseScene";
+import { GameScene } from "@/scenes/GameScene";
 import { Entity } from "./Entity";
 
 import { SparkEffect } from "@/components/particles/SparkEffect";
 import { ExplosionEffect } from "@/components/particles/ExplosionEffect";
+import { pearlState } from "@/state/PearlState";
+import { PearlElement } from "./pearls/PearlElement";
+import { BurnEffect } from "./particles/BurnEffect";
 
 export class BaseMonster extends Entity {
+	public scene: GameScene;
+
 	protected sparkEffect: SparkEffect;
 	protected explosionEffect: ExplosionEffect;
+	protected burnEffect: BurnEffect;
 
-	constructor(scene: BaseScene, x: number, y: number) {
+	protected burningTimer: number; // Remaining burn status in seconds
+
+	constructor(scene: GameScene, x: number, y: number) {
 		super(scene, x, y);
+		this.scene = scene;
 
 		// All colliders attached to this monster deal 10 damage
 		this.entityDamage = 10;
+		this.burningTimer = 0;
 
 		// Use `this.sparkEffect.play(this.x, this.y);` to play
 		this.sparkEffect = new SparkEffect(scene);
-		// Use `this.explosionEffect.play(this.x, this.y);` to play
 		this.explosionEffect = new ExplosionEffect(scene, 2.0);
+		this.burnEffect = new BurnEffect(scene);
+	}
+
+	update(time: number, delta: number) {
+		// If Fire pearl ability is in use, apply burn
+		if (this.isBurning) {
+			this.burningTimer -= delta / 1000;
+			const randomBodyPart = Phaser.Math.RND.pick(this.colliders);
+			const randomChance = Math.random() < 0.2;
+			if (randomBodyPart && randomChance) {
+				const p = randomBodyPart.getRandomPoint();
+				this.burnEffect.play(p.x, p.y);
+			}
+		}
 	}
 
 	// When the monster is encircled by the player's loop
 	onLoop() {
-		// Override this method in subclasses to handle encirclement logic
+		super.onLoop();
+
+		// If Fire pearl is in use, apply burn
+		if (pearlState.currentPearl.element == PearlElement.Fire) {
+			this.burningTimer = 5.0; // 5 seconds of burn
+		}
 	}
 
 	// Tween this monster toward a target position
@@ -74,5 +102,9 @@ export class BaseMonster extends Entity {
 				sprite.setOrigin(0.5 + t * 0.1 * Math.sin(20 * t), sprite.originY);
 			},
 		});
+	}
+
+	get isBurning() {
+		return this.burningTimer > 0;
 	}
 }

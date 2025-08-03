@@ -38,6 +38,13 @@ export class Snail extends Monster{
 			case this.WEAK: { this.curState = this.IDLE; this.behavior.swapScriptList("idle");this.sprite.setFrame(0);  break;}
 			default: { this.curState = this.IDLE; break;}
 		}
+
+        // Music fade when shelled
+        this.scene.tweens.add({
+            targets: this.scene.music,
+            volume: this.curState === this.WEAK ? 0 : 0.2,
+            duration: this.curState === this.WEAK ? 15_000 : 2_000,
+        })
 	}
 
     callSpecial(key: string): void {
@@ -79,6 +86,11 @@ export class Snail extends Monster{
                 ease: Phaser.Math.Easing.Back.Out,
             });
         }
+
+        if (this.curState == this.WEAK) {
+            this.scene.hitSound("e_snail_shell", this.x);
+        }
+
         this.exhaust++;
 		if(this.exhaust >= this.stateHP[this.curState]) {
 			this.advanceState();

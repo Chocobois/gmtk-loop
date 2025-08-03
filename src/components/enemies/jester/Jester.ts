@@ -11,8 +11,6 @@ enum JesterState {
 }
 
 export class Jester extends BaseMonster {
-	public scene: GameScene;
-
 	private health: number;
 
 	private hasActiveMagic: boolean; // If a LoopDrawer input mode effect is in use
@@ -29,8 +27,6 @@ export class Jester extends BaseMonster {
 	constructor(scene: GameScene, x: number, y: number) {
 		super(scene, x, y);
 		scene.add.existing(this);
-		this.scene = scene;
-
 		this.health = 1500;
 		this.hasActiveMagic = false;
 		this.hitsUntilAggro = 2;
@@ -113,6 +109,8 @@ export class Jester extends BaseMonster {
 	}
 
 	update(time: number, delta: number) {
+		super.update(time, delta);
+
 		const wobble = this.jesterState == JesterState.DEAD ? 0 : 0.04;
 		const squish = 1.0 + wobble * Math.sin((8 * time) / 1000);
 		this.sprite.setScale(2 - squish, squish);
@@ -146,6 +144,8 @@ export class Jester extends BaseMonster {
 
 	// When the entity is encircled by the player's loop
 	onLoop() {
+		super.onLoop();
+
 		this.animateShake(this.sprite);
 		this.sparkEffect.play(this.x, this.y);
 

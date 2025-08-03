@@ -36,7 +36,7 @@ export class AbraBoss extends AbraBase {
 				break;
 
 			case AbraState.VANISHING:
-				this.filter.amplitude = 0.01;
+				this.filter.amplitude = 0.009;
 				this.sprite.setTexture("abra_active");
 				this.animateVanish();
 
