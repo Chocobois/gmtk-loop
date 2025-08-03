@@ -6,4 +6,5 @@ export type LevelDefinition = {
 	require: string[];
 	enemy: string;
 	background: string;
+	music: "m_fight" | "m_lightfast";
 };

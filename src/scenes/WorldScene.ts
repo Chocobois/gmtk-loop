@@ -65,6 +65,7 @@ export class WorldScene extends BaseScene {
 			background: "",
 			enemy: "",
 			require: [],
+			music: "m_fight",
 		});
 		this.pearlButton.setDepth(100);
 		this.entities.push(this.pearlButton);
@@ -150,6 +151,12 @@ export class WorldScene extends BaseScene {
 		const selectedEntities = this.entities.filter((entity) =>
 			Phaser.Geom.Polygon.Contains(polygon, entity.x, entity.y)
 		);
+
+		// Only one selected
+		if (selectedEntities.length == 1) {
+			selectedEntities[0].onLoop();
+			return;
+		}
 
 		// If all selected entities are level hubs, then start the levels simultaneously
 		if (

@@ -76,11 +76,8 @@ export class GameScene extends BaseScene {
 		this.initGraphics();
 
 		// Music
-		if (!this.music) {
-			// TODO: Add music track in LevelDefinition
-			this.music = new Music(this, "m_fight", { volume: 0.2 });
-			// this.music = new Music(this, "m_lightfast", { volume: 0.2 });
-		}
+		if (this.music) this.music.destroy();
+		this.music = new Music(this, levelDataList[0].music, { volume: 0.2 });
 		this.music.play();
 
 		/*  Temporary */

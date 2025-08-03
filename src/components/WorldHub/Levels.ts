@@ -9,6 +9,7 @@ export const levels = [
 		require: [],
 		enemy: "wolf",
 		background: "background_plains_0",
+		music: "m_fight",
 	},
 	{
 		x: 800,
@@ -18,6 +19,7 @@ export const levels = [
 		require: ["1"],
 		enemy: "snake",
 		background: "background_ice",
+		music: "m_lightfast",
 	},
 	{
 		x: 800,
@@ -27,6 +29,7 @@ export const levels = [
 		require: ["1"],
 		enemy: "mole",
 		background: "background_plains_2",
+		music: "m_fight",
 	},
 	{
 		x: 1200,
@@ -36,6 +39,7 @@ export const levels = [
 		require: ["2a"],
 		enemy: "jester",
 		background: "background_plains_4",
+		music: "m_lightfast",
 	},
 	{
 		x: 1200,
@@ -45,6 +49,7 @@ export const levels = [
 		require: ["2b"],
 		enemy: "abra",
 		background: "background_magma",
+		music: "m_lightfast",
 	},
 	{
 		x: 1600,
@@ -54,8 +59,9 @@ export const levels = [
 		require: ["3a", "3b"],
 		enemy: "",
 		background: "background_stone",
+		music: "m_fight",
 	},
 ] as const satisfies LevelDefinition[];
 
-export type LevelKeys = typeof levels[number]["key"];
-export type LevelKeysList<T> = { [K in LevelKeys]: T};
+export type LevelKeys = (typeof levels)[number]["key"];
+export type LevelKeysList<T> = { [K in LevelKeys]: T };
