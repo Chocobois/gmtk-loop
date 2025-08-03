@@ -12,6 +12,7 @@ import { PearlElement } from "@/components/pearls/PearlElement";
 
 export class WorldScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
+	private foreground: Phaser.GameObjects.Image;
 	private loopDrawer: LoopDrawer;
 
 	private entities: Entity[];
@@ -38,10 +39,18 @@ export class WorldScene extends BaseScene {
 		this.background.setOrigin(0);
 		this.fitToScreen(this.background);
 
+		this.foreground = this.add.image(0, 0, "hub_foreground");
+		this.foreground.setOrigin(0);
+		this.fitToScreen(this.foreground);
+
 		let sampleText = this.addText({
-			text: "(Draw a loop to select a level)",
+			x: this.CX,
+			y: this.H - 80,
+			text: "Draw a loop to select a level",
 			size: 48,
 		});
+		sampleText.setOrigin(0.5);
+		sampleText.setStroke("white", 32);
 
 		// Create the hub icons for each level
 		this.hubs = [];
@@ -112,7 +121,8 @@ export class WorldScene extends BaseScene {
 		// Set volume to 0 so that animations may continue
 		this.music.setVolume(0);
 		this.addEvent(5, () => {
-			const key = "h_map_select" + (this.queuedLevels.length < 2 ? "" : "_multiple");
+			const key =
+				"h_map_select" + (this.queuedLevels.length < 2 ? "" : "_multiple");
 			this.sound.play(key, { volume: 0.2 });
 		});
 
@@ -129,7 +139,7 @@ export class WorldScene extends BaseScene {
 
 	addHubLines(): void {
 		const graphics = this.add.graphics();
-		graphics.lineStyle(8, 0xffffff, 0.5);
+		graphics.lineStyle(10, 0xffffff, 0.3);
 
 		this.hubs.forEach((hub) => {
 			hub.levelData.require.forEach((key) => {
@@ -197,7 +207,6 @@ export class WorldScene extends BaseScene {
 			selectedEntities.length > 0 &&
 			selectedEntities.every((e) => e instanceof HubLevel && e.levelData.enemy)
 		) {
-
 			selectedEntities.forEach((e) => {
 				e.onLoop();
 				this.tweens.add({
@@ -206,7 +215,7 @@ export class WorldScene extends BaseScene {
 					y: midpoint.y,
 					duration: 1100,
 					ease: "Quad.In",
-				})
+				});
 			});
 			return;
 		}

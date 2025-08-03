@@ -141,7 +141,7 @@ const images: Image[] = [
 
 	// World hub
 	image("worldhub/level", "hub_level"),
-	image("worldhub/menu", "hub_background"),
+	image("worldhub/menu", "hub_foreground"),
 
 	// Titlescreen
 	image("titlescreen/sky", "title_sky"),
