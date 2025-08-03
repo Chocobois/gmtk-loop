@@ -6,6 +6,7 @@ import { pearlState } from "@/state/PearlState";
 import { Pearl } from "@/components/pearls/Pearl";
 import { PearlElement } from "@/components/pearls/PearlElement";
 import { HubLevel } from "@/components/WorldHub/HubLevel";
+import { ColorStr } from "@/util/colors";
 
 export class ShopScene extends BaseScene {
 	public loopDrawer: LoopDrawer;
@@ -15,6 +16,8 @@ export class ShopScene extends BaseScene {
 	private entities: Entity[];
 	private pearls: Pearl[];
 	private backButton: HubLevel;
+
+	private description: Phaser.GameObjects.Text;
 
 	constructor() {
 		super({ key: "ShopScene" });
@@ -40,6 +43,17 @@ export class ShopScene extends BaseScene {
 		this.backButton.setImageScale(1.2);
 		this.entities.push(this.backButton);
 		this.backButton.on("selected", this.loadWorldHub, this);
+
+		this.description = this.addText({
+			x: this.W - 100,
+			y: this.H - 100,
+			text: PearlTypes[PearlElement.None].description,
+			size: 64,
+			color: "white",
+		});
+		this.description.setOrigin(1);
+		this.description.setWordWrapWidth(700);
+		this.description.setStroke("black", 15);
 	}
 
 	initGraphics() {
@@ -63,10 +77,14 @@ export class ShopScene extends BaseScene {
 				// Select pearl if not in use
 				if (pearlState.currentPearl.element != pearlType.element) {
 					pearlState.currentPearl = pearlType;
+					this.description.setText(
+						`${pearlState.currentPearl.name}: ${pearlState.currentPearl.description}`
+					);
 				}
 				// Unequip pearl if already in use
 				else {
 					pearlState.currentPearl = PearlTypes[PearlElement.None];
+					this.description.setText(pearlState.currentPearl.description);
 				}
 				this.refreshPearls();
 			});

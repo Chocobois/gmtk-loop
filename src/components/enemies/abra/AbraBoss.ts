@@ -15,7 +15,7 @@ export class AbraBoss extends AbraBase {
 
 		this.fakeAbras = [];
 		this.maxFakeAbras = 3;
-		this.health = 2000;
+		this.health = 1500;
 
 		this.sprite.setTexture("abra_idle");
 

@@ -57,6 +57,7 @@ export class GameScene extends BaseScene {
 	create(levelDataList: LevelDefinition[]): void {
 		this.fade(false, 200, 0x000000);
 		this.levelDataList = levelDataList;
+		this.cameraShakeValue = 0;
 
 		// Restore health
 		loopState.health = loopState.maxHealth;
@@ -113,20 +114,20 @@ export class GameScene extends BaseScene {
 			this.goToWorldHub(0);
 		});
 
-		let debugButton = this.addText({
-			x: this.W - 20,
-			y: 20,
-			text: "Show colliders",
-			size: 48,
-			color: "white",
-		});
-		debugButton.setOrigin(1, 0);
-		debugButton.setInteractive().on("pointerdown", () => {
-			this.debugGraphics.setVisible(!this.debugGraphics.visible);
-			debugButton.setText(
-				this.debugGraphics.visible ? "Hide colliders" : "Show colliders"
-			);
-		});
+		// let debugButton = this.addText({
+		// 	x: this.W - 20,
+		// 	y: 20,
+		// 	text: "Show colliders",
+		// 	size: 48,
+		// 	color: "white",
+		// });
+		// debugButton.setOrigin(1, 0);
+		// debugButton.setInteractive().on("pointerdown", () => {
+		// 	this.debugGraphics.setVisible(!this.debugGraphics.visible);
+		// 	debugButton.setText(
+		// 		this.debugGraphics.visible ? "Hide colliders" : "Show colliders"
+		// 	);
+		// });
 	}
 
 	// Allow multiple monster keys to be spawned
@@ -138,13 +139,18 @@ export class GameScene extends BaseScene {
 			this.addEntity(monster);
 		}
 
+		if (monsterList.includes("bat")) {
+			const monster = new Snail(this, 960, 540);
+			this.addEntity(monster);
+		}
+
 		if (monsterList.includes("wolf")) {
 			const monster = new Wolf(this, 960, 540);
 			this.addEntity(monster);
 		}
 
 		if (monsterList.includes("snake")) {
-			const snake = new SnakeMonster(this, 960, 540);
+			const snake = new SnakeMonster(this, -100, -100);
 			this.addEntity(snake);
 		}
 
@@ -359,10 +365,13 @@ export class GameScene extends BaseScene {
 		this.activeBossCount -= 1;
 		if (this.activeBossCount > 0) return;
 
+		// Potential fix to prevent simultaneous win and lose
+		if (!this.loopDrawer.getEnabled()) return;
 		this.loopDrawer.setEnabled(false);
+
 		this.music.stop();
 		this.sound.play("victory", { volume: 0.4 });
-		this.sound.play("machinegun", { volume: 0.6, rate: 0.2 });
+		this.sound.play("machinegun", { volume: 0.8, rate: 0.3 });
 
 		this.flash(4000, 0xffffff, 1.0);
 
@@ -386,6 +395,7 @@ export class GameScene extends BaseScene {
 				pearlState.acquiredPearls[pearlReward] = true;
 				pearlState.currentPearl = PearlTypes[pearlReward];
 				this.pearl.setPearlType(PearlTypes[pearlReward]);
+				localStorage.setItem(pearlReward.toString(), "true");
 
 				this.animatePearlReward();
 			});
@@ -394,16 +404,20 @@ export class GameScene extends BaseScene {
 		}
 		// Normal ending
 		else {
-			this.goToWorldHub(5000);
+			this.goToWorldHub(7000);
 		}
 	}
 
 	onGameOver() {
+		// Potential fix to prevent simultaneous win and lose
+		if (!this.loopDrawer.getEnabled()) return;
 		this.loopDrawer.setEnabled(false);
+
 		this.music.stop();
 		this.sound.play("game_over", { volume: 0.4 });
-		this.sound.play("machinegun", { volume: 0.6, rate: 0.2 });
+		this.sound.play("machinegun", { volume: 0.8, rate: 0.3 });
 
+		this.shake(2000, 10, 0);
 		this.flash(4000, 0xffffff, 1.0);
 		this.cameras.main.setPostPipeline(GrayScalePostFilter);
 

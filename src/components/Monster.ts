@@ -65,9 +65,6 @@ export class Monster extends BaseMonster {
 	public stunImmune: boolean = false;
 	protected rip: boolean = false;
 
-	// Sounds and visuals
-	protected genericHitSound: boolean = true;
-
 	constructor(scene: GameScene, x: number, y: number, spr: string = "sansplane") {
 		super(scene, x, y);
 		scene.add.existing(this);
@@ -100,6 +97,8 @@ export class Monster extends BaseMonster {
 
 
 	update(time: number, delta: number) {
+		super.update(time, delta);
+
 		this.boundCheck();
 		this.updateGFX(time,delta);
 		const squish = 1.0 + 0.02 * Math.sin((6 * time) / 1000);
@@ -177,10 +176,9 @@ export class Monster extends BaseMonster {
 	}
 
 	onLoop() {
+		super.onLoop();
+
 		this.damage(loopState.attackPower);
-		if (this.genericHitSound) {
-			this.scene.hitSound("e_hit_generic", this.x, 0.4);
-		}
 	}
 
 	damage(amount: number) {
