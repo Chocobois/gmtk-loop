@@ -11,7 +11,7 @@ export class BaseMonster extends Entity {
 	constructor(scene: BaseScene, x: number, y: number) {
 		super(scene, x, y);
 
-		// All colliders attached to this monster deal 5 damage
+		// All colliders attached to this monster deal 10 damage
 		this.entityDamage = 10;
 
 		// Use `this.sparkEffect.play(this.x, this.y);` to play

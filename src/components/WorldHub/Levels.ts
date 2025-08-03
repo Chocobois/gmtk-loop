@@ -54,11 +54,11 @@ export const levels = [
 	{
 		x: 1600,
 		y: 540,
-		title: "Boss",
+		title: "Wolf",
 		key: "4",
 		require: ["3a", "3b"],
-		enemy: "",
-		background: "background_stone",
+		enemy: "wolf",
+		background: "background_ice",
 		music: "m_fight",
 	},
 ] as const satisfies LevelDefinition[];

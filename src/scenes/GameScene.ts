@@ -123,11 +123,15 @@ export class GameScene extends BaseScene {
 
 	// Allow multiple monster keys to be spawned
 	loadMonsters(monsterList: string[]) {
-
 		this.activeBossCount = monsterList.length;
-		
+
 		if (monsterList.includes("snail")) {
 			const monster = new Snail(this, 960, 540);
+			this.addEntity(monster);
+		}
+
+		if (monsterList.includes("wolf")) {
+			const monster = new Wolf(this, 960, 540);
 			this.addEntity(monster);
 		}
 
@@ -184,9 +188,9 @@ export class GameScene extends BaseScene {
 	initGraphics() {
 		this.background.setDepth(0);
 		this.entityLayer.setDepth(19);
-		this.textParticles.setDepth(30);
 		this.debugGraphics.setDepth(100);
 		this.ui.setDepth(200);
+		this.textParticles.setDepth(300);
 		this.loopDrawer.setDepth(1000);
 
 		this.indicators = new EffectTracker(this, 0, 0);
