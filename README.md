@@ -1,6 +1,26 @@
-# Chocobois Game Jam Template
+# Dragon Rangers
+Dragon Rangers is an action-packed arcade game where you play as a small dragon god, drawing magical loops to trap and defeat forest creatures. Collect their soul pearls to unlock powerful abilities and grow stronger with every battle.
 
-We make game, but faster
+Dragon Rangers was made during GMTK Game Jam 2025.
+
+**Controls**
+
+* Hold and drag to draw a loop
+* Draw a loop around an enemy to deal damage
+* In the level select screen, you can:
+  * Draw a loop around the level you want to play
+  * Draw a loop around the pearl icon to swap out your active ability
+
+**Team**
+
+* Golen (code & art)
+* LuxxArt (art)
+* MatoCookies (music & juice)
+* Nightlightlumie (monster)
+* almost.everywhere (music)
+* ArcticFqx (code)
+* Dreeda (code)
+* Wilon (art)
 
 ## Quick start
 ### Prerequisites
