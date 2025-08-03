@@ -39,7 +39,7 @@ export class Jester extends BaseMonster {
 		this.add(this.sprite);
 
 		this.target = new Phaser.Math.Vector2(x, y);
-		this.velocity = new Phaser.Math.Vector2(1, 1);
+		this.velocity = new Phaser.Math.Vector2(60, 60);
 
 		this.setJesterState(JesterState.IDLE);
 	}
@@ -57,7 +57,7 @@ export class Jester extends BaseMonster {
 				this.hitsUntilAggro = this.hasActiveMagic ? 1 : 2;
 
 				// Determine speed
-				this.velocity.setLength(this.hasActiveMagic ? 1 : 5);
+				this.velocity.setLength(this.hasActiveMagic ? 60 : 300);
 
 				// If Jester is not attacked for this long, remove the magic effect
 				// Otherwise, getting attacked should trigger an attack response
@@ -117,10 +117,10 @@ export class Jester extends BaseMonster {
 		const squish = 1.0 + wobble * Math.sin((8 * time) / 1000);
 		this.sprite.setScale(2 - squish, squish);
 
-		this.moveTargetLocation();
+		this.moveTargetLocation(time, delta);
 	}
 
-	moveTargetLocation() {
+	moveTargetLocation(time: number, delta: number) {
 		// Bounce target location on walls
 		if (this.x < 300 && this.velocity.x < 0) {
 			this.velocity.x *= -1;
@@ -137,8 +137,8 @@ export class Jester extends BaseMonster {
 
 		// Slowly move Jester toward target location
 		if (this.jesterState == JesterState.IDLE) {
-			this.target.x += this.velocity.x;
-			this.target.y += this.velocity.y;
+			this.target.x += this.velocity.x * (delta / 1000);
+			this.target.y += this.velocity.y * (delta / 1000);
 		}
 		this.x += (this.target.x - this.x) * 0.05;
 		this.y += (this.target.y - this.y) * 0.05;
