@@ -18,7 +18,6 @@ export class BurnEffect extends ParticleEffect {
 		});
 
 		this.fireEmitter.setDepth(50);
-		console.log(this.fireEmitter.emitZones);
 	}
 
 	play(x: number, y: number) {
