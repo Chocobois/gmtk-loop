@@ -38,6 +38,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	public muted: boolean = false;
 	private sfxLoop: Phaser.Sound.WebAudioSound;
 	private sfxTween: Phaser.Tweens.Tween;
+	private cursorTween: Phaser.Tweens.Tween;
 
 	constructor(scene: BaseScene) {
 		super(scene);
@@ -80,6 +81,23 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 			},
 		});
 
+		this.cursorTween = this.scene.tweens.add({
+			targets: this.cursor,
+			persist: true,
+			paused: true,
+			alpha: {from: 1, to: 0},
+			// angle: 0, // For some reason this sets it instantly
+			duration: SFX_FADE_OUT_DURATION,
+			onComplete: () => {
+				this.cursor.setVisible(false);
+				this.cursor.setAlpha(1);
+			},
+			onStop: () => {
+				this.cursor.setAlpha(1);
+				this.cursor.setAngle(0);
+			},
+		})
+
 		autorun(() => {
 			console.log("New color");
 			this.loopColor = pearlState.pearlLoopColor;
@@ -106,6 +124,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 	touchStart(pointer: Phaser.Input.Pointer) {
 		const { pointerX, pointerY } = this.getPointer(pointer);
+		this.cursorTween.stop();
 		this.cursor.setVisible(true).setPosition(pointerX, pointerY);
 		this.points = [new Phaser.Math.Vector2(pointerX, pointerY)];
 		this.pointTimes = [pointer.time];
@@ -194,6 +213,9 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		this.graphics.lineTo(pointerX, pointerY);
 		this.graphics.strokePath();
 
+		// Tilt cursor based on horizontal speed
+		this.cursor.angle = Phaser.Math.Clamp(pointer.velocity.x / 2, -20, 20);
+
 		// Sound stuff
 
 		this.sfxTween.stop(); // Cancel SFX fade-out
@@ -234,15 +256,6 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 			const recentSpan =
 				Math.max(...recentPointTimes) - Math.min(...recentPointTimes);
 			const recentSpeed = 1000 * Phaser.Math.GetSpeed(recentDist, recentSpan);
-
-			/* console.debug({
-				len: this.pointTimes.length,
-				window: recentWindowSize,
-				dist: Math.round(recentDist),
-				span: Math.round(recentTimeSpan),
-				speed: Number(recentSpeed.toFixed(4)),
-				times: recentPointTimes
-			}) */
 
 			// The sound clip has 4 loops per 4.745 seconds -> about 0.843 loops/sec
 			this.sfxLoop.setRate(
@@ -303,7 +316,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 	onLineBreak() {
 		if (!this.lineBroken) this.fadeLineEffect(); // Must be before clearing `points`
-		this.cursor.setVisible(false);
+		this.cursorFade();
 		this.points = [];
 		this.pointTimes = [];
 		this.graphics.clear();
@@ -427,6 +440,12 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	unmute() {
 		this.muted = false;
 		return this;
+	}
+
+	cursorFade() {
+		if (this.cursorTween.isPlaying()) return;
+		this.cursorTween.restart();
+		this.cursorTween.play();
 	}
 
 	getPointer(pointer: Phaser.Input.Pointer): {
