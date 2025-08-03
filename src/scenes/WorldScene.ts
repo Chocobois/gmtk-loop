@@ -154,13 +154,27 @@ export class WorldScene extends BaseScene {
 			Phaser.Geom.Polygon.Contains(polygon, entity.x, entity.y)
 		);
 
+		const midpoint = new Phaser.Math.Vector2(
+			Phaser.Math.Average(selectedEntities.map((e) => e.x)),
+			Phaser.Math.Average(selectedEntities.map((e) => e.y))
+		);
+
 		// If all selected entities are level hubs, then start the levels simultaneously
 		if (
 			selectedEntities.length > 0 &&
 			selectedEntities.every((e) => e instanceof HubLevel && e.levelData.enemy)
 		) {
 
-			selectedEntities.forEach((e) => e.onLoop());
+			selectedEntities.forEach((e) => {
+				e.onLoop();
+				this.tweens.add({
+					targets: e,
+					x: midpoint.x,
+					y: midpoint.y,
+					duration: 1100,
+					ease: "Quad.In",
+				})
+			});
 			return;
 		}
 
@@ -174,11 +188,6 @@ export class WorldScene extends BaseScene {
 					rate: 1 + 0.25 * (i - 1),
 				});
 			});
-
-			const midpoint = new Phaser.Math.Vector2(
-				Phaser.Math.Average(selectedEntities.map((e) => e.x)),
-				Phaser.Math.Average(selectedEntities.map((e) => e.y))
-			);
 
 			const questionMark = this.add.sprite(midpoint.x, midpoint.y, "question");
 			questionMark.setScale(0.35);
