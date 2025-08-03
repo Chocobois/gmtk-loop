@@ -24,9 +24,9 @@ export class Badger extends Monster{
     spawnZamboni(){
         let xt = 0;
         if(Math.random() < 0.5) {
-            xt = 210;
+            xt = -150;
         } else {
-            xt = 1910;
+            xt = 2080;
         }
         this.zs.push(new Zamboni(this.scene,xt,200+Math.random()*680));
         this.scene.addEntity(this.zs[this.zs.length-1]);

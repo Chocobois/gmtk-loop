@@ -25,7 +25,7 @@ export class Zamboni extends Monster {
 		super(scene, x, y, spr);
 
 		this.sprite.setTexture(spr);
-        this.sprite.setScale(1);
+        this.sprite.setScale(1.5);
 		this.explosionEffect = new ExplosionEffect(scene, 2.0);
         this.velocity.x = 250;
         this.velocity.y = 0;
