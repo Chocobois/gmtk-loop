@@ -6,7 +6,7 @@ import { title, version } from "@/version.json";
 const creditsLeft = `@Golenchu
 @LuxxArt
 @MatoCookies
-Lumie
+@Nightlightlumie
 @ArcticFqx
 @Dreedawott
 @lmosteverywhere
