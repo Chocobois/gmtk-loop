@@ -16,6 +16,7 @@ import { Jester } from "@/components/enemies/jester/Jester";
 import { AbraBoss } from "@/components/enemies/abra/AbraBoss";
 
 import BendWaves from "@/pipelines/BendWavesPostFX";
+import { Wolf } from "@/components/enemies/wolf/Wolf";
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -23,7 +24,7 @@ export class GameScene extends BaseScene {
 	private entityLayer: Phaser.GameObjects.Container;
 	public loopDrawer: LoopDrawer;
 
-	// private ui: UI;
+	private ui: UI;
 	private debugGraphics: Phaser.GameObjects.Graphics;
 	private textParticles: TextParticle;
 
@@ -37,14 +38,15 @@ export class GameScene extends BaseScene {
 
 	private music: Music;
 
-	private playerHealth: number;
-
 	constructor() {
 		super({ key: "GameScene" });
 	}
 
 	create(levelData: LevelDefinition): void {
 		this.fade(false, 200, 0x000000);
+
+		// Restore health
+		loopState.health = loopState.maxHealth;
 
 		this.cameras.main.setBackgroundColor(0xffffff);
 		this.background = this.add.image(0, 0, levelData.background);
@@ -55,16 +57,15 @@ export class GameScene extends BaseScene {
 		this.entityLayer = new Phaser.GameObjects.Container(this, 0, 0);
 		this.add.existing(this.entityLayer);
 
-		this.playerHealth = loopState.maxHealth;
-
 		this.loadMonster(levelData.enemy);
 
 		this.loopDrawer = new LoopDrawer(this);
 		this.loopDrawer.on("loop", this.onLoop, this);
+		this.loopDrawer.on("break", this.onLoopBreak, this);
 
 		this.textParticles = new TextParticle(this);
 
-		// this.ui = new UI(this);
+		this.ui = new UI(this);
 
 		this.debugGraphics = this.add.graphics();
 
@@ -93,7 +94,7 @@ export class GameScene extends BaseScene {
 	loadMonster(enemyKey: string) {
 		switch (enemyKey) {
 			case "sans":
-				const monster = new Monster(this, 960, 540);
+				const monster = new Wolf(this, 960, 540);
 				this.addEntity(monster);
 				break;
 
@@ -132,6 +133,7 @@ export class GameScene extends BaseScene {
 		// Call `this.emit("addEntity", object)` inside of a Monster class to add it
 		entity.on("addEntity", this.addEntity, this);
 		entity.on("removeEntity", this.removeEntity, this);
+		entity.on("damage", this.damagePlayer, this);
 		entity.on("victory", this.win, this);
 	}
 
@@ -168,10 +170,10 @@ export class GameScene extends BaseScene {
 	}
 
 	update(time: number, delta: number) {
-		this.entities.forEach((entity) => entity.update(time, delta));
+		this.updateEntities(time,delta);
 
 		this.loopDrawer.update(time, delta);
-		this.loopDrawer.checkCollisions(this.colliders);
+		this.loopDrawer.checkCollisions(this.entities);
 		this.textParticles.update(time, delta);
 
 		this.drawColliders();
@@ -201,8 +203,14 @@ export class GameScene extends BaseScene {
 		this.projectiles.update(t, d);
 	}
 
-	addToEntityLayer(p: Phaser.GameObjects.Container) {
-		this.entityLayer.add(p);
+	updateEntities(t: number, d: number){
+		for(let h = (this.entities.length-1); h >= 0; h--){
+			this.entities[h].update(t, d);
+			if(this.entities[h].deleteFlag) {
+				this.entities[h].destroy();
+				this.entities.splice(h,1);
+			}
+		}
 	}
 
 	onLoop(polygon: Phaser.Geom.Polygon) {
@@ -213,6 +221,26 @@ export class GameScene extends BaseScene {
 				}
 			}
 		});
+	}
+
+	onLoopBreak(entity: Entity) {
+		this.damagePlayer(entity.entityDamage);
+	}
+
+	damagePlayer(damage: number) {
+		this.flash(200, 0xff7777, 0.2);
+		this.shake(500, 10, 0);
+
+		this.loopDrawer.onLineBreak();
+
+		const { x, y } = this.ui.healthPosition;
+		this.textParticle(x, y, "red", `${-damage}`, false, 96, 3);
+
+		// Reduce player health
+		loopState.health = Math.max(0, loopState.health - damage);
+		if (loopState.health <= 0) {
+			this.lose();
+		}
 	}
 
 	drawColliders() {
@@ -236,8 +264,11 @@ export class GameScene extends BaseScene {
 			fadeOut: { enable: true },
 		}
 	) {
-		const text = this.createText(x, y, size, color, content);
+		const text = this.addText({ x, y, size, color, text: content });
 		if (outline) text.setStroke("rgba(0,0,0,0.5)", 30);
+
+		// Center text
+		text.setOrigin(0.5);
 
 		// Prevent text from going too far right
 		const right = text.getRightCenter().x ?? 0;
@@ -249,18 +280,6 @@ export class GameScene extends BaseScene {
 
 	get colliders(): Phaser.Geom.Circle[] {
 		return this.entities.flatMap((entity) => entity.colliders);
-	}
-
-	damageToPlayer(amount: number) {
-		this.flash(200, 0xff7777, 0.2);
-		this.shake(500, 10, 0);
-
-		this.loopDrawer.onLineBreak();
-
-		this.playerHealth = Math.max(0, this.playerHealth - amount);
-		if (this.playerHealth <= 0) {
-			this.lose();
-		}
 	}
 
 	win() {

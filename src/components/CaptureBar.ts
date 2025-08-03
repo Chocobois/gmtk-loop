@@ -129,4 +129,8 @@ export class CaptureBar extends Phaser.GameObjects.Container{
         this.x = this.owner.x;
         this.y = this.owner.y;
     }
+
+    disable(){
+        this.setVisible(false);
+    }
 }

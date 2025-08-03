@@ -35,6 +35,9 @@ import { MonsterScriptHandler } from "./MonsterScriptHandler";
 import { WedgeIndicator } from "./Indicators/WedgeIndicator";
 import { GameScene } from "@/scenes/GameScene";
 import { Bounds } from "@/scenes/BaseScene";
+import { DashLine } from "./DashLine";
+import { CircleEffect } from "./CircleEffect";
+import type { Wolf } from "./enemies/wolf/Wolf";
 
 export interface MonsterAction{
     key: string;
@@ -177,6 +180,8 @@ export class MonsterCommand
                     case Bounds.LEFT: {this.owner.travel(this.cmd[this.step].value[0], [200, Phaser.Math.Between(540-(this.cmd[this.step].value[1]/2), 540+(this.cmd[this.step].value[1]/2))], true); break;}
                     default: {break;}
                 }
+                this.circleEffect();
+                this.lineEffect();
                 this.advance();
                 break;
             }   case "dashCorner": {
@@ -194,17 +199,21 @@ export class MonsterCommand
                     case Bounds.BOTTOM_LEFT: {this.owner.travel(this.cmd[this.step].value[0], [200, 880], true); break;}
                     default: {break;}
                 }
+                this.circleEffect();
+                this.lineEffect();
                 this.advance();
                 break;
             }   case "dashAtEdge": {
                 if(this.pend) {
                     break;
                 }
-
-                let px = this.owner.scene.input.activePointer;
                 let pr = this.owner.scene.closestChebyshevEdge(Phaser.Math.Between(860,1060), Phaser.Math.Between(440,640));
-                if( px.isDown) {
-                    pr = this.owner.scene.closestChebyshevEdge(px.x,px.y);
+                if(!this.owner.scene.input == null)
+                {
+                    let px = this.owner.scene.input.activePointer;
+                    if( px.isDown) {
+                        pr = this.owner.scene.closestCorner(px.x,px.y);
+                    }
                 }
                 switch(pr){
                     case Bounds.TOP: {this.owner.travel(this.cmd[this.step].value[0], [Phaser.Math.Between(960-(this.cmd[this.step].value[1]/2), 960+(this.cmd[this.step].value[1]/2)), 200], true); break;}
@@ -213,16 +222,21 @@ export class MonsterCommand
                     case Bounds.LEFT: {this.owner.travel(this.cmd[this.step].value[0], [200, Phaser.Math.Between(540-(this.cmd[this.step].value[1]/2), 540+(this.cmd[this.step].value[1]/2))], true); break;}
                     default: {break;}
                 }
+                this.circleEffect();
+                this.lineEffect();
                 this.advance();
                 break;
             }   case "dashAtCorner": {
                 if(this.pend) {
                     break;
                 }
-                let px = this.owner.scene.input.activePointer;
                 let pr = this.owner.scene.closestCorner(Phaser.Math.Between(860,1060), Phaser.Math.Between(440,640));
-                if( px.isDown) {
-                    pr = this.owner.scene.closestCorner(px.x,px.y);
+                if(!this.owner.scene.input == null)
+                {
+                    let px = this.owner.scene.input.activePointer;
+                    if( px.isDown) {
+                        pr = this.owner.scene.closestCorner(px.x,px.y);
+                    }
                 }
                 switch(pr){
                     case Bounds.TOP_LEFT: {this.owner.travel(this.cmd[this.step].value[0], [200, 200], true); break;}
@@ -231,6 +245,8 @@ export class MonsterCommand
                     case Bounds.BOTTOM_LEFT: {this.owner.travel(this.cmd[this.step].value[0], [200, 880], true); break;}
                     default: {break;}
                 }
+                this.circleEffect();
+                this.lineEffect();
                 this.advance();
                 break;
             }   case "travel": { //go towards either a fixed position (true) or random (false) - accel/x/y or accel/x1/x2/y1/y2 otherwise
@@ -266,6 +282,43 @@ export class MonsterCommand
                     break;
                 }
                 this.owner.flash(this.cmd[this.step].value[0],this.cmd[this.step].value[1]);
+                this.advance();
+                break;
+            }   case "lineEffect": {
+                if(this.pend) {
+                    break;
+                }
+                this.owner.scene.pushHitEffect(new DashLine(this.owner.scene,this.owner.x,this.owner.y,this.owner,-1*Math.atan2(this.owner.velocity.y,this.owner.velocity.x)));
+                this.advance();
+                break;
+            }   case "circleEffect": {
+                if(this.pend) {
+                    break;
+                }
+                this.owner.scene.pushHitEffect(new CircleEffect(this.owner.scene,this.owner.x,this.owner.y,this.owner,600,750));
+                this.advance();
+                break;
+            }  case "call": {
+                if(this.pend) {
+                    break;
+                }
+                for(let i = 0; i < this.cmd[this.step].value[0]; i++){
+                    this.owner.callSpecial(this.cmd[this.step].args[0])
+                }
+                this.advance();
+                break;
+            }   case "stunimmune": {
+                if(this.pend) {
+                    break;
+                }
+                this.owner.stunImmune = this.cmd[this.step].conditions[0];
+                this.advance();
+                break;
+            }   case "die": {
+                if(this.pend) {
+                    break;
+                }
+                this.owner.die();
                 this.advance();
                 break;
             }   case "storeRandom": { //this just stores random numbers, only parameter is the amount and the key
@@ -325,6 +378,14 @@ export class MonsterCommand
                 break;
             }
         }
+    }
+
+    lineEffect(){
+        this.owner.scene.pushHitEffect(new DashLine(this.owner.scene,this.owner.x,this.owner.y,this.owner,-1*Math.atan2(this.owner.velocity.y,this.owner.velocity.x)));
+    }
+
+    circleEffect(){
+        this.owner.scene.pushHitEffect(new CircleEffect(this.owner.scene,this.owner.x,this.owner.y,this.owner,600,750));
     }
 
     resetVariables() {

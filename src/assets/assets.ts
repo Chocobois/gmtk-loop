@@ -13,9 +13,21 @@ const images: Image[] = [
 	image("backgrounds/battlefloor/grassyplains_alt2", "background_plains_2"),
 	image("backgrounds/battlefloor/grassyplains_alt3", "background_plains_3"),
 	image("backgrounds/battlefloor/grassyplains_alt4", "background_plains_4"),
+
+	image("backgrounds/battlefloor/stone", "background_stone_0"),
 	image("backgrounds/battlefloor/ice", "background_ice"),
 	image("backgrounds/battlefloor/magma", "background_magma"),
 	image("backgrounds/battlefloor/stone", "background_stone"),
+	image("backgrounds/battlefloor/rock", "background_rock"),
+
+	image("backgrounds/shelves", "background_shelves"),
+
+	// Pearls
+	image("pearls/fire", "pearl_fire"),
+	image("pearls/grass", "pearl_grass"),
+	image("pearls/water", "pearl_water"),
+	image("pearls/electric", "pearl_electric"),
+
 
 	// Characters
 	image("characters/player", "player"),
@@ -31,6 +43,11 @@ const images: Image[] = [
 	image("characters/runes/r8", "r8"),
 	image("characters/runes/r9", "r9"),
 	image("characters/snailenemy", "escargot"),
+	image("characters/iceberg", "iceberg"),
+	image("characters/c1", "c1"),
+	image("characters/c2", "c2"),
+	image("characters/c3", "c3"),
+	image("characters/c4", "c4"),
 
 	image("characters/snake/snake", "snake"),
 
@@ -109,6 +126,9 @@ const images: Image[] = [
 /* Spritesheets */
 const spritesheets: SpriteSheet[] = [
 	spritesheet("characters/sansplane", "sansplane", 256, 196),
+	spritesheet("characters/snail", "snail", 256, 256),
+	spritesheet("characters/wolf", "wolf", 256, 256),
+	spritesheet("effects/boom", "boom", 512, 512),
 
 	// Particles
 	spritesheet("particles/bubbles", "bubbles", 128, 128),
@@ -142,6 +162,6 @@ const audios: Audio[] = [
 ];
 
 /* Fonts */
-await loadFont("Sketch", "Game Font");
+await loadFont("DynaPuff-Medium", "Game Font");
 
 export { images, spritesheets, audios };
