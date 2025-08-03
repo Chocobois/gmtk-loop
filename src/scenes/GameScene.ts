@@ -355,7 +355,10 @@ export class GameScene extends BaseScene {
 		this.activeBossCount -= 1;
 		if (this.activeBossCount > 0) return;
 
+		// Potential fix to prevent simultaneous win and lose
+		if (!this.loopDrawer.getEnabled()) return;
 		this.loopDrawer.setEnabled(false);
+
 		this.music.stop();
 		this.sound.play("victory", { volume: 0.4 });
 		this.sound.play("machinegun", { volume: 0.6, rate: 0.2 });
@@ -395,7 +398,10 @@ export class GameScene extends BaseScene {
 	}
 
 	onGameOver() {
+		// Potential fix to prevent simultaneous win and lose
+		if (!this.loopDrawer.getEnabled()) return;
 		this.loopDrawer.setEnabled(false);
+
 		this.music.stop();
 		this.sound.play("game_over", { volume: 0.4 });
 		this.sound.play("machinegun", { volume: 0.6, rate: 0.2 });
