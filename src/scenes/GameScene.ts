@@ -80,15 +80,16 @@ export class GameScene extends BaseScene {
 		this.music.play();
 
 		// Temporary
-		this.addText({
-			text: "(Press ESC to return)",
+		let text = this.addText({
+			text: "Return to map",
 			size: 48,
 			color: "white",
 		});
-		this.input.keyboard?.on("keydown-ESC", () => {
+		text.setInteractive().on("pointerdown", () => {
 			this.loopDrawer.setEnabled(false);
+			this.music.stop();
 			this.scene.start("WorldScene");
-		});
+		})
 	}
 
 	loadMonster(enemyKey: string) {
