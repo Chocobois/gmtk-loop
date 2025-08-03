@@ -63,6 +63,7 @@ export class Monster extends BaseMonster {
 	protected stunTime: number = -250;
 	protected stunOverflow: number = -250;
 	public stunImmune: boolean = false;
+	protected rip: boolean = false;
 
 	constructor(scene: GameScene, x: number, y: number, spr: string = "sansplane") {
 		super(scene, x, y);
@@ -110,18 +111,22 @@ export class Monster extends BaseMonster {
 			}
 			//console.log("stunned for " + this.stunTime);
 		}
-		if(this.accel.x != 0 || this.accel.y != 0){
-			this.velocity.x += this.accel.x*delta/1000;
-			this.velocity.y += this.accel.y*delta/1000;
-			//this.velocityCheck;
-		}
-		this.x += (this.velocity.x * delta) / 1000;
-		this.y += (this.velocity.y * delta) / 1000;
+		this.updatePosition(time, delta);
 		if(this.traveling){
 			this.travelCheck();
 		}
 		// Animation (Change to this.sprite.setScale if needed)
 		this.behavior.update(time,delta);
+	}
+
+	updatePosition(t: number, d: number){
+		if(this.accel.x != 0 || this.accel.y != 0){
+			this.velocity.x += this.accel.x*d/1000;
+			this.velocity.y += this.accel.y*d/1000;
+			this.velocityCheck();
+		}
+		this.x += (this.velocity.x * d) / 1000;
+		this.y += (this.velocity.y * d) / 1000;
 	}
 
 	boundCheck(){
@@ -230,7 +235,7 @@ export class Monster extends BaseMonster {
 		this.towardsPos = [0,0];
 		this.traveling = false;
 		this.tDist = 0;
-}
+	}
 
 	travelCheck(){
 		this.cDist = Math.hypot(this.y-this.initPos[1],this.x-this.initPos[0]);
@@ -274,6 +279,18 @@ export class Monster extends BaseMonster {
 			this.velocity.y = this.maxV*v*Math.sin(theta);
 		}
 	}
+
+	ramp(n: number, theta: number){
+		this.accel.x = n*Math.cos(Phaser.Math.DegToRad(theta));
+		this.accel.y = n*Math.sin(Phaser.Math.DegToRad(theta));
+	}
+
+	unramp(n: number){
+        if(this.activetw){
+            this.activetw.destroy();
+        }
+		this.resetVelocity();
+    }
 
 	flash(n: number, t: number){
 		this.fTimer = [0,n,t];

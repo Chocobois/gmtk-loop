@@ -201,6 +201,7 @@ const audios: Audio[] = [
 
 	sound("hub/map_select", "h_map_select"),
 	sound("hub/map_select_evil", "h_map_select_multiple"),
+	sound("tele", "tele"),
 ];
 
 /* Fonts */
