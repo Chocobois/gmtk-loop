@@ -23,6 +23,7 @@ import { Pearl } from "@/components/pearls/Pearl";
 import { pearlState } from "@/state/PearlState";
 import { PearlElement } from "@/components/pearls/PearlElement";
 import { PearlTypes } from "@/components/pearls/PearlTypes";
+import { GrayScalePostFilter } from "@/pipelines/GrayScalePostFilter";
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -170,7 +171,7 @@ export class GameScene extends BaseScene {
 		entity.on("addEntity", this.addEntity, this);
 		entity.on("removeEntity", this.removeEntity, this);
 		entity.on("damage", this.damagePlayer, this);
-		entity.on("victory", this.win, this);
+		entity.on("victory", this.onVictory, this);
 	}
 
 	removeEntity(entity: Entity) {
@@ -181,7 +182,7 @@ export class GameScene extends BaseScene {
 	removeMonster(monster: Monster) {
 		this.removeEntity(monster);
 		if (this.entities.length === 0) {
-			this.win();
+			this.onVictory();
 		}
 	}
 
@@ -292,7 +293,7 @@ export class GameScene extends BaseScene {
 		// Reduce player health
 		loopState.health = Math.max(0, loopState.health - damage);
 		if (loopState.health <= 0) {
-			this.lose();
+			this.onGameOver();
 		}
 	}
 
@@ -335,14 +336,17 @@ export class GameScene extends BaseScene {
 		return this.entities.flatMap((entity) => entity.colliders);
 	}
 
-	win() {
+	onVictory() {
 		// Continue to battle if multiple bosses are loaded
 		this.activeBossCount -= 1;
 		if (this.activeBossCount > 0) return;
 
 		this.loopDrawer.setEnabled(false);
 		this.music.stop();
-		this.sound.play("u_level_enter", { volume: 0.4 });
+		this.sound.play("victory", { volume: 0.4 });
+		this.sound.play("machinegun", { volume: 0.6, rate: 0.2 });
+
+		this.flash(4000, 0xffffff, 1.0);
 
 		// Check level for pearl rewards (allow only one reward)
 		let pearlReward: PearlElement = PearlElement.None;
@@ -359,29 +363,63 @@ export class GameScene extends BaseScene {
 
 		// Pearl reward ending
 		if (pearlReward != PearlElement.None) {
-			this.addEvent(1500, () => {
+			this.addEvent(3000, () => {
 				// Save pearl in state
 				pearlState.acquiredPearls[pearlReward] = true;
 				pearlState.currentPearl = PearlTypes[pearlReward];
 				this.pearl.setPearlType(PearlTypes[pearlReward]);
 
 				this.animatePearlReward();
-
-				this.goToWorldHub(4000);
 			});
+
+			this.goToWorldHub(8000);
 		}
 		// Normal ending
 		else {
-			this.goToWorldHub(2500);
+			this.goToWorldHub(5000);
 		}
 	}
 
-	lose() {
+	onGameOver() {
 		this.loopDrawer.setEnabled(false);
 		this.music.stop();
-		this.sound.play("u_level_enter", { volume: 0.4 });
+		this.sound.play("game_over", { volume: 0.4 });
+		this.sound.play("machinegun", { volume: 0.6, rate: 0.2 });
 
-		this.goToWorldHub(2500);
+		this.flash(4000, 0xffffff, 1.0);
+		this.cameras.main.setPostPipeline(GrayScalePostFilter);
+
+		// Animate black fade
+		let black = this.add.rectangle(0, 0, this.W, this.H, 0).setOrigin(0);
+		black.setDepth(150);
+		this.tweens.add({
+			targets: black,
+			alpha: { from: 0, to: 0.3 },
+			duration: 5000,
+		});
+
+		// Animate text
+		let text = this.addText({
+			x: this.CX,
+			y: this.CY,
+			text: "Game Over",
+			size: 96,
+			color: "white",
+		});
+		text.setOrigin(0.5);
+		text.setStroke("black", 16);
+		text.setDepth(150);
+		text.setScale(0);
+		this.tweens.add({
+			targets: text,
+			scaleX: 1,
+			scaleY: 1,
+			ease: "Back.Out",
+			duration: 4000,
+			delay: 2000,
+		});
+
+		this.goToWorldHub(8000);
 	}
 
 	goToWorldHub(delay: number) {

@@ -111,7 +111,7 @@ export class WorldScene extends BaseScene {
 
 		// Set volume to 0 so that animations may continue
 		this.music.setVolume(0);
-		this.sound.play("h_map_select", { volume: 0.2 });
+		this.sound.play("h_map_select", { volume: 0.25 });
 
 		// Flash the screen and start the level
 		this.flash(1000, 0xffffff, 0.3);

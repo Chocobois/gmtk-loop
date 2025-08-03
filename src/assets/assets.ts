@@ -147,6 +147,8 @@ const audios: Audio[] = [
 	music("map", "m_map"),
 
 	sound("machinegun", "machinegun", 0.5),
+	sound("game_over", "game_over", 0.5),
+	sound("victory", "victory", 0.5),
 
 	sound("tree/rustle", "t_rustle", 0.5),
 	sound("drawing/sine", "d_sine", 0.3),
