@@ -60,7 +60,8 @@ export class Monster extends Entity {
 	protected multipliers: number[] = [1,0.5,3];
 	protected curState: number = 0;
 	protected fTimer: number[] = [0,0,0];
-	protected stunTime: number = 0;
+	protected stunTime: number = -250;
+	protected stunOverflow: number = -250;
 	public stunImmune: boolean = false;
 
 	constructor(scene: GameScene, x: number, y: number, spr: string = "sansplane") {
@@ -99,13 +100,15 @@ export class Monster extends Entity {
 		this.updateGFX(time,delta);
 		const squish = 1.0 + 0.02 * Math.sin((6 * time) / 1000);
 		this.setScale(1.0, squish);
-		if(this.stunTime > 0){
+		if(this.stunTime > this.stunOverflow){
 			this.stunTime -= delta;
-			if(this.stunTime <= 0){
-				this.stunTime = 0;
+			if(this.stunTime <= this.stunOverflow){
+				this.stunTime = this.stunOverflow;
 			}
-			console.log("stunned for " + this.stunTime);
-			return;
+			if(this.stunTime > 0){
+				return;
+			}
+			//console.log("stunned for " + this.stunTime);
 		}
 		if(this.accel.x != 0 || this.accel.y != 0){
 			this.velocity.x += this.accel.x*delta/1000;
