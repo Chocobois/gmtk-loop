@@ -171,6 +171,11 @@ export class GameScene extends BaseScene {
 			this.addEntity(abra);
 		}
 
+		if (monsterList.includes("badger")) {
+			const abra = new Badger(this, 960, 540);
+			this.addEntity(abra);
+		}
+
 		if (this.entities.length === 0) {
 			console.warn("No monsters were loaded for the given monsterList.");
 		}

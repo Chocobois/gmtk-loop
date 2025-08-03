@@ -84,7 +84,7 @@ export const levels = [
 		y: 627,
 		title: "Frassle",
 		key: "badger",
-		require: ["arba", "lycante"],
+		require: ["arba", "wolf"],
 		enemy: "badger",
 		background: "background_ice",
 		music: "m_fight",
