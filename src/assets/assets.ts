@@ -200,6 +200,15 @@ const audios: Audio[] = [
 
 	sound("hub/map_select", "h_map_select"),
 	sound("hub/map_select_evil", "h_map_select_multiple"),
+
+	// Todo: play extra hitsounds based on what pearl is equipped
+	sound("pearl/pearl_fire", "p_fire"),
+	sound("pearl/pearl_coil", "p_coil"),
+	sound("pearl/pearl_psychic", "p_psychic"),
+	sound("pearl/pearl_rock", "p_rock"),
+	sound("pearl/pearl_water", "p_water"),
+
+	sound("enemy/hurt", "e_hit_generic"),
 ];
 
 /* Fonts */

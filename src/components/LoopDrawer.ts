@@ -8,7 +8,6 @@ import { PearlElement } from "./pearls/PearlElement";
 const SFX_FADE_OUT_DURATION = 100; //ms
 const SFX_SMOOTHING_WINDOW_SIZE = 500; //ms
 const SFX_TIMEOUT = 60; //ms
-const SFX_PAN_INTENSITY = 0.3; // 30%
 
 enum InputFlipMode {
 	NORMAL,
@@ -44,6 +43,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 	public muted: boolean = false;
 	public sfxMaxVolume: number = 1;
+	public sfxPanIntensity = 0.3; // 30%
 	private sfxLoop: Phaser.Sound.WebAudioSound;
 	private sfxTween: Phaser.Tweens.Tween;
 	private cursorTween: Phaser.Tweens.Tween;
@@ -145,7 +145,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 		if (!this.muted)
 			this.scene.sound.play("d_tap", {
-				pan: SFX_PAN_INTENSITY * this.scene.getPan(pointerX),
+				pan: this.sfxPanIntensity * this.scene.getPan(pointerX),
 			});
 	}
 
@@ -238,7 +238,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		this.sfxTween.stop(); // Cancel SFX fade-out
 		if (!this.sfxLoop.isPlaying) this.sfxLoop.play();
 
-		this.sfxLoop.setPan(SFX_PAN_INTENSITY * this.scene.getPan(pointerX, true));
+		this.sfxLoop.setPan(this.sfxPanIntensity * this.scene.getPan(pointerX, true));
 
 		// Dynamic sound playing rate (pitch)
 		const minRate = 0.2;
@@ -285,7 +285,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		if (!this.muted && !this.lineBroken) {
 			const { pointerX } = this.getPointer(pointer);
 			this.scene.sound.play("d_raise", {
-				pan: SFX_PAN_INTENSITY * this.scene.getPan(pointerX),
+				pan: this.sfxPanIntensity * this.scene.getPan(pointerX),
 			});
 		}
 
@@ -320,7 +320,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 						if (!this.muted)
 							this.scene.sound.play("d_break", {
 								volume: 0.4,
-								pan: SFX_PAN_INTENSITY * this.scene.getPan(collider.x),
+								pan: this.sfxPanIntensity * this.scene.getPan(collider.x),
 							});
 
 						this.lineBroken = true;
