@@ -183,11 +183,20 @@ const audios: Audio[] = [
 	sound("drawing/tap", "d_tap"),
 	sound("drawing/break", "d_break"),
 
+	sound("drawing/combo1", "d_combo_1"),
+	sound("drawing/combo2", "d_combo_2"),
+	sound("drawing/combo3", "d_combo_3"),
+	sound("drawing/combo4", "d_combo_4"),
+	sound("drawing/combo5", "d_combo_5"),
+	sound("drawing/combo6", "d_combo_6"),
+	sound("drawing/combo7", "d_combo_7"),
+
 	sound("ui/screen_transition", "u_level_enter"),
 	sound("ui/what", "u_question"),
 	sound("ui/disabled", "u_disabled"),
 
 	sound("hub/map_select", "h_map_select"),
+	sound("hub/map_select_evil", "h_map_select_multiple"),
 ];
 
 /* Fonts */

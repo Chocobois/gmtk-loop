@@ -21,7 +21,7 @@ export class WorldScene extends BaseScene {
 	private music: Music;
 
 	// Special case in case two levels are selected
-	private levelIsStarting: boolean;
+	private levelIsStarting: boolean = false;
 	private queuedLevels: LevelDefinition[];
 
 	constructor() {
@@ -111,7 +111,10 @@ export class WorldScene extends BaseScene {
 
 		// Set volume to 0 so that animations may continue
 		this.music.setVolume(0);
-		this.sound.play("h_map_select", { volume: 0.2 });
+		this.addEvent(5, () => {
+			const key = "h_map_select" + (this.queuedLevels.length < 2 ? "" : "_multiple");
+			this.sound.play(key, { volume: 0.2 });
+		});
 
 		// Flash the screen and start the level
 		this.flash(1000, 0xffffff, 0.3);
@@ -184,20 +187,32 @@ export class WorldScene extends BaseScene {
 			return;
 		}
 
+		const midpoint = new Phaser.Math.Vector2(
+			Phaser.Math.Average(selectedEntities.map((e) => e.x)),
+			Phaser.Math.Average(selectedEntities.map((e) => e.y))
+		);
+
 		// If all selected entities are level hubs, then start the levels simultaneously
 		if (
 			selectedEntities.length > 0 &&
 			selectedEntities.every((e) => e instanceof HubLevel && e.levelData.enemy)
 		) {
-			if (selectedEntities.length > 1) {
-				// Add some other sound here, Mato
-			}
 
-			selectedEntities.forEach((e) => e.onLoop());
+			selectedEntities.forEach((e) => {
+				e.onLoop();
+				this.tweens.add({
+					targets: e,
+					x: midpoint.x,
+					y: midpoint.y,
+					duration: 1100,
+					ease: "Quad.In",
+				})
+			});
 			return;
 		}
+
 		// Easter eggs when selecting multiple non-levels at once
-		else {
+		else if (selectedEntities.length > 1) {
 			selectedEntities.forEach((e, i) => {
 				if (i == 0) return;
 				this.sound.play("u_question", {
@@ -206,11 +221,6 @@ export class WorldScene extends BaseScene {
 					rate: 1 + 0.25 * (i - 1),
 				});
 			});
-
-			const midpoint = new Phaser.Math.Vector2(
-				Phaser.Math.Average(selectedEntities.map((e) => e.x)),
-				Phaser.Math.Average(selectedEntities.map((e) => e.y))
-			);
 
 			const questionMark = this.add.sprite(midpoint.x, midpoint.y, "question");
 			questionMark.setScale(0.35);
