@@ -4,10 +4,6 @@ import { image, sound, music, loadFont, spritesheet } from "./util";
 /* Images */
 const images: Image[] = [
 	// Backgrounds
-	image("backgrounds/background", "background"),
-	image("backgrounds/bz", "bz"),
-
-	// Biomes, combat background
 	image("backgrounds/battlefloor/grassyplains", "background_plains_0"),
 	image("backgrounds/battlefloor/grassyplains_alt1", "background_plains_1"),
 	image("backgrounds/battlefloor/grassyplains_alt2", "background_plains_2"),
@@ -29,9 +25,8 @@ const images: Image[] = [
 	image("pearls/electric", "pearl_electric"),
 
 
-	// Characters
-	image("characters/player", "player"),
-	image("characters/enemy_1", "enemy_1"),
+	// Sans
+	image("characters/sans/enemy_1", "enemy_1"),	
 	image("characters/runes/r0", "r0"),
 	image("characters/runes/r1", "r1"),
 	image("characters/runes/r2", "r2"),
@@ -42,21 +37,29 @@ const images: Image[] = [
 	image("characters/runes/r7", "r7"),
 	image("characters/runes/r8", "r8"),
 	image("characters/runes/r9", "r9"),
-	image("characters/snailenemy", "escargot"),
-	image("characters/iceberg", "iceberg"),
-	image("characters/c1", "c1"),
-	image("characters/c2", "c2"),
-	image("characters/c3", "c3"),
-	image("characters/c4", "c4"),
 
+	// Snail
+	image("characters/snail/snailenemy", "escargot"),
+
+	// Wolf
+	image("characters/wolf/wolf", "wolf"),
+	image("characters/wolf/iceberg", "iceberg"),
+	image("characters/wolf/c1", "c1"),
+	image("characters/wolf/c2", "c2"),
+	image("characters/wolf/c3", "c3"),
+	image("characters/wolf/c4", "c4"),
+
+	// Snake
 	image("characters/snake/snake", "snake"),
 
+	// Mole
 	image("characters/mole/boss_1", "mole_boss_1"),
 	image("characters/mole/boss_2", "mole_boss_2"),
 	image("characters/mole/fake_1", "mole_fake_1"),
 	image("characters/mole/fake_2", "mole_fake_2"),
 	image("characters/mole/dirt", "mole_dirt"),
 
+	// Jester
 	image("characters/jester/idle", "jester_idle"),
 	image("characters/jester/charge", "jester_charge"),
 	image("characters/jester/attack", "jester_attack"),
@@ -66,34 +69,24 @@ const images: Image[] = [
 	image("characters/jester/card_club", "jester_card_club"),
 	image("characters/jester/card_spade", "jester_card_spade"),
 
+	// Abra
 	image("characters/abra/idle", "abra_idle"),
 	image("characters/abra/active", "abra_active"),
 	image("characters/abra/hurt", "abra_hurt"),
 
-	// Monsters
-	// Planning on making monsters a 1 file spritesheet
-
-	image("characters/enemy/placeholder_enemy", "enemy_placeholder"),
-	// Attacks
-	image("characters/hazards/placeholder_attack", "projectile_placeholder"),
-	// Hazards (spritesheets 512px * Y (how many frames))
-	image("characters/hazards/placeholder_hazard", "hazard_placeholder"),
-
 	// Items
-	image("items/coin", "coin"),
 	image("items/pbullet", "pbullet"),
-	image("items/spellback", "spellback"),
-	image("items/spellhighlight", "spellhighlight"),
+	// image("items/spellback", "spellback"),
+	// image("items/spellhighlight", "spellhighlight"),
 
 	// UI
-	image("ui/hud", "hud"),
 	image("ui/cursor", "cursor"),
 	image("ui/lose", "lose"),
 	image("ui/win", "win"),
 	image("ui/question", "question"),
 
 	// World hub
-	image("hub/level", "hub_level"),
+	image("worldhub/level", "hub_level"),
 
 	// Titlescreen
 	image("titlescreen/sky", "title_sky"),
@@ -108,9 +101,9 @@ const images: Image[] = [
 
 /* Spritesheets */
 const spritesheets: SpriteSheet[] = [
-	spritesheet("characters/sansplane", "sansplane", 256, 196),
-	spritesheet("characters/snail", "snail", 256, 256),
-	spritesheet("characters/wolf", "wolf", 256, 256),
+	spritesheet("characters/sans/sansplane", "sansplane", 256, 196),
+	spritesheet("characters/snail/snail", "snail", 256, 256),
+	// spritesheet("characters/wolf_old", "wolf", 256, 256),
 	spritesheet("effects/boom", "boom", 512, 512),
 
 	// Particles
@@ -129,13 +122,14 @@ const audios: Audio[] = [
 	music("fight", "m_fight"),
 	music("map", "m_map"),
 
+	sound("machinegun", "machinegun", 0.5),
+
 	sound("tree/rustle", "t_rustle", 0.5),
 	sound("drawing/sine", "d_sine", 0.3),
 	sound("drawing/brush", "d_brush"),
 	sound("drawing/raise", "d_raise"),
 	sound("drawing/tap", "d_tap"),
 	sound("drawing/break", "d_break"),
-	sound("tree/machinegun", "machinegun", 0.5),
 
 	sound("ui/screen_transition", "u_level_enter"),
 	sound("ui/what", "u_question"),
