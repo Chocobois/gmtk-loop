@@ -22,6 +22,7 @@ const ROCK_ARMOR_DURATION = 200; // Milliseconds of invulnerability
 
 export class LoopDrawer extends Phaser.GameObjects.Container {
 	public scene: BaseScene;
+	public combo: number = 0;
 
 	public loopColor: number = 0xffffff;
 	public lineColor: number = 0xffffff;
@@ -288,6 +289,12 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 			});
 		}
 
+		// Combo lost when releasing (rest of the logic in onLineBreak -> resetCombo)
+		if (this.combo > 2) this.scene.sound.play("d_combo_lost", {
+			volume: 0.2,
+			delay: 0.2, //seconds
+		});
+
 		this.lineBroken = false;
 		this.onLineBreak();
 	}
@@ -347,6 +354,7 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		this.pointTimes = [];
 		this.graphics.clear();
 		this.sfxStop();
+		this.resetCombo();
 	}
 
 	addLoopGraphic(points: Phaser.Math.Vector2[]) {
@@ -529,6 +537,21 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	resetInputFlipMode() {
 		this.inputFlipMode = InputFlipMode.NORMAL;
 		this.onLineBreak();
+	}
+
+	incrementCombo(playSound: boolean = true) {
+		if (playSound && this.combo >= 1) {
+			const soundIndex = Math.min(this.combo, 7);
+			this.scene.sound.play(`d_combo_${soundIndex}`, { volume: 0.3 });
+		}
+
+		this.combo++;
+		return this.combo;
+	}
+
+	resetCombo() {
+		this.combo = 0;
+		return this.combo;
 	}
 
 	get lineSegments(): Phaser.Geom.Line[] {
