@@ -163,8 +163,9 @@ export class WorldScene extends BaseScene {
 			selectedEntities.forEach((e) => e.onLoop());
 			return;
 		}
+
 		// Easter eggs when selecting multiple non-levels at once
-		else {
+		else if (selectedEntities.length > 1) {
 			selectedEntities.forEach((e, i) => {
 				if (i == 0) return;
 				this.sound.play("u_question", {
