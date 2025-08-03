@@ -34,6 +34,7 @@ export class MoleFake extends MoleBase {
 
 		this.sprite.play("mole_fake_damage");
 		this.explosionEffect.play(this.x, this.y);
+		this.scene.sound.play("e_boom", {volume: 0.5});
 		this.emit("damage", 40);
 	}
 }

@@ -220,6 +220,7 @@ const audios: Audio[] = [
 	sound("enemy/hurt", "e_hit_generic"),
 	sound("enemy/snail_shell", "e_snail_shell"),
 	sound("enemy/gaster", "e_gaster"),
+	sound("enemy/boom", "e_boom"),
 	sound("tele", "tele"),
 ];
 
