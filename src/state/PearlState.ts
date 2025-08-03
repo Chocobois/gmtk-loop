@@ -15,11 +15,11 @@ export class PearlState {
 		// TODO: Save and load to localStorage
 		this.acquiredPearls = {
 			[PearlElement.None]: true,
-			[PearlElement.Coil]: false,
-			[PearlElement.Fire]: false,
-			[PearlElement.Psychic]: false,
-			[PearlElement.Rock]: false,
-			[PearlElement.Water]: false,
+			[PearlElement.Coil]: !!localStorage.getItem(PearlElement.Coil.toString()),
+			[PearlElement.Fire]: !!localStorage.getItem(PearlElement.Fire.toString()),
+			[PearlElement.Psychic]: !!localStorage.getItem(PearlElement.Psychic.toString()),
+			[PearlElement.Rock]: !!localStorage.getItem(PearlElement.Rock.toString()),
+			[PearlElement.Water]: !!localStorage.getItem(PearlElement.Water.toString()),
 		};
 
 		makeAutoObservable(this);
