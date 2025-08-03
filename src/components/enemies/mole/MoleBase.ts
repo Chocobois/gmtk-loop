@@ -9,8 +9,6 @@ export enum MoleState {
 
 // Shared Mole functionality between MoleBoss and MoleFake
 export class MoleBase extends BaseMonster {
-	public scene: GameScene;
-
 	protected moleState: MoleState;
 	protected stateTimer: Phaser.Time.TimerEvent;
 
@@ -22,7 +20,6 @@ export class MoleBase extends BaseMonster {
 	constructor(scene: GameScene, x: number, y: number) {
 		super(scene, x, y);
 		scene.add.existing(this);
-		this.scene = scene;
 		this.hideValue = 1;
 
 		this.sprite = scene.add.sprite(0, 0, "mole_boss_1");
@@ -88,6 +85,8 @@ export class MoleBase extends BaseMonster {
 	}
 
 	update(time: number, delta: number) {
+		super.update(time, delta);
+
 		const wobble = this.moleState == MoleState.DEAD ? 0 : 0.04;
 		const squish = 1.0 + wobble * Math.sin((8 * time) / 1000);
 		this.sprite.setScale(2 - squish, squish);
@@ -103,6 +102,7 @@ export class MoleBase extends BaseMonster {
 	}
 
 	onLoop() {
+		super.onLoop();
 		this.animateShake(this.sprite);
 	}
 
