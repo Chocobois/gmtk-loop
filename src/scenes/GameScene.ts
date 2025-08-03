@@ -17,6 +17,9 @@ import { AbraBoss } from "@/components/enemies/abra/AbraBoss";
 
 import BendWaves from "@/pipelines/BendWavesPostFX";
 import { Wolf } from "@/components/enemies/wolf/Wolf";
+import { Pearl } from "@/components/pearls/Pearl";
+import { pearlState } from "@/state/PearlState";
+import { PearlElement } from "@/components/pearls/PearlElement";
 
 export class GameScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -71,7 +74,11 @@ export class GameScene extends BaseScene {
 		this.debugGraphics = this.add.graphics();
 		this.debugGraphics.setVisible(false);
 
+		/* UI */
+
 		this.ui = new UI(this);
+
+		this.setupPearlUI();
 
 		this.initGraphics();
 
@@ -176,6 +183,7 @@ export class GameScene extends BaseScene {
 		this.entityLayer.setDepth(19);
 		this.textParticles.setDepth(30);
 		this.debugGraphics.setDepth(100);
+		this.ui.setDepth(200);
 		this.loopDrawer.setDepth(1000);
 
 		this.indicators = new EffectTracker(this, 0, 0);
@@ -189,6 +197,22 @@ export class GameScene extends BaseScene {
 		this.hitEffects = new EffectTracker(this, 0, 0);
 		this.add.existing(this.hitEffects);
 		this.hitEffects.setDepth(16);
+	}
+
+	// Purely visual Pearl entity to show what pearl is in use
+	setupPearlUI() {
+		if (pearlState.currentPearl.element == PearlElement.None) {
+			return;
+		}
+
+		const pearl = new Pearl(
+			this,
+			this.W - 100,
+			this.H - 100,
+			pearlState.currentPearl
+		);
+		pearl.setScale(0.8);
+		pearl.setDepth(200);
 	}
 
 	update(time: number, delta: number) {

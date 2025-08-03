@@ -4,6 +4,7 @@ import { GrayScalePostFilter } from "@/pipelines/GrayScalePostFilter";
 import { BlurPostFilter } from "@/pipelines/BlurPostFilter";
 import BendWaves from "@/pipelines/BendWavesPostFX";
 import { title, version } from "@/version.json";
+import { levels } from "@/components/WorldHub/Levels";
 
 export class PreloadScene extends BaseScene {
 	constructor() {
@@ -75,8 +76,8 @@ export class PreloadScene extends BaseScene {
 		this.fade(true, 100, 0x000000);
 		this.addEvent(100, () => {
 			// this.scene.start("TitleScene");
-			// this.scene.start("GameScene");
 			this.scene.start("WorldScene");
+			// this.scene.start("GameScene", levels[1]);
 		});
 	}
 }

@@ -81,9 +81,13 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		});
 
 		autorun(() => {
-			console.log("New color");
-			this.loopColor = pearlState.pearlLoopColor;
-			this.lineColor = pearlState.pearlLineColor;
+			if (!this.scene) {
+				console.warn("LoopDrawer `autorun` bug");
+				return;
+			}
+
+			this.loopColor = pearlState.currentPearl.loopColor;
+			this.lineColor = pearlState.currentPearl.lineColor;
 		});
 	}
 

@@ -1,14 +1,20 @@
 import { BaseScene } from "@/scenes/BaseScene";
 import { LoopDrawer } from "@/components/LoopDrawer";
-import { Pearl, PearlType, PearlTypes } from "@/components/pearls/Pearl";
 import { Entity } from "@/components/Entity";
+import { PearlType, PearlTypes } from "@/components/pearls/PearlTypes";
 import { pearlState } from "@/state/PearlState";
+import { Pearl } from "@/components/pearls/Pearl";
+import { PearlElement } from "@/components/pearls/PearlElement";
+import { HubLevel } from "@/components/WorldHub/HubLevel";
 
 export class ShopScene extends BaseScene {
+	public loopDrawer: LoopDrawer;
+
 	private background: Phaser.GameObjects.Image;
 	private entityLayer: Phaser.GameObjects.Container;
-    private entities: Entity[];
-	public loopDrawer: LoopDrawer;
+	private entities: Entity[];
+	private pearls: Pearl[];
+	private backButton: HubLevel;
 
 	constructor() {
 		super({ key: "ShopScene" });
@@ -16,19 +22,23 @@ export class ShopScene extends BaseScene {
 
 	create(): void {
 		this.entities = [];
+		this.pearls = [];
 		this.initGraphics();
 
-		// Temporary
-		let text = this.addText({
-			text: "Return to map",
-			size: 48,
-			color: "white",
+		// Back button
+		this.backButton = new HubLevel(this, {
+			x: 200,
+			y: this.H - 200,
+			title: "Back",
+			key: "",
+			require: [],
+			enemy: "",
+			background: "",
+			music: "m_fight",
 		});
-		
-		text.setInteractive().on("pointerdown", () => {
-			this.loopDrawer.setEnabled(false);
-			this.scene.start("WorldScene");
-		})
+		this.backButton.setImageScale(1.2);
+		this.entities.push(this.backButton);
+		this.backButton.on("selected", this.loadWorldHub, this);
 	}
 
 	initGraphics() {
@@ -39,18 +49,35 @@ export class ShopScene extends BaseScene {
 		this.loopDrawer.setDepth(1000);
 		this.loopDrawer.on("loop", this.onLoop, this);
 
-        for(const [_, pearlDescriptor] of Object.entries(PearlTypes)) {
-            const pearl = new Pearl(this, pearlDescriptor);
-            this.entities.push(pearl);
-            pearl.on("selected", (pearl: PearlType) => {
-				pearlState.pearlLineColor = pearl.lineColor
+		for (const [_, pearlType] of Object.entries(PearlTypes)) {
+			if (pearlType.element == PearlElement.None) continue;
+			if (!pearlState.acquiredPearls[pearlType.element]) continue;
+
+			const x = pearlType.shopX;
+			const y = pearlType.shopY;
+			const pearl = new Pearl(this, x, y, pearlType);
+			this.entities.push(pearl);
+			this.pearls.push(pearl);
+			pearl.on("selected", (pearlType: PearlType) => {
+				// Select pearl if not in use
+				if (pearlState.currentPearl.element != pearlType.element) {
+					pearlState.currentPearl = pearlType;
+				}
+				// Unequip pearl if already in use
+				else {
+					pearlState.currentPearl = PearlTypes[PearlElement.None];
+				}
+				this.refreshPearls();
 			});
-        }
+		}
+
+		this.refreshPearls();
 	}
 
 	update(time: number, delta: number) {
-
 		this.loopDrawer.update(time, delta);
+
+		this.pearls.forEach((pearl) => pearl.update(time, delta));
 
 		// Camera shake
 		if (this.cameraShakeValue > 0)
@@ -58,17 +85,40 @@ export class ShopScene extends BaseScene {
 		else this.cameras.main.x = 0;
 	}
 
-
 	addToEntityLayer(p: Phaser.GameObjects.Container) {
 		this.entityLayer.add(p);
 	}
 
+	refreshPearls() {
+		this.pearls.forEach((pearl) => {
+			pearl.setHighlight(pearl.element == pearlState.currentPearl.element);
+		});
+	}
+
 	onLoop(polygon: Phaser.Geom.Polygon) {
-        const selectedEntities = this.entities.filter((entity) =>
+		const selectedEntities = this.entities.filter((entity) =>
 			Phaser.Geom.Polygon.Contains(polygon, entity.x, entity.y)
 		);
+
+		// Select pearl
 		if (selectedEntities.length === 1) {
 			selectedEntities[0].onLoop();
 		}
+		// Prevent multiple pearls from being selected
+		else if (selectedEntities.length > 1) {
+			selectedEntities.forEach((entity) => {
+				if (entity instanceof Pearl) {
+					(entity as Pearl).shake();
+				}
+			});
+		}
+	}
+
+	loadWorldHub() {
+		this.loopDrawer.setEnabled(false);
+		this.fade(true, 100, 0x000000);
+		this.addEvent(100, () => {
+			this.scene.start("WorldScene");
+		});
 	}
 }
