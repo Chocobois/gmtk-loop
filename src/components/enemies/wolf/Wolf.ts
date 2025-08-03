@@ -13,6 +13,7 @@ export class Wolf extends Monster{
 		super(scene, x, y, spr);
         this.stateHP = [5,10,10];
         this.behavior = new MonsterScriptHandler(this,"wolfidle");
+        this.stunOverflow = -1000;
 	}
 
     spawnIce(){
