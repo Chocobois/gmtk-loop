@@ -3,15 +3,23 @@ import { Music } from "@/components/Music";
 
 import { title, version } from "@/version.json";
 
-const creditsLeft = `Please
-Someone
-Write
-This`;
+const creditsLeft = `@Golenchu
+@LuxxArt
+@MatoCookies
+Lumie
+@ArcticFqx
+@Dreedawott
+@lmosteverywhere
+@WilonWuff`;
 
-const creditsRight = `I
-Didn't
-Keep
-Track`;
+const creditsRight = `art & code
+art
+music & code
+code
+code
+code
+music
+art & game design`;
 
 const pos = {
 	loop: new Phaser.Geom.Point(1450, 500),
@@ -101,7 +109,7 @@ export class TitleScene extends BaseScene {
 		this.credits.setAlpha(0);
 
 		let credits1 = this.addText({
-			x: 0.70 * this.W,
+			x: 0.60 * this.W,
 			y: 0.02 * this.H,
 			size: 35,
 			color: "#fff398",
@@ -114,7 +122,7 @@ export class TitleScene extends BaseScene {
 		this.credits.add(credits1);
 
 		let credits2 = this.addText({
-			x: 0.86 * this.W,
+			x: 0.82 * this.W,
 			y: 0.02 * this.H,
 			size: 35,
 			color: "#a8f7ff",
