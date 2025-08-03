@@ -9,6 +9,7 @@ import { Pearl } from "@/components/pearls/Pearl";
 import { PearlTypes } from "@/components/pearls/PearlTypes";
 import { pearlState } from "@/state/PearlState";
 import { PearlElement } from "@/components/pearls/PearlElement";
+import { ColorStr } from "@/util/colors";
 
 export class WorldScene extends BaseScene {
 	private background: Phaser.GameObjects.Image;
@@ -48,9 +49,10 @@ export class WorldScene extends BaseScene {
 			y: this.H - 80,
 			text: "Draw a loop to select a level",
 			size: 48,
+			color: ColorStr.Amber600,
 		});
 		sampleText.setOrigin(0.5);
-		sampleText.setStroke("white", 32);
+		sampleText.setStroke("white", 15);
 
 		// Create the hub icons for each level
 		this.hubs = [];

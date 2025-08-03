@@ -59,7 +59,7 @@ export const levels = [
 	},
 	{
 		x: 1485,
-		y: 326,
+		y: 306,
 		title: "Arba",
 		key: "arba",
 		require: ["noctua", "lycante"],
@@ -70,7 +70,7 @@ export const levels = [
 	},
 	{
 		x: 1216,
-		y: 607,
+		y: 597,
 		title: "Lycante",
 		key: "lycante",
 		require: ["jester", "moler"],
@@ -81,7 +81,7 @@ export const levels = [
 	},
 	{
 		x: 1576,
-		y: 647,
+		y: 627,
 		title: "Frassle",
 		key: "badger",
 		require: ["arba", "lycante"],
