@@ -9,6 +9,7 @@ export class TreadEffect extends Effect{
     public spr: Phaser.GameObjects.Sprite;
     public dir: number = 1;
     private owner: Zamboni;
+    protected follow: boolean = true;
     constructor(scene:BaseScene,x:number,y:number,owner:Zamboni,direction: number){
         super(scene,x,y);
         this.spr = this.scene.add.sprite(0,0,"tread");
@@ -35,17 +36,27 @@ export class TreadEffect extends Effect{
             return;
         }
         if(this.owner != null){
+
             if(this.fade <= 0){
-                if(this.owner.treading){
+                if(this.owner.treading && this.follow){
+                    //console.log("treading " + this.owner.treading + " " + this.x + ", " + this.y + ", " + this.follow);
                     this.end = [this.owner.x, this.owner.y];
-                    this.spr.setScale(this.dir*(this.end[0]-this.begin[0])/320,1);
+                    this.x = this.owner.x;
+                    this.y = this.owner.y;
+                    this.spr.setScale(this.dir*Math.abs(this.end[0]-this.begin[0])/320,1);
                 } else {
-                    this.spr.setScale(this.dir*(this.end[0]-this.begin[0])/320,1);
+                    this.spr.setScale(this.dir*Math.abs(this.end[0]-this.begin[0])/320,1);
                     this.fade = 2000;
                 }
+                if(this.owner.exploded){
+                    this.follow = false;
+                    this.fade = 2000;
+    
+                }
             }
+            
         } else if (this.fade <= 0){
-            this.spr.setScale(this.dir*(this.end[0]-this.begin[0])/320,1);
+            this.spr.setScale(this.dir*Math.abs(this.end[0]-this.begin[0])/320,1);
             this.fade = 2000;
         }
     }

@@ -12,13 +12,14 @@ export class Zamboni extends Monster {
     protected hp: number = 300;
     protected spark: SparkEffect;
     protected invuln: boolean = false;
-    protected spacing: number = 340;
+    protected spacing: number = 240;
     protected zdir: number = 0;
     protected vdir: number = 0;
     public treading: boolean = true;
     protected circling: number = 0;
-    protected exploded: boolean = false;
+    public exploded: boolean = false;
     protected etimer: number = 2000;
+
 
 	constructor(scene: GameScene, x: number, y: number, spr: string = "zamboni") {
 		super(scene, x, y, spr);
@@ -34,7 +35,7 @@ export class Zamboni extends Monster {
         stateHP: [9999,9999,9999];
         this.behavior = new MonsterScriptHandler(this,"inanimate");
         this.captureDisp.disable();
-        this.treading = false;
+        //this.treading = false;
         if(this.y >= 540) {
             this.vdir = -1;
         } else {this.vdir = 1;}
@@ -56,28 +57,28 @@ export class Zamboni extends Monster {
             this.die();
         }
 		if (this.x < (this.border.left-320)) {
-			if(this.treading) {
+			if(this.treading && !this.exploded) {
                 this.treading = false;
                 this.y += this.spacing*this.vdir;
                 this.zdir *= -1;
                 this.sprite.setScale(this.zdir,1);
-                this.circling = 1000;
+                this.circling = 3000;
             }
-		} else {
+		} else if (this.x < (this.border.right+320)){
             if(!this.treading) {
                 this.scene.pushHitEffect(new TreadEffect(this.scene,this.x,this.y,this,this.zdir));
                 this.treading = true;
             }
         }
 		if (this.x > (this.border.right+320)) {
-            if(this.treading) {
+            if(this.treading && !this.exploded) {
                 this.treading = false;
                 this.y += this.spacing*this.vdir;
                 this.zdir *= -1;
                 this.sprite.setScale(this.zdir,1);
-                this.circling = 1000;
+                this.circling = 3000;
             }
-		} else {
+		} else if (this.x > (this.border.left-320)){
             if(!this.treading) {
                 this.scene.pushHitEffect(new TreadEffect(this.scene,this.x,this.y,this,this.zdir));
                 this.treading = true;
@@ -105,7 +106,9 @@ export class Zamboni extends Monster {
                     this.deleteFlag = true;
                 }
             }
+            return;
         }
+        this.sprite.setOrigin(0.5+0.05*(Math.sin(time)/250),0.5+0.05*(Math.cos(time+325)/250));
         if(this.circling > 0){
             this.circling -= delta;
             return;
@@ -155,6 +158,9 @@ export class Zamboni extends Monster {
         this.scene.pushHitEffect(new BasicEffect(this.scene,"boom2",this.x,this.y,6,75,false,0,0));
         this.sprite.setFrame(1);
         this.exploded = true;
+        this.treading = false;
+        this.velocity.x = 0;
+        this.velocity.y = 0;
     }
 
     damage(amount: number) {

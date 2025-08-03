@@ -15,7 +15,7 @@ export class Badger extends Monster{
     constructor(scene: GameScene, x: number, y: number, spr: string = "badger_idle_1") {
 		super(scene, x, y, spr);
         this.stateHP = [10,20,10];
-        this.behavior = new MonsterScriptHandler(this,"wolfidle");
+        this.behavior = new MonsterScriptHandler(this,"badgerrage");
         this.stunOverflow = -1000;
 
         this.sprite.setScale(500 / this.sprite.width);
@@ -24,7 +24,7 @@ export class Badger extends Monster{
     spawnZamboni(){
         let xt = 0;
         if(Math.random() < 0.5) {
-            xt = 10;
+            xt = 210;
         } else {
             xt = 1910;
         }

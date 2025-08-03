@@ -71,6 +71,7 @@ export class Snowball extends Monster {
             this.stimer -= d;
             if(this.stimer <= 0) {
                 this.advanceFrame();
+                //console.log("frame advanced");
                 this.stimer = 250;
             }
         }
@@ -80,8 +81,10 @@ export class Snowball extends Monster {
     advanceFrame(){
         if(this.curFrame == 0){
             this.sprite.setFrame(1);
+            this.curFrame = 1;
         } else {
             this.sprite.setFrame(0);
+            this.curFrame = 0;
         }
     }
 
