@@ -38,8 +38,12 @@ export class Wolf extends Monster{
         this.sprite.setAlpha(this.fade);
         this.captureDisp.setAlpha(this.fade);
         if(this.fade <= 0){
-            this.setVisible(false);
-            this.emit("victory");
+            if(!this.rip){
+                this.setVisible(false);
+                this.emit("victory");
+                this.rip = true;
+            }
+
         }
     }
 
