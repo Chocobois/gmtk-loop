@@ -40,6 +40,14 @@ src/neutralino.js
 # Uncompressed music
 *.wav
 
+# Layered artwork
+*.pdn
+*.xcf
+*.mdp
+*.ora
+*.kra
+*.psd
+
 # Misc files
 .cache/
 .firebase/

@@ -1,5 +1,5 @@
 import { BaseScene } from "@/scenes/BaseScene";
-import { LoopDrawer } from "@/components/LoopDrawer";
+import { LoopDrawer, HintTrigger } from "@/components/LoopDrawer";
 import { HubLevel } from "@/components/WorldHub/HubLevel";
 import { levels } from "@/components/WorldHub/Levels";
 import { Entity } from "@/components/Entity";
@@ -16,9 +16,10 @@ export class WorldScene extends BaseScene {
 	private foreground: Phaser.GameObjects.Image;
 	private loopDrawer: LoopDrawer;
 
-	private entities: Entity[];
+	public entities: Entity[];
 	private hubs: HubLevel[];
 	private pearlButton: Pearl;
+	private hintText: Phaser.GameObjects.Text;
 
 	private music: Music;
 
@@ -44,15 +45,19 @@ export class WorldScene extends BaseScene {
 		this.foreground.setOrigin(0.5, 0.5);
 		this.fitToScreen(this.foreground);
 
-		let sampleText = this.addText({
+		this.hintText = this.addText({
 			x: this.CX,
 			y: this.H - 80,
 			text: "Draw a loop to select a level",
 			size: 48,
 			color: ColorStr.Amber600,
 		});
-		sampleText.setOrigin(0.5);
-		sampleText.setStroke("white", 15);
+		this.hintText.setOrigin(0.5);
+		this.hintText.setStroke("white", 15);
+
+		// Hide hint text once we've obtained a few pearls
+		// TODO: Change this to level clear check once that's implemented
+		this.hintText.setVisible(pearlState.unlockedPearlCount < 2);
 
 		// Create the hub icons for each level
 		this.hubs = [];
@@ -77,6 +82,7 @@ export class WorldScene extends BaseScene {
 		this.loopDrawer = new LoopDrawer(this);
 		this.loopDrawer.setDepth(1000);
 		this.loopDrawer.on("loop", this.onLoop, this);
+		this.loopDrawer.on("mapHint", this.onMapHint, this);
 
 		// Music
 		if (!this.music || !this.music.isPlaying) {
@@ -203,10 +209,7 @@ export class WorldScene extends BaseScene {
 			return;
 		}
 
-		const midpoint = new Phaser.Math.Vector2(
-			Phaser.Math.Average(selectedEntities.map((e) => e.x)),
-			Phaser.Math.Average(selectedEntities.map((e) => e.y))
-		);
+		const midpoint = Phaser.Geom.Point.GetCentroid(selectedEntities.map( e => ({x: e.x, y: e.y}) ))
 
 		// If all selected entities are level hubs, then start the levels simultaneously
 		if (
@@ -249,5 +252,17 @@ export class WorldScene extends BaseScene {
 				onComplete: () => questionMark.destroy(),
 			});
 		}
+	}
+
+	onMapHint(ht: HintTrigger) {
+		console.debug("Map hint", ["None","LineBreak","PointerUp","Encircled"][ht.reason], ht);
+		this.tweens.addCounter({
+			duration: 1_600,
+			onUpdate: (tween) => {
+				const x = tween.getValue() || 0;
+				const y = Math.sin(10 * x) * Math.pow(1 - x, 2);
+				this.hintText.setScale(1.0 + 0.2 * y);
+			},
+		});
 	}
 }

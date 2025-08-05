@@ -139,6 +139,7 @@ const images: Image[] = [
 
 	// UI
 	image("ui/cursor.png", "cursor"),
+	image("ui/cursor-hint.png", "cursor_hint"),
 	image("ui/lose.png", "lose"),
 	image("ui/win.png", "win"),
 	image("ui/question.png", "question"),

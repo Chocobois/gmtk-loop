@@ -40,6 +40,12 @@ export class PearlState {
 	get allPearlsUnlocked(): boolean {
 		return Object.values(this.acquiredPearls).every(Boolean);
 	}
+
+	get unlockedPearlCount(): number {
+		return Object.entries(this.acquiredPearls)
+			.filter(([key, value]) => key !== PearlElement.None.toString() && value)
+			.length;
+	}
 }
 
 export const pearlState = new PearlState();

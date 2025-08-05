@@ -5,6 +5,8 @@ import { pearlState } from "@/state/PearlState";
 import { autorun } from "mobx";
 import { PearlElement } from "./pearls/PearlElement";
 import { BurnEffect } from "./particles/BurnEffect";
+import { WorldScene } from '../scenes/WorldScene'; // Only for instaceof checks
+import { Pearl } from "./pearls/Pearl"; // Only for instaceof checks
 
 const SFX_FADE_OUT_DURATION = 100; //ms
 const SFX_SMOOTHING_WINDOW_SIZE = 500; //ms
@@ -35,6 +37,13 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 	private graphics: Phaser.GameObjects.Graphics;
 	private cursor: Phaser.GameObjects.Image;
 	private lineBroken: boolean = false;
+
+	public doHintChecks: boolean = pearlState.unlockedPearlCount < 2;
+	private lastHintReason: HintReason = HintReason.None;
+	private hintGraphics: Phaser.GameObjects.Graphics;
+	private hintCursor: Phaser.GameObjects.Image;
+	private hintDemo: Phaser.Tweens.Tween;
+	public hintDemoActive: boolean = false;
 
 	// Manipulate how pointer x/y input is read. Used in the Jester fight.
 	private inputFlipMode: InputFlipMode;
@@ -70,6 +79,16 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 		this.cursor = scene.add.image(-999, -999, "cursor");
 		this.add(this.cursor);
+
+		if (this.doHintChecks) {
+			this.hintGraphics = scene.add.graphics();
+			this.add(this.hintGraphics);
+			this.hintGraphics.setBelow(this.graphics);
+
+			this.hintCursor = scene.add.image(-999, -999, "cursor_hint");
+			this.add(this.hintCursor);
+			this.hintCursor.setBelow(this.cursor);
+		}
 
 		// Use the `d_sine` key for sound debugging
 		this.sfxLoop = scene.sound.add("d_brush", {
@@ -317,8 +336,56 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 			delay: 0.2, //seconds
 		});
 
+		// Hint trigger in the map
+		if (this.scene instanceof WorldScene && this.doHintChecks) {
+			this.checkMapHint(this.scene.entities, pointer);
+		}
+
 		this.lineBroken = false;
 		this.onLineBreak();
+	}
+
+	checkMapHint(entities: Entity[], pointer: Phaser.Input.Pointer) {
+		let unclosedMidpoints: Entity[] = [];
+
+		for (const entity of entities) {
+			const AABB = entity.getBounds();
+
+			// PointerUp: Pointer was released directly on the map entity
+			if (AABB.contains(pointer.x, pointer.y)) {
+
+				// Debounce check for line breaks
+				if (this.lastHintReason === HintReason.LineBreak) {
+					this.lastHintReason = HintReason.None;
+					return true;
+				}
+
+				return this.emitMapHint(entity, HintReason.PointerUp);
+			}
+
+			// Encircled: Unclosed loop is centered inside the map entity
+			if (!this.pointCenter) continue;
+			const {x, y} = this.pointCenter;
+			if (AABB.contains(x, y)) {
+				unclosedMidpoints.push(entity);
+			}
+		}
+
+		// Emit Encircled triggers only after we rule out all PointerUp triggers
+		if (unclosedMidpoints.length > 0) {
+			unclosedMidpoints.sort((a, b) => (
+				Phaser.Math.Distance.Between(pointer.x, pointer.y, a.x, a.y) -
+				Phaser.Math.Distance.Between(pointer.x, pointer.y, b.x, b.y)
+			));
+			return this.emitMapHint(unclosedMidpoints[0], HintReason.Encircled);
+		}
+		return false;
+	}
+
+	emitMapHint(entity: Entity, reason: HintReason) {
+		this.lastHintReason = reason;
+		this.drawDemoLoop({x: entity.x, y: entity.y}, entity instanceof Pearl ? 160 : 100);
+		return this.emit("mapHint", new HintTrigger(entity, reason));
 	}
 
 	// Check if any of the loop's line segments touch any entity colliders
@@ -351,6 +418,10 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 						// Emit a signal about who's responsible for breaking the line
 						this.emit("break", entity);
+
+						if (this.scene instanceof WorldScene && this.doHintChecks) {
+							this.emitMapHint(entity, HintReason.LineBreak);
+						}
 
 						return;
 					}
@@ -471,6 +542,79 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 		});
 	}
 
+	/** Animates a clockwise loop around the center point, drawn with a ghostly cursor and trail */
+	drawDemoLoop(center: Phaser.Types.Math.Vector2Like, radius=100, duration=2000, fadeDuration=300) {
+		if (this.hintDemoActive) return;
+
+		const hintLineColor = 0x00d4ec;
+		const hintObjects = [this.hintGraphics, this.hintCursor];
+
+		const startAngle = Phaser.Math.FloatBetween(0, Math.PI * 2);
+		const endAngle = startAngle + (Math.PI * 2 * 1.1); // 10% overshoot
+
+		const updateDemo = (progress: number) => {
+			const pulse = 0.75 + 0.25 * Math.sin(3 * this.scene.time.now * 0.5);
+			const fadeIn = Phaser.Math.Clamp(progress * duration / fadeDuration, 0, 1);
+			const alpha = pulse * fadeIn;
+
+			// Draw hint trail
+			this.hintGraphics.clear();
+			this.hintGraphics.lineStyle(this.lineWidth, hintLineColor, alpha);
+			this.hintGraphics.beginPath();
+			this.hintGraphics.arc(
+				center.x,
+				center.y,
+				radius,
+				startAngle,
+				startAngle + (endAngle - startAngle) * progress,
+			);
+			this.hintGraphics.strokePath();
+
+			// Move hint cursor
+			const angle = startAngle + (endAngle - startAngle) * progress;
+			const x = center.x + radius * Math.cos(angle);
+			const y = center.y + radius * Math.sin(angle);
+			this.hintCursor.setPosition(x, y);
+			this.hintCursor.setAlpha(alpha);
+		};
+
+		const fadeOut = () => {
+			const startingAlpha = hintObjects.map(o => o.alpha);
+			this.scene.tweens.addCounter({
+				from: 1, to: 0,
+				duration: fadeDuration,
+				onUpdate: tween => hintObjects.forEach((obj, i) => {
+					const progress = tween.getValue() ?? 0;
+					obj.setAlpha(progress * startingAlpha[i]);
+				}),
+				onComplete: cleanup,
+				onStop: cleanup,
+			})
+		}
+
+		const cleanup = () => {
+			this.hintGraphics.clear();
+			this.hintCursor.setVisible(false);
+			this.hintCursor.setPosition(-999, -999);
+			hintObjects.forEach(o => o.setAlpha(1));
+			this.hintDemoActive = false;
+		}
+
+		this.hintCursor.setAlpha(1);
+		this.hintCursor.setVisible(true);
+		this.hintCursor.setScale(0.6);
+
+		this.hintDemo = this.scene.tweens.addCounter({
+			duration,
+			ease: "Quad.Out",
+			onUpdate: tween => updateDemo(tween.getValue() ?? 0),
+			onComplete: fadeOut,
+			onStop: cleanup,
+		});
+
+		this.hintDemoActive = true;
+	}
+
 	/** Fade out the drawing loop sound @param [duration] in milliseconds */
 	sfxFadeOut(duration = SFX_FADE_OUT_DURATION) {
 		this.sfxTween.duration = duration;
@@ -589,5 +733,22 @@ export class LoopDrawer extends Phaser.GameObjects.Container {
 
 	get cursorPosition(): Phaser.Types.Math.Vector2Like {
 		return { x: this.cursor.x, y: this.cursor.y };
+	}
+
+	/** Midpoint of the currently drawn line */
+	get pointCenter(): Phaser.Geom.Point | undefined {
+		if (this.points.length > 0) return Phaser.Geom.Point.GetCentroid(this.points);
+	}
+}
+
+export enum HintReason { None, LineBreak, PointerUp, Encircled }
+
+export class HintTrigger {
+	public entity: Entity;
+	public reason: HintReason;
+
+	constructor(entity: Entity, reason: HintReason) {
+		this.entity = entity;
+		this.reason = reason;
 	}
 }
